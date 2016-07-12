@@ -62,6 +62,10 @@ shinyServer(function(input, output, session){
       # Generate the PNG
       png(outfile, width=400, height=300)
       
+      gt <- "Male Population"
+      if (input$in_sub_population == 2)
+        gt <- "Female Population"
+      
       gg <- 
         ggplot(plot_data, aes(dose,  RR)) + 
         geom_line(data = plot_data) + 
@@ -76,7 +80,7 @@ shinyServer(function(input, output, session){
           plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
           legend.direction = "horizontal",
           legend.position = c(0.1, 1.05)) + 
-        ggtitle("Male Population") +
+        ggtitle(gt) +
         labs(fill = "") 
       p <- ggplotly(gg)
       dev.off()
