@@ -2,8 +2,8 @@ source("setup.R")
 
 pa_exposure <- c("LTPA", "TPA")
 # "Overall Population"
-sub_population <- c("Male Population",
-                    "Female Population")
+sub_population <- c("Male Population" = 1,
+                    "Female Population" = 2)
 
 shinyUI(fluidPage(
   list(tags$title(HTML('Meta-Analysis'))),
@@ -20,8 +20,8 @@ shinyUI(fluidPage(
   mainPanel(
     tabsetPanel(
       tabPanel("Analysis", value = 1,
-               plotlyOutput("plotAnalysis")
-               # ,               showOutput("plotAnalysis", "highcharts")
+               plotlyOutput("plot_overall_analysis"),
+               plotlyOutput("plot_subpopulation_analysis")
       ),
       
       id = "conditionedPanels"
