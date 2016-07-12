@@ -138,7 +138,7 @@ shinyServer(function(input, output, session){
     
     sub_population_data <- get_subpopulation_data()
     # Subset by columns
-    overall_data <- subset(overall_data, select = c(ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
+    sub_population_data <- subset(overall_data, select = c(ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
     
     # cat("draw nrow: ", nrow(overall_data), "\n")
     if(nrow(sub_population_data) <= 0){
