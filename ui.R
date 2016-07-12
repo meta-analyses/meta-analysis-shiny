@@ -1,8 +1,8 @@
 source("setup.R")
 
-pa_exposure <- c("LTPA", "PTA")
-sub_population <- c("Overall Population",
-                    "Male Population",
+pa_exposure <- c("LTPA", "TPA")
+# "Overall Population"
+sub_population <- c("Male Population",
                     "Female Population")
 
 shinyUI(fluidPage(
@@ -12,14 +12,16 @@ shinyUI(fluidPage(
   sidebarPanel(
     conditionalPanel(condition="input.conditionedPanels == 1",
                      selectInput(inputId = "in_outcome", label = "Select Outcome:", choices =  uoutcome$outcome),
-                     selectInput(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
+                     radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
+                     HTML("<hr>"),
                      radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE)
     )
   ),
   mainPanel(
     tabsetPanel(
       tabPanel("Analysis", value = 1,
-               showOutput("plotAnalysis", "highcharts")
+               plotlyOutput("plotAnalysis")
+               # ,               showOutput("plotAnalysis", "highcharts")
       ),
       
       id = "conditionedPanels"
