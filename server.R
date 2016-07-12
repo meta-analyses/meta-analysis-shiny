@@ -1,6 +1,9 @@
 shinyServer(function(input, output, session){
   
-  output$plot_overall_analysis <- renderPlotly({
+  get_overall_data <- reactive({
+    input$in_outcome 
+    input$in_PA_exposure
+    input$in_sub_population
     
     acmdata <- getDiseaseSpecificData(data, input$in_outcome, input$in_PA_exposure, overall1 = 1)
     # acmdata <- acmdata[!duplicated(acmdata$ref_number),]
@@ -11,6 +14,30 @@ shinyServer(function(input, output, session){
     acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
     
+    acmfdata
+
+  })
+  
+  get_subpopulation_data <- reactive({
+    input$in_outcome 
+    input$in_PA_exposure
+    input$in_sub_population
+    
+    acmdata <- getDiseaseSpecificData(data, input$in_outcome, input$in_PA_exposure, gender =  input$in_sub_population)
+    acmfdata <- formatData(acmdata, kcases = T)
+    # Remove all cases where both rr and dose are null
+    acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
+    # Remove when totalperson is not available for hr, and personsyears for rr/or
+    acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
+                                     (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    
+    acmfdata
+    
+  })
+  
+  output$plot_overall_analysis <- renderPlotly({
+    
+    acmfdata <- get_overall_data()
     if (nrow(acmfdata) > 0){
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = paste( input$in_PA_exposure, " LTPA - Female Population"), covMethed = T, returnval = T))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
@@ -44,14 +71,8 @@ shinyServer(function(input, output, session){
   
   output$plot_subpopulation_analysis <- renderPlotly({
     
-    acmdata <- getDiseaseSpecificData(data, input$in_outcome, input$in_PA_exposure, gender =  input$in_sub_population)
-    # acmdata <- acmdata[!duplicated(acmdata$ref_number),]
-    acmfdata <- formatData(acmdata, kcases = T)
-    # Remove all cases where both rr and dose are null
-    acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
-    # Remove when totalperson is not available for hr, and personsyears for rr/or
-    acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
-                                     (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    
+    acmfdata <- get_subpopulation_data()
     
     if (nrow(acmfdata) > 0){
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = paste( input$in_PA_exposure, " LTPA - Female Population"), covMethed = T, returnval = T))
@@ -88,6 +109,39 @@ shinyServer(function(input, output, session){
     }
   })
   
+  output$overall_datatable <- DT::renderDataTable({
+    
+    overall_data <- get_overall_data()
+    
+    # cat("draw nrow: ", nrow(overall_data), "\n")
+    if(nrow(overall_data) <= 0){
+      # Set the warning message that no lines have been selected by the user
+      output$overall_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
+      # Return an empty data.frame
+      return(data.frame(File=character()))
+    }
+    # Empty the warning message - as some lines have been selected by the user
+    output$overall_warning_message <- renderUI("")
+    DT::datatable(overall_data, options = list(pageLength = 10)) #%>%
+      #formatRound(columns = names(numeric_line_col_names), digits=2)
+  })
+  
+  output$subpopulation_datatable <- DT::renderDataTable({
+    
+    sub_population_data <- get_subpopulation_data()
+    
+    # cat("draw nrow: ", nrow(overall_data), "\n")
+    if(nrow(sub_population_data) <= 0){
+      # Set the warning message that no lines have been selected by the user
+      output$sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
+      # Return an empty data.frame
+      return(data.frame(File=character()))
+    }
+    # Empty the warning message - as some lines have been selected by the user
+    output$sub_warning_message <- renderUI("")
+    DT::datatable(sub_population_data, options = list(pageLength = 10)) #%>%
+    #formatRound(columns = names(numeric_line_col_names), digits=2)
+  })
   
   
   
