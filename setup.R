@@ -1,13 +1,8 @@
 pkgs <- c(
   "DT",
   "devtools",
-  "shinyBS",
   "shinyjs",
-  "dplyr",  
-  "plyr",  
   "ggplot2",
-  "stringr",
-  "Hmisc",
   "rCharts",
   "plotly"
 )
