@@ -112,6 +112,14 @@ shinyServer(function(input, output, session){
   output$overall_datatable <- DT::renderDataTable({
     
     overall_data <- get_overall_data()
+    # Select only a subset of columns
+#     [1] "id"             "ref_number"     "study"          "authors"       
+#     [5] "outcome"        "effect_measure" "type"           "follow_up"     
+#     [9] "sex_subgroups"  "overall"        "totalpersons"   "personyears"   
+#     [13] "dose"           "rr"             "cases"          "lci"           
+#     [17] "uci"            "logrr"          "se"
+    
+    overall_data <- subset(overall_data, select = c(ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
     
     # cat("draw nrow: ", nrow(overall_data), "\n")
     if(nrow(overall_data) <= 0){
@@ -129,6 +137,8 @@ shinyServer(function(input, output, session){
   output$subpopulation_datatable <- DT::renderDataTable({
     
     sub_population_data <- get_subpopulation_data()
+    # Subset by columns
+    overall_data <- subset(overall_data, select = c(ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
     
     # cat("draw nrow: ", nrow(overall_data), "\n")
     if(nrow(sub_population_data) <= 0){
