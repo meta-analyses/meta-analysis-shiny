@@ -8,7 +8,8 @@ pkgs <- c(
   "ggplot2",
   "stringr",
   "Hmisc",
-  "rCharts"
+  "rCharts",
+  "plotly"
 )
 # Which packages do we require?
 # lapply(pkgs, library, character.only = T)
