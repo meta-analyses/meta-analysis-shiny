@@ -10,18 +10,25 @@ shinyUI(fluidPage(
   useShinyjs(),
   width="100%", height="100%",
   sidebarPanel(
-    conditionalPanel(condition="input.conditionedPanels == 1",
-                     selectInput(inputId = "in_outcome", label = "Select Outcome:", choices =  uoutcome$outcome),
-                     radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
-                     HTML("<hr>"),
-                     radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE)
-    )
+    selectInput(inputId = "in_outcome", label = "Select Outcome:", choices =  uoutcome$outcome),
+    radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
+    HTML("<hr>"),
+    radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE)
+    
   ),
   mainPanel(
     tabsetPanel(
-      tabPanel("Analysis", value = 1,
+      tabPanel("Analysis",
                plotlyOutput("plot_overall_analysis"),
                plotlyOutput("plot_subpopulation_analysis")
+      ),
+      tabPanel("Overall Data",
+               uiOutput("overall_warning_message"),
+               DT::dataTableOutput("overall_datatable")
+      ),
+      tabPanel("Sub-population Data",
+               uiOutput("sub_warning_message"),
+               DT::dataTableOutput("subpopulation_datatable")
       ),
       
       id = "conditionedPanels"
