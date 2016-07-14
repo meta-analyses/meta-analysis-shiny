@@ -6,16 +6,14 @@ shinyServer(function(input, output, session){
     input$in_sub_population
     
     acmdata <- getDiseaseSpecificData(data, input$in_outcome, input$in_PA_exposure, overall1 = 1)
-    # acmdata <- acmdata[!duplicated(acmdata$ref_number),]
     acmfdata <- formatData(acmdata, kcases = T)
     # Remove all cases where both rr and dose are null
     acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
     # Remove when totalperson is not available for hr, and personsyears for rr/or
     acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
-    
     acmfdata
-
+    
   })
   
   get_subpopulation_data <- reactive({
@@ -30,7 +28,6 @@ shinyServer(function(input, output, session){
     # Remove when totalperson is not available for hr, and personsyears for rr/or
     acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
-    
     acmfdata
     
   })
@@ -47,15 +44,12 @@ shinyServer(function(input, output, session){
       # Generate the PNG
       png(outfile, width=400, height=300)
       
-      gg <- 
-        ggplot(plot_data, aes(dose,  RR)) + 
+      gg <- ggplot(plot_data, aes(dose,  RR)) + 
         geom_line(data = plot_data) + 
         geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-        #coord_cartesian(ylim = c(min(plot_data$lb) + 0.2, max(plot_data$ub) + 0.2), xlim = c(0, max(plot_data$dose) + 10)) +
         scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
-        xlab("\n Dose \n") +
-        ylab("\nRelative Risk\n") + 
-        
+        xlab("Dose\n") +
+        ylab("Relative Risk") + 
         theme(
           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
           plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
@@ -113,11 +107,11 @@ shinyServer(function(input, output, session){
     
     overall_data <- get_overall_data()
     # Select only a subset of columns
-#     [1] "id"             "ref_number"     "study"          "authors"       
-#     [5] "outcome"        "effect_measure" "type"           "follow_up"     
-#     [9] "sex_subgroups"  "overall"        "totalpersons"   "personyears"   
-#     [13] "dose"           "rr"             "cases"          "lci"           
-#     [17] "uci"            "logrr"          "se"
+    #     [1] "id"             "ref_number"     "study"          "authors"       
+    #     [5] "outcome"        "effect_measure" "type"           "follow_up"     
+    #     [9] "sex_subgroups"  "overall"        "totalpersons"   "personyears"   
+    #     [13] "dose"           "rr"             "cases"          "lci"           
+    #     [17] "uci"            "logrr"          "se"
     
     overall_data <- subset(overall_data, select = c(ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
     
@@ -131,7 +125,7 @@ shinyServer(function(input, output, session){
     # Empty the warning message - as some lines have been selected by the user
     output$overall_warning_message <- renderUI("")
     DT::datatable(overall_data, options = list(pageLength = 10)) #%>%
-      #formatRound(columns = names(numeric_line_col_names), digits=2)
+    #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
   
   output$subpopulation_datatable <- DT::renderDataTable({
