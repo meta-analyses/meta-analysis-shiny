@@ -1,5 +1,5 @@
 rm (list = ls())
-# Read the data
+# Read the data from the meta-analysis repo
 data <- read.csv("../meta-analysis/data/09.06_COMBINED DATASET REDUCED.csv", header = T, stringsAsFactors = F, skipNul = TRUE)
 
 data$tot_personyrs <- as.numeric(data$tot_personyrs)
@@ -10,7 +10,7 @@ data[(is.na(data$mean_followup)),]$mean_followup <-
 
 data$outcome <- trimws(data$outcome)
 
-# Read all the functions
+# Read the functions from the meta-analysis repo
 source("../meta-analysis/all-functions.R")
 
 # Identify unique outcomes
