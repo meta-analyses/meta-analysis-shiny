@@ -26,10 +26,10 @@ shinyUI(fluidPage(
                uiOutput("overall_warning_message"),
                DT::dataTableOutput("overall_datatable")
       ),
-#       tabPanel("Sub-population Data",
-#                uiOutput("sub_warning_message"),
-#                DT::dataTableOutput("subpopulation_datatable")
-#       ),
+      tabPanel("Sub-population Data",
+               uiOutput("sub_warning_message"),
+               DT::dataTableOutput("subpopulation_datatable")
+      ),
       
       id = "conditionedPanels"
     )
