@@ -134,7 +134,6 @@ shinyServer(function(input, output, session){
     # Subset by columns
     sub_population_data <- subset(sub_population_data, select = c(ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
     
-    # cat("draw nrow: ", nrow(overall_data), "\n")
     if(nrow(sub_population_data) <= 0){
       # Set the warning message that no lines have been selected by the user
       output$sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
