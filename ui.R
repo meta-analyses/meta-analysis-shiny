@@ -22,11 +22,11 @@ shinyUI(fluidPage(
                plotlyOutput("plot_overall_analysis"),
                plotlyOutput("plot_subpopulation_analysis")
       ),
-      tabPanel("Overall Data",
+      tabPanel("Outcome-specific Data",
                uiOutput("overall_warning_message"),
                DT::dataTableOutput("overall_datatable")
       ),
-      tabPanel("Sub-population Data",
+      tabPanel("Outcome-specific Sub-population Data",
                uiOutput("sub_warning_message"),
                DT::dataTableOutput("subpopulation_datatable")
       ),
