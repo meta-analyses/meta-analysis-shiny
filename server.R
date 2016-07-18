@@ -124,7 +124,7 @@ shinyServer(function(input, output, session){
     }
     # Empty the warning message - as some lines have been selected by the user
     output$overall_warning_message <- renderUI("")
-    DT::datatable(overall_data, options = list(pageLength = 10)) #%>%
+    DT::datatable(overall_data, options = list(pageLength = 20)) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
   
@@ -142,7 +142,7 @@ shinyServer(function(input, output, session){
     }
     # Empty the warning message - as some lines have been selected by the user
     output$sub_warning_message <- renderUI("")
-    DT::datatable(sub_population_data, options = list(pageLength = 10)) #%>%
+    DT::datatable(sub_population_data, options = list(pageLength = 20)) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
 })
