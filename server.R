@@ -39,6 +39,12 @@ shinyServer(function(input, output, session){
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = paste( input$in_PA_exposure, " LTPA - Female Population"), covMethed = T, returnval = T))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
+      fig_title <- input$in_outcome
+      if (fig_title != toupper(fig_title))
+        fig_title <- stringi::stri_trans_totitle(fig_title)
+      
+      fig_title <- paste0("Overall Population - ", fig_title)
+      
       outfile <- tempfile(fileext='.png')
       
       # Generate the PNG
@@ -55,7 +61,7 @@ shinyServer(function(input, output, session){
           plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
           legend.direction = "horizontal",
           legend.position = c(0.1, 1.05)) + 
-        ggtitle("Overall Population") +
+        ggtitle(fig_title)+#"Overall Population") +
         labs(fill = "") 
       p <- ggplotly(gg)
       dev.off()
@@ -72,14 +78,22 @@ shinyServer(function(input, output, session){
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = paste( input$in_PA_exposure, " LTPA - Female Population"), covMethed = T, returnval = T))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
+      gt <- "Male Population"
+      if (input$in_sub_population == 2)
+        gt <- "Female Population"
+      
+      fig_title <- input$in_outcome
+      if (fig_title != toupper(fig_title))
+        fig_title <- stringi::stri_trans_totitle(fig_title)
+      
+      fig_title <- paste0(gt, " - ", fig_title)
+      
       outfile <- tempfile(fileext='.png')
       
       # Generate the PNG
       png(outfile, width=400, height=300)
       
-      gt <- "Male Population"
-      if (input$in_sub_population == 2)
-        gt <- "Female Population"
+      
       
       gg <- 
         ggplot(plot_data, aes(dose,  RR)) + 
@@ -95,7 +109,7 @@ shinyServer(function(input, output, session){
           plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
           legend.direction = "horizontal",
           legend.position = c(0.1, 1.05)) + 
-        ggtitle(gt) +
+        ggtitle(fig_title) +
         labs(fill = "") 
       p <- ggplotly(gg)
       dev.off()
