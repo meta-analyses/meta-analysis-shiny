@@ -145,7 +145,4 @@ shinyServer(function(input, output, session){
     DT::datatable(sub_population_data, options = list(pageLength = 10)) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
-  
-  
-  
 })
