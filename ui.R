@@ -1,6 +1,19 @@
 source("setup.R")
 
+# domain
 pa_exposure <- c("LTPA", "TPA")
+
+# outcome_type
+# outcome_type <- c("All" = "all", 
+#                   "Mortality" = "mortality",
+#                   "Incidence" = "incidence")
+
+
+# outcome_type
+outcome_type <- c("all", 
+                  "mortality",
+                  "incidence")
+
 # "Overall Population"
 sub_population <- c("Male Population" = 1,
                     "Female Population" = 2)
@@ -12,6 +25,7 @@ shinyUI(fluidPage(
   sidebarPanel(
     selectInput(inputId = "in_outcome", label = "Select Outcome:", choices =  uoutcome$outcome),
     radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
+    radioButtons(inputId = "in_outcome_type", label = "Select Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
     radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE)
     
