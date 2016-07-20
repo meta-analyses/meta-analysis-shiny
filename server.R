@@ -72,23 +72,6 @@ shinyServer(function(input, output, session){
     
   })
   
-  get_plot_data <- reactive({
-    input$in_outcome_type
-    p <- NULL
-    if (input$in_outcome_type != "incidence"){
-      
-      gg <- ggplot(ggplot2movies::movies, aes(x=Action)) +
-        geom_histogram(aes(y = ..density..), binwidth=10)
-      p <- ggplotly(gg)
-    }else{
-      df <- data.frame()
-      gg <- ggplot(ggplot2movies::movies, aes(x=rating)) +
-        geom_histogram(aes(y = ..density..), binwidth=4)
-      p <- ggplotly(gg)
-    }
-    print(p)
-  })
-  
   output$plot_overall_analysis <- renderPlotly({
     
     acmfdata <- get_overall_data()
@@ -140,115 +123,9 @@ shinyServer(function(input, output, session){
       p
     }
     
-    
-    #     plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T))
-    #     if (nrow(plot_data) == 0 )
-    #       plot_data <- data.frame(dose = c(0),  RR = c(0), lb = c(0), ub = c(0))
-    #     #     else
-    #     #       colnames(plot_data) <- c("dose","RR", "lb", "ub")
-    #     fig_title <- input$in_outcome
-    #     if (fig_title != toupper(fig_title))
-    #       fig_title <- stringi::stri_trans_totitle(fig_title)
-    #     
-    #     fig_title <- paste0("Overall Population - ", fig_title)
-    #     
-    #     
-    #     
-    #     # if (nrow(plot_data) > 0 ){
-    #     
-    #     cat(nrow(plot_data), "\n")
-    #     # outfile <- file(fileext='.pdf')
-    #     # Generate the PNG
-    #     # png(filename = "with-data.png", width=400, height=300)
-    #     
-    #     gg <- ggplot(plot_data, aes(dose,  RR)) + 
-    #       geom_line(data = plot_data) + 
-    #       geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-    #       scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
-    #       xlab("Dose\n") +
-    #       ylab("Relative Risk") + 
-    #       theme(
-    #         plot.margin = unit(c(2, 1, 1, 1), "cm"), 
-    #         plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
-    #         legend.direction = "horizontal",
-    #         legend.position = c(0.1, 1.05)) + 
-    #       ggtitle(fig_title)+#"Overall Population") +
-    #       labs(fill = "") 
-    #     p <- ggplotly(gg)
-    #     # dev.off()
-    #     p
-    
-    
-    #     acmfdata <- get_overall_data()
-    #     cat("nrows: ", nrow(acmfdata), "\n")
-    #     if (nrow(acmfdata) > 0){
-    #       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T))
-    #       colnames(plot_data) <- c("dose","RR", "lb", "ub")
-    #       cat("INSIDE - nrows (plot_data) : ", nrow(plot_data),
-    #           "nrows (acmfdata): ", nrow(acmfdata), "\n")
-    #       fig_title <- input$in_outcome
-    #       if (fig_title != toupper(fig_title))
-    #         fig_title <- stringi::stri_trans_totitle(fig_title)
-    #       
-    #       fig_title <- paste0("Overall Population - ", fig_title)
-    #       
-    #       outfile <- tempfile(fileext='.png')
-    #       
-    #       # Generate the PNG
-    #       png(outfile, width=400, height=300)
-    #       
-    #       gg <- ggplot(plot_data, aes(dose,  RR)) + 
-    #         geom_line(data = plot_data) + 
-    #         geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-    #         scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
-    #         xlab("Dose\n") +
-    #         ylab("Relative Risk") + 
-    #         theme(
-    #           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
-    #           plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
-    #           legend.direction = "horizontal",
-    #           legend.position = c(0.1, 1.05)) + 
-    #         ggtitle(fig_title)+#"Overall Population") +
-    #         labs(fill = "") 
-    #       p <- ggplotly(gg)
-    #       dev.off()
-    #       p
-    #     }else{
-    
-    # if (!is.null(input$in_outcome_type)){
-    
-    
-    
-    #       df <- data.frame()
-    #       
-    #       gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
-    #         ggtitle("NO DATA")
-    #       
-    #       #       
-    #       p <- ggplotly(gg)
-    #       
-    #       p
-    
-    #       outfile <- tempfile(fileext='.png')
-    #       
-    #       # Generate the PNG
-    #       png(outfile, width=400, height=300)
-    #       
-    #       df <- data.frame()
-    #       gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100)
-    #       
-    #       p <- ggplotly(gg)
-    #       
-    #       dev.off()
-    #       p
-    # HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)")
-    # }
-    
-    
   })
   
   output$plot_subpopulation_analysis <- renderPlotly({
-    
     
     acmfdata <- get_subpopulation_data()
     
@@ -277,7 +154,6 @@ shinyServer(function(input, output, session){
         ggplot(plot_data, aes(dose,  RR)) + 
         geom_line(data = plot_data) + 
         geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-        #coord_cartesian(ylim = c(min(plot_data$lb) + 0.2, max(plot_data$ub) + 0.2), xlim = c(0, max(plot_data$dose) + 10)) +
         scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
         xlab("\n Dose \n") +
         ylab("\nRelative Risk\n") + 
