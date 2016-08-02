@@ -10,9 +10,9 @@ pa_exposure <- c("LTPA", "TPA")
 
 
 # outcome_type
-outcome_type <- c("all", 
-                  "mortality",
-                  "incidence")
+outcome_type <- c("all",
+                  "incidence",
+                  "mortality")
 
 # "Overall Population"
 sub_population <- c("Male Population" = 1,
@@ -33,8 +33,10 @@ shinyUI(fluidPage(
   mainPanel(
     tabsetPanel(
       tabPanel("Analysis",
-               plotlyOutput("plot_overall_analysis"),
-               plotlyOutput("plot_subpopulation_analysis")
+               plotOutput('plot_overall_analysis'),
+               plotOutput('plot_subpopulation_analysis')
+#                plotlyOutput("plot_overall_analysis"),
+#                plotlyOutput("plot_subpopulation_analysis")
       ),
       tabPanel("Outcome-specific Data",
                uiOutput("overall_warning_message"),
