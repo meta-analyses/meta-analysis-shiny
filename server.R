@@ -72,7 +72,7 @@ shinyServer(function(input, output, session){
     
   })
   
-  output$plot_overall_analysis <- renderPlotly({
+  output$plot_overall_analysis <- renderPlot({
     
     acmfdata <- get_overall_data()
     
@@ -86,10 +86,10 @@ shinyServer(function(input, output, session){
       
       fig_title <- paste0("Overall Population - ", fig_title)
       
-      outfile <- tempfile(fileext='.png')
-      
-      # Generate the PNG
-      png(outfile, width=400, height=300)
+#       outfile <- tempfile(fileext='.png')
+#       
+#       # Generate the PNG
+#       png(outfile, width=400, height=300)
       
       gg <- 
         ggplot(plot_data, aes(dose,  RR)) + 
@@ -107,9 +107,11 @@ shinyServer(function(input, output, session){
           legend.position = c(0.1, 1.05)) + 
         ggtitle(fig_title) +
         labs(fill = "") 
-      p <- ggplotly(gg)
-      dev.off()
-      p
+      
+      print(gg)
+#       p <- ggplotly(gg)
+#       dev.off()
+#       p
     }else{
       
       df <- data.frame()
@@ -117,15 +119,16 @@ shinyServer(function(input, output, session){
       gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
         ggtitle("NO DATA")
       
-      #       
-      p <- ggplotly(gg)
-      
-      p
+      # 
+      print(gg)
+#       p <- ggplotly(gg)
+#       
+#       p
     }
     
-  })
+  })#, height=700)
   
-  output$plot_subpopulation_analysis <- renderPlotly({
+  output$plot_subpopulation_analysis <- renderPlot({
     
     acmfdata <- get_subpopulation_data()
     
@@ -143,10 +146,10 @@ shinyServer(function(input, output, session){
       
       fig_title <- paste0(gt, " - ", fig_title)
       
-      outfile <- tempfile(fileext='.png')
-      
-      # Generate the PNG
-      png(outfile, width=400, height=300)
+#       outfile <- tempfile(fileext='.png')
+#       
+#       # Generate the PNG
+#       png(outfile, width=400, height=300)
       
       
       
@@ -165,9 +168,10 @@ shinyServer(function(input, output, session){
           legend.position = c(0.1, 1.05)) + 
         ggtitle(fig_title) +
         labs(fill = "") 
-      p <- ggplotly(gg)
-      dev.off()
-      p
+      print(gg)
+#       p <- ggplotly(gg)
+#       dev.off()
+#       p
     }else{
       
       df <- data.frame()
@@ -175,12 +179,14 @@ shinyServer(function(input, output, session){
       gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
         ggtitle("NO DATA")
       
-      #       
-      p <- ggplotly(gg)
+      print(gg)
       
-      p
+      #       
+#       p <- ggplotly(gg)
+#       
+#       p
     }
-  })
+  })#, height=700)
   
   output$overall_datatable <- DT::renderDataTable({
     
