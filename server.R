@@ -60,15 +60,15 @@ shinyServer(function(input, output, session){
       }
     }
     
-    if (length(index) > 0){
-      if ((1 %in% index) && length(index) != 3){
-        index <- index[index != 1]
-      }
-      if (length(index) == 3)
-        updateRadioButtons(session, "in_outcome_type", choices = outcome_type[index], selected = input$in_outcome_type)
-      else
-        updateRadioButtons(session, "in_outcome_type", choices = outcome_type[index])
-    }
+#     if (length(index) > 0){
+#       if ((1 %in% index) && length(index) != 3){
+#         index <- index[index != 1]
+#       }
+#       if (length(index) == 3)
+#         updateRadioButtons(session, "in_outcome_type", choices = outcome_type[index], selected = input$in_outcome_type)
+#       else
+#         updateRadioButtons(session, "in_outcome_type", choices = outcome_type[index])
+#     }
     
   })
   
