@@ -96,7 +96,7 @@ shinyServer(function(input, output, session){
         geom_line(data = plot_data) + 
         geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
         #coord_cartesian(ylim = c(min(plot_data$lb) + 0.2, max(plot_data$ub) + 0.2), xlim = c(0, max(plot_data$dose) + 10)) +
-        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
+        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0), trans = "log") + 
         xlab("\n Dose \n") +
         ylab("\nRelative Risk\n") + 
         
@@ -154,7 +154,7 @@ shinyServer(function(input, output, session){
         ggplot(plot_data, aes(dose,  RR)) + 
         geom_line(data = plot_data) + 
         geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
+        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0), trans = "log") + 
         xlab("\n Dose \n") +
         ylab("\nRelative Risk\n") + 
         
