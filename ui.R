@@ -27,7 +27,8 @@ shinyUI(fluidPage(
     radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
     radioButtons(inputId = "in_outcome_type", label = "Select Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
-    radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE)
+    radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE),
+    sliderInput(inputId = "in_quantile", label = "Quantiles", min = 0, max = 1, value = c(0.25, 0.75), step = 0.05)
     
   ),
   mainPanel(
