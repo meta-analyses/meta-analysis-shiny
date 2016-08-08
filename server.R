@@ -77,7 +77,7 @@ shinyServer(function(input, output, session){
     acmfdata <- get_overall_data()
     
     if (nrow(acmfdata) > 0){
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_quantile[1], maxQuantile = input$in_quantile[2]))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
       fig_title <- input$in_outcome
@@ -133,7 +133,7 @@ shinyServer(function(input, output, session){
     acmfdata <- get_subpopulation_data()
     
     if (nrow(acmfdata) > 0){
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_quantile[1], maxQuantile = input$in_quantile[2]))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
       gt <- "Male Population"
