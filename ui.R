@@ -28,7 +28,8 @@ shinyUI(fluidPage(
     radioButtons(inputId = "in_outcome_type", label = "Select Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
     radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE),
-    sliderInput(inputId = "in_main_quantile", label = "Main outocme quantiles", min = 0, max = 1, value = c(0.25, 0.75), step = 0.05),
+    HTML("<hr>"),
+    sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0, max = 1, value = c(0.25, 0.75), step = 0.05),
     HTML("<hr>"),
     sliderInput(inputId = "in_sub_quantile", label = "Sub-population quantiles", min = 0, max = 1, value = c(0.25, 0.75), step = 0.05)
     
