@@ -60,133 +60,189 @@ shinyServer(function(input, output, session){
       }
     }
     
-#     if (length(index) > 0){
-#       if ((1 %in% index) && length(index) != 3){
-#         index <- index[index != 1]
-#       }
-#       if (length(index) == 3)
-#         updateRadioButtons(session, "in_outcome_type", choices = outcome_type[index], selected = input$in_outcome_type)
-#       else
-#         updateRadioButtons(session, "in_outcome_type", choices = outcome_type[index])
-#     }
+    #     if (length(index) > 0){
+    #       if ((1 %in% index) && length(index) != 3){
+    #         index <- index[index != 1]
+    #       }
+    #       if (length(index) == 3)
+    #         updateRadioButtons(session, "in_outcome_type", choices = outcome_type[index], selected = input$in_outcome_type)
+    #       else
+    #         updateRadioButtons(session, "in_outcome_type", choices = outcome_type[index])
+    #     }
     
   })
   
-  output$plot_overall_analysis <- renderPlot({
+  output$plot_overall_analysis <- renderChart({
     
     acmfdata <- get_overall_data()
     
     if (nrow(acmfdata) > 0){
+      # plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
+      # colnames(plot_data) <- c("dose","RR", "lb", "ub")
+      # 
+      # fig_title <- input$in_outcome
+      # if (fig_title != toupper(fig_title))
+      #   fig_title <- stringi::stri_trans_totitle(fig_title)
+      # 
+      # fig_title <- paste0("Overall Population - ", fig_title)
+      # gg <- 
+      #   ggplot(plot_data, aes(dose,  RR)) + 
+      #   geom_line(data = plot_data) + 
+      #   geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
+      #   #coord_cartesian(ylim = c(min(plot_data$lb) + 0.2, max(plot_data$ub) + 0.2), xlim = c(0, max(plot_data$dose) + 10)) +
+      #   scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0), trans = "log") + 
+      #   xlab("\n Dose \n") +
+      #   ylab("\nRelative Risk\n") + 
+      #   
+      #   theme(
+      #     plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+      #     plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
+      #     legend.direction = "horizontal",
+      #     legend.position = c(0.1, 1.05)) + 
+      #   ggtitle(fig_title) +
+      #   labs(fill = "") 
+      # 
+      # print(gg)
+      #       p <- ggplotly(gg)
+      #       dev.off()
+      #       p
+      
+      
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
-      fig_title <- input$in_outcome
-      if (fig_title != toupper(fig_title))
-        fig_title <- stringi::stri_trans_totitle(fig_title)
+      h1 <- Highcharts$new()
+      h1$series(
+        data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
+        zIndex = 1,
+        name = "Relative Risk",
+        type = "line"
+      )
+      h1$series(
+        data = toJSONArray2(plot_data[,c('dose', 'lb', 'ub')], names = F, json = F),
+        type = 'arearange',
+        fillOpacity = 0.3,
+        lineWidth = 0,
+        color = 'grey',
+        zIndex = 0,
+        name = "Confidence Interval"
+      )
       
-      fig_title <- paste0("Overall Population - ", fig_title)
-      
-#       outfile <- tempfile(fileext='.png')
-#       
-#       # Generate the PNG
-#       png(outfile, width=400, height=300)
-      
-      gg <- 
-        ggplot(plot_data, aes(dose,  RR)) + 
-        geom_line(data = plot_data) + 
-        geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-        #coord_cartesian(ylim = c(min(plot_data$lb) + 0.2, max(plot_data$ub) + 0.2), xlim = c(0, max(plot_data$dose) + 10)) +
-        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0), trans = "log") + 
-        xlab("\n Dose \n") +
-        ylab("\nRelative Risk\n") + 
-        
-        theme(
-          plot.margin = unit(c(2, 1, 1, 1), "cm"), 
-          plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
-          legend.direction = "horizontal",
-          legend.position = c(0.1, 1.05)) + 
-        ggtitle(fig_title) +
-        labs(fill = "") 
-      
-      print(gg)
-#       p <- ggplotly(gg)
-#       dev.off()
-#       p
+      h1$tooltip(formatter = "#! function() {return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0; } !#") #  
+      h1$set(dom = "plot_overall_analysis")
+      h1$exporting(enabled = T)
+      return (h1)
     }else{
       
-      df <- data.frame()
+      return(NULL)
       
-      gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
-        ggtitle("NO DATA")
-      
+      # df <- data.frame()
       # 
-      print(gg)
-#       p <- ggplotly(gg)
-#       
-#       p
+      # gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
+      #   ggtitle("NO DATA")
+      # 
+      # # 
+      # print(gg)
+      # #       p <- ggplotly(gg)
+      # #       
+      # #       p
     }
     
   })#, height=700)
   
-  output$plot_subpopulation_analysis <- renderPlot({
+  output$plot_subpopulation_analysis <- renderChart({
     
+    h <- Highcharts$new()
     acmfdata <- get_subpopulation_data()
     
     if (nrow(acmfdata) > 0){
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
-      gt <- "Male Population"
-      if (input$in_sub_population == 2)
-        gt <- "Female Population"
+      h1 <- Highcharts$new()
+      h1$series(
+        data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
+        zIndex = 1,
+        name = "Relative Risk",
+        type = "line"
+      )
+      h1$series(
+        data = toJSONArray2(plot_data[,c('dose', 'lb', 'ub')], names = F, json = F),
+        type = 'arearange',
+        fillOpacity = 0.3,
+        lineWidth = 0,
+        color = 'grey',
+        zIndex = 0,
+        name = "Confidence Interval"
+      )
       
-      fig_title <- input$in_outcome
-      if (fig_title != toupper(fig_title))
-        fig_title <- stringi::stri_trans_totitle(fig_title)
-      
-      fig_title <- paste0(gt, " - ", fig_title)
-      
-#       outfile <- tempfile(fileext='.png')
+      h1$tooltip(formatter = "#! function() {return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0; } !#") #  
+      h1$set(dom = "plot_subpopulation_analysis")
+      h1$exporting(enabled = T)
+      return (h1)
+    }else
+      return(NULL)
+  })
+  
+#   output$plot_subpopulation_analysis <- renderPlot({
+#     
+#     acmfdata <- get_subpopulation_data()
+#     
+#     if (nrow(acmfdata) > 0){
+#       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
+#       colnames(plot_data) <- c("dose","RR", "lb", "ub")
 #       
-#       # Generate the PNG
-#       png(outfile, width=400, height=300)
-      
-      
-      
-      gg <- 
-        ggplot(plot_data, aes(dose,  RR)) + 
-        geom_line(data = plot_data) + 
-        geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0), trans = "log") + 
-        xlab("\n Dose \n") +
-        ylab("\nRelative Risk\n") + 
-        
-        theme(
-          plot.margin = unit(c(2, 1, 1, 1), "cm"), 
-          plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
-          legend.direction = "horizontal",
-          legend.position = c(0.1, 1.05)) + 
-        ggtitle(fig_title) +
-        labs(fill = "") 
-      print(gg)
-#       p <- ggplotly(gg)
-#       dev.off()
-#       p
-    }else{
-      
-      df <- data.frame()
-      
-      gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
-        ggtitle("NO DATA")
-      
-      print(gg)
-      
-      #       
-#       p <- ggplotly(gg)
+#       gt <- "Male Population"
+#       if (input$in_sub_population == 2)
+#         gt <- "Female Population"
 #       
-#       p
-    }
-  })#, height=700)
+#       fig_title <- input$in_outcome
+#       if (fig_title != toupper(fig_title))
+#         fig_title <- stringi::stri_trans_totitle(fig_title)
+#       
+#       fig_title <- paste0(gt, " - ", fig_title)
+#       
+#       #       outfile <- tempfile(fileext='.png')
+#       #       
+#       #       # Generate the PNG
+#       #       png(outfile, width=400, height=300)
+#       
+#       
+#       
+#       gg <- 
+#         ggplot(plot_data, aes(dose,  RR)) + 
+#         geom_line(data = plot_data) + 
+#         geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
+#         scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0), trans = "log") + 
+#         xlab("\n Dose \n") +
+#         ylab("\nRelative Risk\n") + 
+#         
+#         theme(
+#           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+#           plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
+#           legend.direction = "horizontal",
+#           legend.position = c(0.1, 1.05)) + 
+#         ggtitle(fig_title) +
+#         labs(fill = "") 
+#       print(gg)
+#       #       p <- ggplotly(gg)
+#       #       dev.off()
+#       #       p
+#     }else{
+#       
+#       df <- data.frame()
+#       
+#       gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
+#         ggtitle("NO DATA")
+#       
+#       print(gg)
+#       
+#       #       
+#       #       p <- ggplotly(gg)
+#       #       
+#       #       p
+#     }
+#   })#, height=700)
   
   output$overall_datatable <- DT::renderDataTable({
     
