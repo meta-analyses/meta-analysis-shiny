@@ -38,10 +38,8 @@ shinyUI(fluidPage(
   mainPanel(
     tabsetPanel(
       tabPanel("Analysis",
-               plotOutput('plot_overall_analysis'),
-               plotOutput('plot_subpopulation_analysis')
-#                plotlyOutput("plot_overall_analysis"),
-#                plotlyOutput("plot_subpopulation_analysis")
+               showOutput('plot_overall_analysis', "highcharts"),
+               showOutput("plot_subpopulation_analysis", "highcharts")
       ),
       tabPanel("Outcome-specific Data",
                uiOutput("overall_warning_message"),
