@@ -80,11 +80,6 @@ shinyServer(function(input, output, session){
       # plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       # colnames(plot_data) <- c("dose","RR", "lb", "ub")
       # 
-      # fig_title <- input$in_outcome
-      # if (fig_title != toupper(fig_title))
-      #   fig_title <- stringi::stri_trans_totitle(fig_title)
-      # 
-      # fig_title <- paste0("Overall Population - ", fig_title)
       # gg <- 
       #   ggplot(plot_data, aes(dose,  RR)) + 
       #   geom_line(data = plot_data) + 
@@ -127,6 +122,14 @@ shinyServer(function(input, output, session){
         zIndex = 0,
         name = "Confidence Interval"
       )
+      
+      fig_title <- input$in_outcome
+      if (fig_title != toupper(fig_title))
+        fig_title <- stringi::stri_trans_totitle(fig_title)
+      
+      fig_title <- paste0("Overall Population - ", fig_title)
+      
+      h1$title(text= fig_title)
       
       h1$tooltip(formatter = "#! function() {return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0; } !#") #  
       h1$set(dom = "plot_overall_analysis")
@@ -176,6 +179,19 @@ shinyServer(function(input, output, session){
         name = "Confidence Interval"
       )
       
+      
+      gt <- "Male Population"
+      if (input$in_sub_population == 2)
+        gt <- "Female Population"
+      
+      fig_title <- input$in_outcome
+      if (fig_title != toupper(fig_title))
+        fig_title <- stringi::stri_trans_totitle(fig_title)
+      
+      fig_title <- paste0(gt, " - ", fig_title)
+      
+      h1$title(text= fig_title)
+      
       h1$tooltip(formatter = "#! function() {return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0; } !#") #  
       h1$set(dom = "plot_subpopulation_analysis")
       h1$exporting(enabled = T)
@@ -184,65 +200,65 @@ shinyServer(function(input, output, session){
       return(NULL)
   })
   
-#   output$plot_subpopulation_analysis <- renderPlot({
-#     
-#     acmfdata <- get_subpopulation_data()
-#     
-#     if (nrow(acmfdata) > 0){
-#       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
-#       colnames(plot_data) <- c("dose","RR", "lb", "ub")
-#       
-#       gt <- "Male Population"
-#       if (input$in_sub_population == 2)
-#         gt <- "Female Population"
-#       
-#       fig_title <- input$in_outcome
-#       if (fig_title != toupper(fig_title))
-#         fig_title <- stringi::stri_trans_totitle(fig_title)
-#       
-#       fig_title <- paste0(gt, " - ", fig_title)
-#       
-#       #       outfile <- tempfile(fileext='.png')
-#       #       
-#       #       # Generate the PNG
-#       #       png(outfile, width=400, height=300)
-#       
-#       
-#       
-#       gg <- 
-#         ggplot(plot_data, aes(dose,  RR)) + 
-#         geom_line(data = plot_data) + 
-#         geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-#         scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0), trans = "log") + 
-#         xlab("\n Dose \n") +
-#         ylab("\nRelative Risk\n") + 
-#         
-#         theme(
-#           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
-#           plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
-#           legend.direction = "horizontal",
-#           legend.position = c(0.1, 1.05)) + 
-#         ggtitle(fig_title) +
-#         labs(fill = "") 
-#       print(gg)
-#       #       p <- ggplotly(gg)
-#       #       dev.off()
-#       #       p
-#     }else{
-#       
-#       df <- data.frame()
-#       
-#       gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
-#         ggtitle("NO DATA")
-#       
-#       print(gg)
-#       
-#       #       
-#       #       p <- ggplotly(gg)
-#       #       
-#       #       p
-#     }
-#   })#, height=700)
+  #   output$plot_subpopulation_analysis <- renderPlot({
+  #     
+  #     acmfdata <- get_subpopulation_data()
+  #     
+  #     if (nrow(acmfdata) > 0){
+  #       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
+  #       colnames(plot_data) <- c("dose","RR", "lb", "ub")
+  #       
+  #       gt <- "Male Population"
+  #       if (input$in_sub_population == 2)
+  #         gt <- "Female Population"
+  #       
+  #       fig_title <- input$in_outcome
+  #       if (fig_title != toupper(fig_title))
+  #         fig_title <- stringi::stri_trans_totitle(fig_title)
+  #       
+  #       fig_title <- paste0(gt, " - ", fig_title)
+  #       
+  #       #       outfile <- tempfile(fileext='.png')
+  #       #       
+  #       #       # Generate the PNG
+  #       #       png(outfile, width=400, height=300)
+  #       
+  #       
+  #       
+  #       gg <- 
+  #         ggplot(plot_data, aes(dose,  RR)) + 
+  #         geom_line(data = plot_data) + 
+  #         geom_ribbon(data = plot_data, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
+  #         scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0), trans = "log") + 
+  #         xlab("\n Dose \n") +
+  #         ylab("\nRelative Risk\n") + 
+  #         
+  #         theme(
+  #           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+  #           plot.title = element_text(size = 15, face = "bold", colour = "black", vjust = 7), 
+  #           legend.direction = "horizontal",
+  #           legend.position = c(0.1, 1.05)) + 
+  #         ggtitle(fig_title) +
+  #         labs(fill = "") 
+  #       print(gg)
+  #       #       p <- ggplotly(gg)
+  #       #       dev.off()
+  #       #       p
+  #     }else{
+  #       
+  #       df <- data.frame()
+  #       
+  #       gg <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) + 
+  #         ggtitle("NO DATA")
+  #       
+  #       print(gg)
+  #       
+  #       #       
+  #       #       p <- ggplotly(gg)
+  #       #       
+  #       #       p
+  #     }
+  #   })#, height=700)
   
   output$overall_datatable <- DT::renderDataTable({
     
