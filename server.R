@@ -95,6 +95,8 @@ shinyServer(function(input, output, session){
       
       h1$title(text= fig_title)
       
+      h1$yAxis(min = 0, max = max(plot_data[,'ub']) + 0.1)
+      
       h1$tooltip(formatter = "#! function() {return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0; } !#") #  
       h1$set(dom = "plot_overall_analysis")
       h1$exporting(enabled = T)
@@ -141,6 +143,8 @@ shinyServer(function(input, output, session){
       fig_title <- paste0(gt, " - ", fig_title)
       
       h1$title(text= fig_title)
+      
+      h1$yAxis(min = 0, max = max(plot_data[,'ub']) + 0.1)
       
       h1$tooltip(formatter = "#! function() {return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0; } !#") #  
       h1$set(dom = "plot_subpopulation_analysis")
