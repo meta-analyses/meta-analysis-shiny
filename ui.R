@@ -4,12 +4,6 @@ source("setup.R")
 pa_exposure <- c("LTPA", "TPA")
 
 # outcome_type
-# outcome_type <- c("All" = "all", 
-#                   "Mortality" = "mortality",
-#                   "Incidence" = "incidence")
-
-
-# outcome_type
 outcome_type <- c("all",
                   "incidence",
                   "mortality")
