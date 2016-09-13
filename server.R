@@ -1,3 +1,5 @@
+lower_guideline_value <- NA
+upper_guideline_value <- NA
 shinyServer(function(input, output, session){
   
   get_overall_data <- reactive({
@@ -67,8 +69,69 @@ shinyServer(function(input, output, session){
     acmfdata <- get_overall_data()
     
     if (nrow(acmfdata) > 0){
+      
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
+      
+      
+      sum_tp <- sum(acmfdata$totalpersons * acmfdata$rr, na.rm = T) 
+      
+      acmfdata_ls <- acmfdata
+      
+      #Replace lower dose with 8.75
+      acmfdata_ls[acmfdata_ls$dose < 8.75,]$dose <- 8.75
+      
+      val <- subset(plot_data, round(dose, 1) <= (8.75 + 0.05) & round(dose, 1) >= (8.75 - 0.05))
+      if (nrow(val) > 0)
+        acmfdata_ls[acmfdata_ls$dose == 8.75,]$rr <- val$RR[1]
+      
+      # #Update relative risk from the lookup table
+      # for (i in 1:length(acmfdata_ls)){
+      #   dose_val <- acmfdata_ls$dose[i]
+      #   val <- subset(plot_data, round(dose, 1) <= (round(dose_val,1) + 0.5) & round(dose, 1) >= (round(dose_val,1) - 0.5))
+      #   if (nrow(val) >= 1){
+      #     # cat("replacing ", acmfdata_ls$rr[i], " with ", val$RR[1], "\n")
+      #     acmfdata_ls$rr[i] <- val$RR[1]
+      #   }
+      # }
+      
+      sum_ls_tp <- sum(acmfdata$totalpersons * acmfdata_ls$rr, na.rm = T)
+      
+      pert_ls <- ((sum_tp - sum_ls_tp) / sum_tp) * 100
+      
+      lower_guideline_value <<- pert_ls
+      
+      acmfdata_hs <- acmfdata
+      
+      #Replace lower dose with 8.75
+      acmfdata_hs[acmfdata_ls$dose < 17.5,]$dose <- 17.5
+      
+      val <- subset(plot_data, round(dose, 1) <= (17.5 + 0.05) & round(dose, 1) >= (17.5 - 0.05))
+      
+      if (nrow(val) > 0)
+        acmfdata_hs[acmfdata_hs$dose == 17.5,]$rr <- val$RR[1]
+      
+      
+      # only replace RR where dose is 17.5
+      
+      # #Update relative risk from the lookup table
+      # for (i in 1:length(acmfdata_hs)){
+      #   dose_val <- acmfdata_hs$dose[i]
+      #   val <- subset(plot_data, round(dose, 1) <= (round(dose_val,1) + 0.5) & round(dose, 1) >= (round(dose_val,1) - 0.5))
+      #   if (nrow(val) >= 1){
+      #     #cat("replacing ", acmfdata_hs$rr[i], " with ", val$RR[1], "\n")
+      #     acmfdata_hs$rr[i] <- val$RR[1]
+      #   }
+      # }
+      
+      sum_hs_tp <- sum(acmfdata$totalpersons * acmfdata_hs$rr, na.rm = T)
+      
+      pert_hs <- ((sum_tp - sum_hs_tp) / sum_tp) * 100
+      
+      upper_guideline_value <<- pert_hs
+      
+      cat(" pert_ls ", pert_ls, " pert_hs ", pert_hs, "\n")
+      
       
       h1 <- Highcharts$new()
       h1$series(
@@ -116,6 +179,7 @@ shinyServer(function(input, output, session){
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
+      
       h1 <- Highcharts$new()
       h1$series(
         data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
@@ -154,6 +218,28 @@ shinyServer(function(input, output, session){
       return (h1)
     }else
       return(NULL)
+  })
+  
+  
+  
+  output$lower_guideline <- renderUI({
+    input$in_outcome 
+    input$in_outcome_type
+    input$in_PA_exposure
+    input$in_sub_population
+    
+    
+    HTML("PIF (%) for meeting the lower WHO guideline (MMET >= 8.75 per week): ", round(lower_guideline_value, 2), "\n")
+  })
+  
+  output$upper_guideline <- renderUI({
+    input$in_outcome 
+    input$in_outcome_type
+    input$in_PA_exposure
+    input$in_sub_population
+    
+    
+    HTML("PIF (%) for meeting the upper WHO guideline (MMET >= 17.5 per week): ", round(upper_guideline_value, 2), "\n")
   })
   
   output$overall_datatable <- DT::renderDataTable({
