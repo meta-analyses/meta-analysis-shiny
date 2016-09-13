@@ -13,7 +13,7 @@ shinyServer(function(input, output, session){
                                       overall1 = 1)
     acmfdata <- data.frame()
     # if (nrow(acmdata) > 0){
-    acmfdata <- formatData(acmdata, kcases = T)
+    acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
     # Remove all cases where both rr and dose are null
     acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
     # Remove when totalperson is not available for hr, and personsyears for rr/or
@@ -33,7 +33,7 @@ shinyServer(function(input, output, session){
     acmdata <- getDiseaseSpecificData(data, input$in_outcome, input$in_PA_exposure, gender =  input$in_sub_population, out_type = input$in_outcome_type)
     
     acmfdata <- data.frame()
-    acmfdata <- formatData(acmdata, kcases = T)
+    acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
     # Remove all cases where both rr and dose are null
     acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
     # Remove when totalperson is not available for hr, and personsyears for rr/or
