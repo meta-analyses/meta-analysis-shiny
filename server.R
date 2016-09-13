@@ -85,16 +85,6 @@ shinyServer(function(input, output, session){
       if (nrow(val) > 0)
         acmfdata_ls[acmfdata_ls$dose == 8.75,]$rr <- val$RR[1]
       
-      # #Update relative risk from the lookup table
-      # for (i in 1:length(acmfdata_ls)){
-      #   dose_val <- acmfdata_ls$dose[i]
-      #   val <- subset(plot_data, round(dose, 1) <= (round(dose_val,1) + 0.5) & round(dose, 1) >= (round(dose_val,1) - 0.5))
-      #   if (nrow(val) >= 1){
-      #     # cat("replacing ", acmfdata_ls$rr[i], " with ", val$RR[1], "\n")
-      #     acmfdata_ls$rr[i] <- val$RR[1]
-      #   }
-      # }
-      
       sum_ls_tp <- sum(acmfdata$totalpersons * acmfdata_ls$rr, na.rm = T)
       
       pert_ls <- ((sum_tp - sum_ls_tp) / sum_tp) * 100
@@ -111,27 +101,11 @@ shinyServer(function(input, output, session){
       if (nrow(val) > 0)
         acmfdata_hs[acmfdata_hs$dose == 17.5,]$rr <- val$RR[1]
       
-      
-      # only replace RR where dose is 17.5
-      
-      # #Update relative risk from the lookup table
-      # for (i in 1:length(acmfdata_hs)){
-      #   dose_val <- acmfdata_hs$dose[i]
-      #   val <- subset(plot_data, round(dose, 1) <= (round(dose_val,1) + 0.5) & round(dose, 1) >= (round(dose_val,1) - 0.5))
-      #   if (nrow(val) >= 1){
-      #     #cat("replacing ", acmfdata_hs$rr[i], " with ", val$RR[1], "\n")
-      #     acmfdata_hs$rr[i] <- val$RR[1]
-      #   }
-      # }
-      
       sum_hs_tp <- sum(acmfdata$totalpersons * acmfdata_hs$rr, na.rm = T)
       
       pert_hs <- ((sum_tp - sum_hs_tp) / sum_tp) * 100
       
       upper_guideline_value <<- pert_hs
-      
-      cat(" pert_ls ", pert_ls, " pert_hs ", pert_hs, "\n")
-      
       
       h1 <- Highcharts$new()
       h1$series(
