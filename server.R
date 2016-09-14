@@ -174,9 +174,7 @@ shinyServer(function(input, output, session){
       
       # Update RR from the lookup table
       for (i in 1:nrow(acmfdata)){
-
         val <- subset(plot_data, round(dose, 1) <= (acmfdata$dose[i] + 0.05) & round(dose, 1) >= (acmfdata$dose[i] - 0.05))
-        cat(acmfdata$dose[i], " nrow ", nrow(val), "\n")
         if (nrow(val) > 0){
           acmfdata$rr[i] <- val$RR[1]
           if (removeNA){
@@ -247,7 +245,7 @@ shinyServer(function(input, output, session){
       
       pert_ls_upper <- ((sum_tp - sum_ls_upper_tp) / sum_tp) * 100
       
-      lower_guideline_value <<- paste(round(pert_ls, 2) , "(", round(pert_ls_lower, 2), " - ",  round(pert_ls_upper, 2), ")" )
+      lower_guideline_value <<- paste(round(pert_ls, 2) , "(95% CI: ", round(pert_ls_lower, 2), " - ",  round(pert_ls_upper, 2), ")" )
       
       acmfdata_hs <- acmfdata
       
@@ -300,7 +298,7 @@ shinyServer(function(input, output, session){
       
       pert_hs_upper <- ((sum_tp - sum_hs_upper_tp) / sum_tp) * 100
       
-      upper_guideline_value <<- paste(round(pert_hs, 2) , "(", round(pert_hs_lower, 2), " - ",  round(pert_hs_upper, 2), ")" )
+      upper_guideline_value <<- paste(round(pert_hs, 2) , "(95% CI: ", round(pert_hs_lower, 2), "-",  round(pert_hs_upper, 2), ")" )
     }
     
     
