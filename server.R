@@ -80,6 +80,7 @@ shinyServer(function(input, output, session){
         name = "Relative Risk",
         type = "line"
       )
+      
       h1$series(
         data = toJSONArray2(plot_data[,c('dose', 'lb', 'ub')], names = F, json = F),
         type = 'arearange',
@@ -89,6 +90,14 @@ shinyServer(function(input, output, session){
         zIndex = 0,
         name = "Confidence Interval"
       )
+      
+      h1$tooltip(formatter = "#! function() {
+                  if (this.series.name == 'Relative Risk'){
+                      return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0;
+                  }else{
+                      return 'CI: <b>' + Math.round(this.point.low * 100.0) / 100.0 + ' - ' + Math.round(this.point.high * 100.0) / 100.0 ;
+                  }
+                 } !#")
       
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
@@ -101,7 +110,6 @@ shinyServer(function(input, output, session){
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']) + 0.1)
       h1$xAxis(title = list(text = 'Marginal MET Hours'), min = 0)
       
-      h1$tooltip(formatter = "#! function() {return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0; } !#") #  
       h1$set(dom = "plot_overall_analysis")
       h1$exporting(enabled = T)
       return (h1)
@@ -152,7 +160,14 @@ shinyServer(function(input, output, session){
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']) + 0.1)
       h1$xAxis(title = list(text = 'Marginal MET Hours'), min = 0)
       
-      h1$tooltip(formatter = "#! function() {return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0; } !#") #  
+      h1$tooltip(formatter = "#! function() {
+                  if (this.series.name == 'Relative Risk'){
+                    return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0;
+                  }else{
+                               return 'CI: <b>' + Math.round(this.point.low * 100.0) / 100.0 + ' - ' + Math.round(this.point.high * 100.0) / 100.0 ;
+                  }
+                } !#")
+      
       h1$set(dom = "plot_subpopulation_analysis")
       h1$exporting(enabled = T)
       return (h1)
@@ -199,7 +214,7 @@ shinyServer(function(input, output, session){
       local_var <- acmfdata_ls
       
       val <- subset(plot_data, round(dose, 1) <= (8.75 + 0.05) & round(dose, 1) >= (8.75 - 0.05))
-
+      
       if (nrow(val) > 0)
         acmfdata_ls[acmfdata_ls$dose == 8.75,]$rr <- val$RR[1]
       
