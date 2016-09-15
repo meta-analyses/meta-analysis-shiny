@@ -110,6 +110,9 @@ shinyServer(function(input, output, session){
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']) + 0.1)
       h1$xAxis(title = list(text = 'Marginal MET Hours'), min = 0)
       
+      h1$subtitle(text = HTML(paste("Number of observations: ",  length(unique(acmfdata$ref_number)) , " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), format = "f", big.mark = ",", drop0trailing = TRUE))), style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
+      
+      
       h1$set(dom = "plot_overall_analysis")
       h1$exporting(enabled = T)
       return (h1)
@@ -159,6 +162,8 @@ shinyServer(function(input, output, session){
       
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']) + 0.1)
       h1$xAxis(title = list(text = 'Marginal MET Hours'), min = 0)
+      
+      h1$subtitle(text = HTML(paste("Number of observations: ",  length(unique(acmfdata$ref_number)) , " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), format = "f", big.mark = ",", drop0trailing = TRUE))), style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
       
       h1$tooltip(formatter = "#! function() {
                   if (this.series.name == 'Relative Risk'){
