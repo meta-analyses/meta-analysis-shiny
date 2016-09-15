@@ -116,8 +116,28 @@ shinyServer(function(input, output, session){
       h1$set(dom = "plot_overall_analysis")
       h1$exporting(enabled = T)
       return (h1)
-    }else
-      return(NULL)
+    }else{
+      
+      h1 <- Highcharts$new()
+      
+      fig_title <- input$in_outcome
+      if (fig_title != toupper(fig_title))
+        fig_title <- stringi::stri_trans_totitle(fig_title)
+      
+      fig_title <- paste0("Overall Population - ", fig_title)
+      
+      h1$title(text= fig_title)
+      
+      
+      h1$yAxis(title = list(text = 'Relative Risk'), min = 0)
+      h1$xAxis(title = list(text = 'Marginal MET Hours'), min = 0)
+      
+      h1$subtitle(text = HTML("Sorry: There is no data to display"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
+      
+      h1$set(dom = "plot_overall_analysis")
+      h1$exporting(enabled = F)
+      return (h1)
+    }
     
   })
   
@@ -176,8 +196,32 @@ shinyServer(function(input, output, session){
       h1$set(dom = "plot_subpopulation_analysis")
       h1$exporting(enabled = T)
       return (h1)
-    }else
-      return(NULL)
+    }else{
+      
+      h1 <- Highcharts$new()
+      
+      gt <- "Male Population"
+      if (input$in_sub_population == 2)
+        gt <- "Female Population"
+      
+      fig_title <- input$in_outcome
+      if (fig_title != toupper(fig_title))
+        fig_title <- stringi::stri_trans_totitle(fig_title)
+      
+      fig_title <- paste0(gt, " - ", fig_title)
+      
+      h1$title(text= fig_title)
+      
+      
+      h1$yAxis(title = list(text = 'Relative Risk'), min = 0)
+      h1$xAxis(title = list(text = 'Marginal MET Hours'), min = 0)
+      
+      h1$subtitle(text = HTML("Sorry: There is no data to display"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
+      
+      h1$set(dom = "plot_subpopulation_analysis")
+      h1$exporting(enabled = F)
+      return (h1)
+    }
   })
   
   
