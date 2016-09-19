@@ -10,6 +10,12 @@ data[(is.na(data$mean_followup)),]$mean_followup <-
 
 data$outcome <- trimws(data$outcome)
 
+# Replace 'Heart failure' with 'heart failure'
+data[data$outcome == 'Heart failure',]$outcome <- 'heart failure'
+
+# Replace "Alzheimer's Disease" with "Alzheimer's disease"
+data[data$outcome == "Alzheimer's Disease",]$outcome <- "Alzheimer's disease"
+
 # Read the functions from the meta-analysis repo
 source("../meta-analysis/all-functions.R")
 
