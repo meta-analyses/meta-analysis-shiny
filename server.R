@@ -110,7 +110,10 @@ shinyServer(function(input, output, session){
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']) + 0.1)
       h1$xAxis(title = list(text = 'Marginal MET Hours'), min = 0)
       
-      h1$subtitle(text = HTML(paste("Number of observations: ",  length(unique(acmfdata$ref_number)) , " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), format = "f", big.mark = ",", drop0trailing = TRUE))), style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
+      h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$ref_number)) , 
+                                    " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
+                                                                      format = "f", big.mark = ",", drop0trailing = TRUE))), 
+                  style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
       
       
       h1$set(dom = "plot_overall_analysis")
@@ -147,7 +150,7 @@ shinyServer(function(input, output, session){
     acmfdata <- get_subpopulation_data()
     
     if (nrow(acmfdata) > 0){
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
+    plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
       
@@ -183,7 +186,7 @@ shinyServer(function(input, output, session){
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']) + 0.1)
       h1$xAxis(title = list(text = 'Marginal MET Hours'), min = 0)
       
-      h1$subtitle(text = HTML(paste("Number of observations: ",  length(unique(acmfdata$ref_number)) , " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), format = "f", big.mark = ",", drop0trailing = TRUE))), style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
+      h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$ref_number)) , " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), format = "f", big.mark = ",", drop0trailing = TRUE))), style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
       
       h1$tooltip(formatter = "#! function() {
                   if (this.series.name == 'Relative Risk'){
@@ -309,7 +312,7 @@ shinyServer(function(input, output, session){
       
       pert_ls_upper <- ((sum_tp - sum_ls_upper_tp) / sum_tp) * 100
       
-      lower_guideline_value <<- paste(round(pert_ls, 2) , "(95% CI: ", round(pert_ls_lower, 2), " - ",  round(pert_ls_upper, 2), ")" )
+      lower_guideline_value <<- paste0(round(pert_ls, 2) , "% (95% CI: ", round(pert_ls_lower, 2), " - ",  round(pert_ls_upper, 2), ")" )
       
       acmfdata_hs <- acmfdata
       
@@ -362,7 +365,7 @@ shinyServer(function(input, output, session){
       
       pert_hs_upper <- ((sum_tp - sum_hs_upper_tp) / sum_tp) * 100
       
-      upper_guideline_value <<- paste(round(pert_hs, 2) , "(95% CI: ", round(pert_hs_lower, 2), "-",  round(pert_hs_upper, 2), ")" )
+      upper_guideline_value <<- paste0(round(pert_hs, 2) , "% (95% CI: ", round(pert_hs_lower, 2), " - ",  round(pert_hs_upper, 2), ")" )
     }
     
     
@@ -370,12 +373,12 @@ shinyServer(function(input, output, session){
   
   output$lower_guideline <- renderUI({
     set_pif_values()
-    HTML("PIF (%) for meeting the lower WHO guideline (MMET >= 8.75 per week): ", lower_guideline_value, "\n")
+    HTML("PIF for meeting the lower WHO guideline (MMET >= 8.75 per week): ", lower_guideline_value, "\n")
   })
   
   output$upper_guideline <- renderUI({
     set_pif_values()
-    HTML("PIF (%) for meeting the upper WHO guideline (MMET >= 17.5 per week): ", upper_guideline_value , "\n")
+    HTML("PIF for meeting the upper WHO guideline (MMET >= 17.5 per week): ", upper_guideline_value , "\n")
   })
   
   output$overall_datatable <- DT::renderDataTable({
