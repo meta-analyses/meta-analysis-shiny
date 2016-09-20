@@ -393,7 +393,10 @@ shinyServer(function(input, output, session){
     #     [13] "dose"           "rr"             "cases"          "lci"           
     #     [17] "uci"            "logrr"          "se"
     
-    overall_data <- subset(overall_data, select = c(ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
+    overall_data <- subset(overall_data, select = c(id,ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
+    
+    # Convert id into factor and then back to numeric for an ordered id
+    overall_data$id <- as.numeric(as.factor(overall_data$id))
     
     if(nrow(overall_data) <= 0){
       # Set the warning message that no lines have been selected by the user
@@ -411,7 +414,10 @@ shinyServer(function(input, output, session){
     
     sub_population_data <- get_subpopulation_data()
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
+    sub_population_data <- subset(sub_population_data, select = c(id, ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
+    
+    # Convert id into factor and then back to numeric for an ordered id
+    sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
     
     if(nrow(sub_population_data) <= 0){
       # Set the warning message that no lines have been selected by the user
