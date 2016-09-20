@@ -322,6 +322,8 @@ shinyServer(function(input, output, session){
       local_var <- acmfdata_hs
       
       val <- subset(plot_data, round(dose, 1) <= (17.5 + 0.05) & round(dose, 1) >= (17.5 - 0.05))
+      if (nrow(val) == 0)
+        val <- subset(plot_data, round(dose, 1) <= (17.5 + 0.1) & round(dose, 1) >= (17.5 - 0.1))
       
       if (nrow(val) > 0){
         acmfdata_hs[acmfdata_hs$dose == 17.5,]$rr <- val$RR[1]
