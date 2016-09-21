@@ -21,6 +21,15 @@ shinyServer(function(input, output, session){
     # Remove when totalperson is not available for hr, and personsyears for rr/or
     acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    
+    # cat(input$in_outcome, " - ", input$in_PA_exposure, " - ", input$in_sub_population, "\n")
+    if (input$in_outcome == 'stroke' && input$in_PA_exposure == 'TPA'){
+      # Remove study # 70 from stroke
+      acmfdata <- subset(acmfdata, !ref_number %in% c(70))
+    }else if(input$in_outcome == 'CHD' && input$in_PA_exposure == 'TPA'){
+      # Remove study # 38 from stroke
+      acmfdata <- subset(acmfdata, !ref_number %in% c(38))
+    }
     acmfdata
     # }else
     # data.frame()
@@ -41,6 +50,14 @@ shinyServer(function(input, output, session){
     # Remove when totalperson is not available for hr, and personsyears for rr/or
     acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    
+    if (input$in_outcome == 'stroke' && input$in_PA_exposure == 'TPA'){
+      # Remove study # 70 from stroke
+      acmfdata <- subset(acmfdata, !ref_number %in% c(70))
+    }else if(input$in_outcome == 'CHD' && input$in_PA_exposure == 'TPA'){
+      # Remove study # 38 from stroke
+      acmfdata <- subset(acmfdata, !ref_number %in% c(38))
+    }
     acmfdata
     
   })
