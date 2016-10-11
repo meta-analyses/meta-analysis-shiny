@@ -22,6 +22,10 @@ data[data$outcome == "CVD",]$outcome <- "Cardiovascular Disease"
 # Replace "CHD" with "Coronary Heart Disease"
 data[data$outcome == "CHD",]$outcome <- "Coronary Heart Disease"
 
+data <- plyr::arrange(data, outcome)
+
+#data$outcome <- stringi::stri_trans_totitle(data$outcome)
+
 # Read the functions from the meta-analysis repo
 source("../meta-analysis/all-functions.R")
 
