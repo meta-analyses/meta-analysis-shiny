@@ -16,6 +16,12 @@ data[data$outcome == 'Heart failure',]$outcome <- 'heart failure'
 # Replace "Alzheimer's Disease" with "Alzheimer's disease"
 data[data$outcome == "Alzheimer's Disease",]$outcome <- "Alzheimer's disease"
 
+# Replace "CVD" with "Cardiovascular Disease"
+data[data$outcome == "CVD",]$outcome <- "Cardiovascular Disease"
+
+# Replace "CHD" with "Coronary Heart Disease"
+data[data$outcome == "CHD",]$outcome <- "Coronary Heart Disease"
+
 # Read the functions from the meta-analysis repo
 source("../meta-analysis/all-functions.R")
 
