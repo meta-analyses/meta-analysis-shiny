@@ -123,8 +123,7 @@ shinyServer(function(input, output, session){
       fig_title <- paste0("Overall Population - ", fig_title)
       
       h1$title(text= fig_title)
-      
-      h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']) + 0.1)
+      h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']))
     h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
       
       h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$id)) , 
@@ -200,7 +199,7 @@ shinyServer(function(input, output, session){
       
       h1$title(text= fig_title)
       
-      h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']) + 0.1)
+      h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']))
       h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
       
       h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$id)) , " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), format = "f", big.mark = ",", drop0trailing = TRUE))), style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
