@@ -124,7 +124,7 @@ shinyServer(function(input, output, session){
       
       h1$title(text= fig_title)
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']))
-    h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
+      h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
       
       h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$id)) , 
                                     " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
@@ -166,7 +166,7 @@ shinyServer(function(input, output, session){
     acmfdata <- get_subpopulation_data()
     
     if (nrow(acmfdata) > 0){
-    plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
       
