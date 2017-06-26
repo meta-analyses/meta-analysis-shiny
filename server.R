@@ -8,7 +8,7 @@ shinyServer(function(input, output, session){
     input$in_PA_exposure
     input$in_sub_population
     
-    acmdata <- getDiseaseSpecificData(data, 
+    acmdata <- getDiseaseSpecificData(raw_data, 
                                       outcome1 = input$in_outcome, 
                                       paexposure = input$in_PA_exposure, 
                                       out_type = input$in_outcome_type,
@@ -41,7 +41,7 @@ shinyServer(function(input, output, session){
     input$in_PA_exposure
     input$in_sub_population
     
-    acmdata <- getDiseaseSpecificData(data, input$in_outcome, input$in_PA_exposure, gender =  input$in_sub_population, out_type = input$in_outcome_type)
+    acmdata <- getDiseaseSpecificData(raw_data, input$in_outcome, input$in_PA_exposure, gender =  input$in_sub_population, out_type = input$in_outcome_type)
     
     acmfdata <- data.frame()
     acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
@@ -73,7 +73,7 @@ shinyServer(function(input, output, session){
                       "incidence")
     index <- c()    
     for (i in 1:length(outcome_type)){
-      acmdata <- getDiseaseSpecificData(data, input$in_outcome, input$in_PA_exposure, overall1 = 1, out_type = outcome_type[i])
+      acmdata <- getDiseaseSpecificData(raw_data, input$in_outcome, input$in_PA_exposure, overall1 = 1, out_type = outcome_type[i])
       if (nrow(acmdata) > 0){
         index <- append(index, i)
       }
@@ -87,7 +87,7 @@ shinyServer(function(input, output, session){
     
     if (nrow(acmfdata) > 0){
       
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
       h1 <- Highcharts$new()
@@ -107,6 +107,8 @@ shinyServer(function(input, output, session){
         zIndex = 0,
         name = "Confidence Interval"
       )
+      
+      h1$xAxis(min = 0, max = 80, tickInterval = 2, endOnTick=FALSE, tickPositions = seq(0, 80, by = 10))
       
       h1$tooltip(formatter = "#! function() {
                   if (this.series.name == 'Relative Risk'){
@@ -166,7 +168,7 @@ shinyServer(function(input, output, session){
     acmfdata <- get_subpopulation_data()
     
     if (nrow(acmfdata) > 0){
-    plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
+    plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2], lout = 1000))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
       
@@ -186,6 +188,7 @@ shinyServer(function(input, output, session){
         zIndex = 0,
         name = "Confidence Interval"
       )
+      h1$xAxis(min = 0, max = 80, tickInterval = 2)
       
       gt <- "Male Population"
       if (input$in_sub_population == 2)
@@ -409,7 +412,7 @@ shinyServer(function(input, output, session){
     #     [13] "dose"           "rr"             "cases"          "lci"           
     #     [17] "uci"            "logrr"          "se"
     
-    overall_data <- subset(overall_data, select = c(id,ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
+    overall_data <- subset(overall_data)#, select = c(id,ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
     
     # Convert id into factor and then back to numeric for an ordered id
     overall_data$id <- as.numeric(as.factor(overall_data$id))
