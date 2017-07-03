@@ -11,7 +11,6 @@ shinyServer(function(input, output, session){
     acmfdata <- data.frame()
     
     if (!is.na(input$in_outcome_type) & input$in_outcome_type != 'all'){
-      # cat(input$in_outcome, ": ", )
       acmfdata <- subset(raw_data, 
                          outcome == input$in_outcome & 
                            pa_domain_subgroup == input$in_PA_exposure & 
@@ -31,29 +30,6 @@ shinyServer(function(input, output, session){
       acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyrs) | personyrs == 0) ) | 
                                        (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
     
-    # acmdata <- getDiseaseSpecificData(raw_data, 
-    #                                   outcome1 = input$in_outcome, 
-    #                                   paexposure = input$in_PA_exposure, 
-    #                                   out_type = input$in_outcome_type,
-    #                                   overall1 = 1)
-    
-    # acmfdata <- data.frame()
-    # # if (nrow(acmdata) > 0){
-    # acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
-    # # Remove all cases where both rr and dose are null
-    # acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
-    # # Remove when totalperson is not available for hr, and personsyears for rr/or
-    # acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
-    #                                  (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
-    # 
-    # # cat(input$in_outcome, " - ", input$in_PA_exposure, " - ", input$in_sub_population, "\n")
-    # if (input$in_outcome == 'stroke' && input$in_PA_exposure == 'TPA'){
-    #   # Remove study # 70 from stroke
-    #   acmfdata <- subset(acmfdata, !ref_number %in% c(70))
-    # }else if(input$in_outcome == 'CHD' && input$in_PA_exposure == 'TPA'){
-    #   # Remove study # 38 from stroke
-    #   acmfdata <- subset(acmfdata, !ref_number %in% c(38))
-    # }
     }
     acmfdata
     
@@ -86,8 +62,6 @@ shinyServer(function(input, output, session){
     # Remove where both dose and response are null
     acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
     
-    # cat("outcome is: ", input$in_outcome, " ", input$in_outcome_type, " ", input$in_PA_exposure, " ", input$in_sub_population, " ", nrow(acmfdata), "\n")
-    
     if (nrow(acmfdata) > 0){
       acmfdata <- getMissingVariables(acmfdata, infertotalpersons = T, kcases = T)
       # Remove when totalperson is not available for hr, and personsyears for rr/or
@@ -95,61 +69,6 @@ shinyServer(function(input, output, session){
                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
     }
     
-    
-    
-    
-    # acmdata <- getDiseaseSpecificData(raw_data, input$in_outcome, input$in_PA_exposure, gender =  input$in_sub_population, out_type = input$in_outcome_type)
-    # 
-    # acmfdata <- data.frame()
-    # acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
-    # # Remove all cases where both rr and dose are null
-    # acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
-    # # Remove when totalperson is not available for hr, and personsyears for rr/or
-    # acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
-    #                                  (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
-    # 
-    # if (input$in_outcome == 'stroke' && input$in_PA_exposure == 'TPA'){
-    #   # Remove study # 70 from stroke
-    #   acmfdata <- subset(acmfdata, !ref_number %in% c(70))
-    # }else if(input$in_outcome == 'CHD' && input$in_PA_exposure == 'TPA'){
-    #   # Remove study # 38 from stroke
-    #   acmfdata <- subset(acmfdata, !ref_number %in% c(38))
-    # }
-    acmfdata
-    
-  })
-  
-  observe({
-    # input$in_outcome 
-    # input$in_outcome_type
-    # input$in_PA_exposure
-    # input$in_sub_population
-    # # outcome_type
-    # outcome_type <- c("all", 
-    #                   "mortality",
-    #                   "incidence")
-    # index <- c()    
-    # for (i in 1:length(outcome_type)){
-    #   # acmdata <- getDiseaseSpecificData(raw_data, input$in_outcome, input$in_PA_exposure, overall1 = 1, out_type = outcome_type[i])
-    #   acmfdata <- data.frame()
-    #   if (outcome_type[i] != 'all')
-    #     acmfdata <- subset(raw_data, outcome == input$in_outcome & pa_domain_subgroup == input$in_PA_exposure & (overall == 1 | sex_subgroups == 3) & outcome_type == outcome_type[i])
-    #   else
-    #     acmfdata <- subset(raw_data, outcome == input$in_outcome & pa_domain_subgroup == input$in_PA_exposure & (overall == 1 | sex_subgroups == 3))
-    #   
-    #   cat("outcome is: ", input$in_outcome, " ", input$in_outcome_type, " ", input$in_PA_exposure, " ", input$in_sub_population, " ", nrow(acmfdata), "\n")
-    #   acmfdata <- getMissingVariables(acmfdata, infertotalpersons = T, kcases = T)
-    #   cat("cols ", colnames(acmfdata), "\n")
-    #   # Remove when totalperson is not available for hr, and personsyears for rr/or
-    #   if (nrow(acmfdata) > 0){
-    #     acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyrs) | personyrs == 0) ) | 
-    #                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
-    #   }
-    #   
-    #   if (nrow(acmfdata) > 0){
-    #     index <- append(index, i)
-    #   }
-    # }
     
   })
   
