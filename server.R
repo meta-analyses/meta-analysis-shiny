@@ -8,31 +8,55 @@ shinyServer(function(input, output, session){
     input$in_PA_exposure
     input$in_sub_population
     
-    acmdata <- getDiseaseSpecificData(raw_data, 
-                                      outcome1 = input$in_outcome, 
-                                      paexposure = input$in_PA_exposure, 
-                                      out_type = input$in_outcome_type,
-                                      overall1 = 1)
     acmfdata <- data.frame()
-    # if (nrow(acmdata) > 0){
-    acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
-    # Remove all cases where both rr and dose are null
-    acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
-    # Remove when totalperson is not available for hr, and personsyears for rr/or
-    acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
-                                     (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
     
-    # cat(input$in_outcome, " - ", input$in_PA_exposure, " - ", input$in_sub_population, "\n")
-    if (input$in_outcome == 'stroke' && input$in_PA_exposure == 'TPA'){
-      # Remove study # 70 from stroke
-      acmfdata <- subset(acmfdata, !ref_number %in% c(70))
-    }else if(input$in_outcome == 'CHD' && input$in_PA_exposure == 'TPA'){
-      # Remove study # 38 from stroke
-      acmfdata <- subset(acmfdata, !ref_number %in% c(38))
+    if (!is.na(input$in_outcome_type) & input$in_outcome_type != 'all'){
+      # cat(input$in_outcome, ": ", )
+      acmfdata <- subset(raw_data, 
+                         outcome == input$in_outcome & 
+                           pa_domain_subgroup == input$in_PA_exposure & 
+                           (overall == 1 | sex_subgroups == 3) & 
+                           outcome_type == input$in_outcome_type)
+    }else{
+      acmfdata <- subset(raw_data, 
+                         outcome == input$in_outcome & 
+                           pa_domain_subgroup == input$in_PA_exposure & 
+                           (overall == 1 | sex_subgroups == 3))
+      
+    }
+    
+    if (nrow(acmfdata) > 0){
+      acmfdata <- getMissingVariables(acmfdata, infertotalpersons = T, kcases = T)
+      # Remove when totalperson is not available for hr, and personsyears for rr/or
+      acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyrs) | personyrs == 0) ) | 
+                                       (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    
+    # acmdata <- getDiseaseSpecificData(raw_data, 
+    #                                   outcome1 = input$in_outcome, 
+    #                                   paexposure = input$in_PA_exposure, 
+    #                                   out_type = input$in_outcome_type,
+    #                                   overall1 = 1)
+    
+    # acmfdata <- data.frame()
+    # # if (nrow(acmdata) > 0){
+    # acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
+    # # Remove all cases where both rr and dose are null
+    # acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
+    # # Remove when totalperson is not available for hr, and personsyears for rr/or
+    # acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
+    #                                  (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    # 
+    # # cat(input$in_outcome, " - ", input$in_PA_exposure, " - ", input$in_sub_population, "\n")
+    # if (input$in_outcome == 'stroke' && input$in_PA_exposure == 'TPA'){
+    #   # Remove study # 70 from stroke
+    #   acmfdata <- subset(acmfdata, !ref_number %in% c(70))
+    # }else if(input$in_outcome == 'CHD' && input$in_PA_exposure == 'TPA'){
+    #   # Remove study # 38 from stroke
+    #   acmfdata <- subset(acmfdata, !ref_number %in% c(38))
+    # }
     }
     acmfdata
-    # }else
-    # data.frame()
+    
   })
   
   get_subpopulation_data <- reactive({
@@ -41,55 +65,103 @@ shinyServer(function(input, output, session){
     input$in_PA_exposure
     input$in_sub_population
     
-    acmdata <- getDiseaseSpecificData(raw_data, input$in_outcome, input$in_PA_exposure, gender =  input$in_sub_population, out_type = input$in_outcome_type)
-    
     acmfdata <- data.frame()
-    acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
-    # Remove all cases where both rr and dose are null
-    acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
-    # Remove when totalperson is not available for hr, and personsyears for rr/or
-    acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
-                                     (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    if (is.na(input$in_outcome_type))
+      return()
     
-    if (input$in_outcome == 'stroke' && input$in_PA_exposure == 'TPA'){
-      # Remove study # 70 from stroke
-      acmfdata <- subset(acmfdata, !ref_number %in% c(70))
-    }else if(input$in_outcome == 'CHD' && input$in_PA_exposure == 'TPA'){
-      # Remove study # 38 from stroke
-      acmfdata <- subset(acmfdata, !ref_number %in% c(38))
+    if (input$in_outcome_type != 'all'){
+      acmfdata <- subset(raw_data, 
+                       outcome == input$in_outcome & 
+                         pa_domain_subgroup == input$in_PA_exposure & 
+                         sex_subgroups == input$in_sub_population & 
+                         outcome_type == input$in_outcome_type)
+    }else{
+      acmfdata <- subset(raw_data, 
+                         outcome == input$in_outcome & 
+                           pa_domain_subgroup == input$in_PA_exposure & 
+                           sex_subgroups == input$in_sub_population)
+      
     }
+    
+    # Remove where both dose and response are null
+    acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
+    
+    # cat("outcome is: ", input$in_outcome, " ", input$in_outcome_type, " ", input$in_PA_exposure, " ", input$in_sub_population, " ", nrow(acmfdata), "\n")
+    
+    if (nrow(acmfdata) > 0){
+      acmfdata <- getMissingVariables(acmfdata, infertotalpersons = T, kcases = T)
+      # Remove when totalperson is not available for hr, and personsyears for rr/or
+      acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyrs) | personyrs == 0) ) | 
+                                     (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    }
+    
+    
+    
+    
+    # acmdata <- getDiseaseSpecificData(raw_data, input$in_outcome, input$in_PA_exposure, gender =  input$in_sub_population, out_type = input$in_outcome_type)
+    # 
+    # acmfdata <- data.frame()
+    # acmfdata <- formatData(acmdata, kcases = T, infertotalpersons = T)
+    # # Remove all cases where both rr and dose are null
+    # acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
+    # # Remove when totalperson is not available for hr, and personsyears for rr/or
+    # acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyears) | personyears == 0) ) | 
+    #                                  (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    # 
+    # if (input$in_outcome == 'stroke' && input$in_PA_exposure == 'TPA'){
+    #   # Remove study # 70 from stroke
+    #   acmfdata <- subset(acmfdata, !ref_number %in% c(70))
+    # }else if(input$in_outcome == 'CHD' && input$in_PA_exposure == 'TPA'){
+    #   # Remove study # 38 from stroke
+    #   acmfdata <- subset(acmfdata, !ref_number %in% c(38))
+    # }
     acmfdata
     
   })
   
   observe({
-    input$in_outcome 
-    input$in_outcome_type
-    input$in_PA_exposure
-    input$in_sub_population
-    # outcome_type
-    outcome_type <- c("all", 
-                      "mortality",
-                      "incidence")
-    index <- c()    
-    for (i in 1:length(outcome_type)){
-      acmdata <- getDiseaseSpecificData(raw_data, input$in_outcome, input$in_PA_exposure, overall1 = 1, out_type = outcome_type[i])
-      if (nrow(acmdata) > 0){
-        index <- append(index, i)
-      }
-    }
+    # input$in_outcome 
+    # input$in_outcome_type
+    # input$in_PA_exposure
+    # input$in_sub_population
+    # # outcome_type
+    # outcome_type <- c("all", 
+    #                   "mortality",
+    #                   "incidence")
+    # index <- c()    
+    # for (i in 1:length(outcome_type)){
+    #   # acmdata <- getDiseaseSpecificData(raw_data, input$in_outcome, input$in_PA_exposure, overall1 = 1, out_type = outcome_type[i])
+    #   acmfdata <- data.frame()
+    #   if (outcome_type[i] != 'all')
+    #     acmfdata <- subset(raw_data, outcome == input$in_outcome & pa_domain_subgroup == input$in_PA_exposure & (overall == 1 | sex_subgroups == 3) & outcome_type == outcome_type[i])
+    #   else
+    #     acmfdata <- subset(raw_data, outcome == input$in_outcome & pa_domain_subgroup == input$in_PA_exposure & (overall == 1 | sex_subgroups == 3))
+    #   
+    #   cat("outcome is: ", input$in_outcome, " ", input$in_outcome_type, " ", input$in_PA_exposure, " ", input$in_sub_population, " ", nrow(acmfdata), "\n")
+    #   acmfdata <- getMissingVariables(acmfdata, infertotalpersons = T, kcases = T)
+    #   cat("cols ", colnames(acmfdata), "\n")
+    #   # Remove when totalperson is not available for hr, and personsyears for rr/or
+    #   if (nrow(acmfdata) > 0){
+    #     acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyrs) | personyrs == 0) ) | 
+    #                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+    #   }
+    #   
+    #   if (nrow(acmfdata) > 0){
+    #     index <- append(index, i)
+    #   }
+    # }
     
   })
   
   output$plot_overall_analysis <- renderChart({
     
     acmfdata <- get_overall_data()
-    
+
     if (nrow(acmfdata) > 0){
-      
+
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
-      
+
       h1 <- Highcharts$new()
       h1$series(
         data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
@@ -97,7 +169,7 @@ shinyServer(function(input, output, session){
         name = "Relative Risk",
         type = "line"
       )
-      
+
       h1$series(
         data = toJSONArray2(plot_data[,c('dose', 'lb', 'ub')], names = F, json = F),
         type = 'arearange',
@@ -107,9 +179,9 @@ shinyServer(function(input, output, session){
         zIndex = 0,
         name = "Confidence Interval"
       )
-      
+
       h1$xAxis(min = 0, max = 80, tickInterval = 2, endOnTick=FALSE, tickPositions = seq(0, 80, by = 10))
-      
+
       h1$tooltip(formatter = "#! function() {
                   if (this.series.name == 'Relative Risk'){
                       return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0;
@@ -117,44 +189,44 @@ shinyServer(function(input, output, session){
                       return 'CI: <b>' + Math.round(this.point.low * 100.0) / 100.0 + ' - ' + Math.round(this.point.high * 100.0) / 100.0 ;
                   }
                  } !#")
-      
+
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
-      
+
       fig_title <- paste0("Overall Population - ", fig_title)
-      
+
       h1$title(text= fig_title)
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']))
     h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
-      
-      h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$id)) , 
-                                    " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
-                                                                      format = "f", big.mark = ",", drop0trailing = TRUE))), 
+
+      h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$id)) ,
+                                    " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)),
+                                                                      format = "f", big.mark = ",", drop0trailing = TRUE))),
                   style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
-      
-      
+
+
       h1$set(dom = "plot_overall_analysis")
       h1$exporting(enabled = T)
       return (h1)
     }else{
-      
+
       h1 <- Highcharts$new()
-      
+
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
-      
+
       fig_title <- paste0("Overall Population - ", fig_title)
-      
+
       h1$title(text= fig_title)
-      
-      
+
+
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0)
       h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
-      
+
       h1$subtitle(text = HTML("Sorry: There is no data to display"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
-      
+
       h1$set(dom = "plot_overall_analysis")
       h1$exporting(enabled = F)
       return (h1)
@@ -166,12 +238,12 @@ shinyServer(function(input, output, session){
     
     h <- Highcharts$new()
     acmfdata <- get_subpopulation_data()
-    
+
     if (nrow(acmfdata) > 0){
-    plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2], lout = 1000))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2], lout = 1000))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
-      
-      
+
+
       h1 <- Highcharts$new()
       h1$series(
         data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
@@ -189,24 +261,24 @@ shinyServer(function(input, output, session){
         name = "Confidence Interval"
       )
       h1$xAxis(min = 0, max = 80, tickInterval = 2)
-      
+
       gt <- "Male Population"
       if (input$in_sub_population == 2)
         gt <- "Female Population"
-      
+
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
-      
+
       fig_title <- paste0(gt, " - ", fig_title)
-      
+
       h1$title(text= fig_title)
-      
+
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']))
       h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
-      
+
       h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$id)) , " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), format = "f", big.mark = ",", drop0trailing = TRUE))), style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
-      
+
       h1$tooltip(formatter = "#! function() {
                   if (this.series.name == 'Relative Risk'){
                     return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0;
@@ -214,32 +286,32 @@ shinyServer(function(input, output, session){
                                return 'CI: <b>' + Math.round(this.point.low * 100.0) / 100.0 + ' - ' + Math.round(this.point.high * 100.0) / 100.0 ;
                   }
                 } !#")
-      
+
       h1$set(dom = "plot_subpopulation_analysis")
       h1$exporting(enabled = T)
       return (h1)
     }else{
-      
+
       h1 <- Highcharts$new()
-      
+
       gt <- "Male Population"
       if (input$in_sub_population == 2)
         gt <- "Female Population"
-      
+
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
-      
+
       fig_title <- paste0(gt, " - ", fig_title)
-      
+
       h1$title(text= fig_title)
-      
-      
+
+
       h1$yAxis(title = list(text = 'Relative Risk'), min = 0)
       h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
-      
+
       h1$subtitle(text = HTML("Sorry: There is no data to display"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
-      
+
       h1$set(dom = "plot_subpopulation_analysis")
       h1$exporting(enabled = F)
       return (h1)
@@ -250,14 +322,14 @@ shinyServer(function(input, output, session){
   set_pif_values <- reactive({
     
     acmfdata <- get_overall_data()
-    
+
     if (nrow(acmfdata) > 0){
-      
+
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
-      
+
       removeNA <- F
-      
+
       # Update RR from the lookup table
       for (i in 1:nrow(acmfdata)){
         val <- subset(plot_data, round(dose, 1) <= (acmfdata$dose[i] + 0.05) & round(dose, 1) >= (acmfdata$dose[i] - 0.05))
@@ -274,45 +346,45 @@ shinyServer(function(input, output, session){
           }
         }
       }
-      
-      sum_tp <- sum(acmfdata$totalpersons * acmfdata$rr, na.rm = T) 
-      
+
+      sum_tp <- sum(acmfdata$totalpersons * acmfdata$rr, na.rm = T)
+
       acmfdata_ls <- acmfdata
-      
+
       #Replace lower dose with 8.75
       acmfdata_ls[acmfdata_ls$dose < 8.75,]$dose <- 8.75
-      
+
       local_var <- acmfdata_ls
-      
+
       val <- subset(plot_data, round(dose, 1) <= (8.75 + 0.05) & round(dose, 1) >= (8.75 - 0.05))
-      
+
       if (nrow(val) > 0)
         acmfdata_ls[acmfdata_ls$dose == 8.75,]$rr <- val$RR[1]
-      
+
       sum_ls_tp <- sum(acmfdata$totalpersons * acmfdata_ls$rr, na.rm = T)
-      
+
       pert_ls <- ((sum_tp - sum_ls_tp) / sum_tp) * 100
-      
+
       acmfdata_ls <- local_var
-      
+
       if (nrow(val) > 0){
-        
+
         if (removeNA){
           acmfdata_ls[acmfdata_ls$dose == 8.75 & !is.na(acmfdata_ls$uci),]$uci <- val$ub[1]
         }else{
           acmfdata_ls[acmfdata_ls$dose == 8.75,]$uci <- val$ub[1]
         }
-        
+
       }
-      
+
       sum_ls_lower_tp <- sum(acmfdata$totalpersons * acmfdata_ls$uci, na.rm = T)
-      
+
       sum_tp <- sum(acmfdata$totalpersons * acmfdata$uci, na.rm = T)
-      
+
       pert_ls_lower <- ((sum_tp - sum_ls_lower_tp) / sum_tp) * 100
-      
+
       acmfdata_ls <- local_var
-      
+
       if (nrow(val) > 0){
         if (removeNA){
           acmfdata_ls[acmfdata_ls$dose == 8.75 & !is.na(acmfdata_ls$uci),]$lci <- val$lb[1]
@@ -320,42 +392,42 @@ shinyServer(function(input, output, session){
           acmfdata_ls[acmfdata_ls$dose == 8.75,]$lci <- val$lb[1]
         }
       }
-      
+
       sum(acmfdata_ls$lci, na.rm = T)
-      
+
       sum(acmfdata$lci, na.rm = T)
-      
+
       sum_ls_upper_tp <- sum(acmfdata$totalpersons * acmfdata_ls$lci, na.rm = T)
-      
+
       sum_tp <- sum(acmfdata$totalpersons * acmfdata$lci, na.rm = T)
-      
+
       pert_ls_upper <- ((sum_tp - sum_ls_upper_tp) / sum_tp) * 100
-      
+
       lower_guideline_value <<- paste0(round(pert_ls, 2) , "% (95% CI: ", round(pert_ls_lower, 2), " - ",  round(pert_ls_upper, 2), ")" )
-      
+
       acmfdata_hs <- acmfdata
-      
+
       #Replace higher dose with 17.5
       acmfdata_hs[acmfdata_hs$dose < 17.5,]$dose <- 17.5
-      
+
       local_var <- acmfdata_hs
-      
+
       val <- subset(plot_data, round(dose, 1) <= (17.5 + 0.05) & round(dose, 1) >= (17.5 - 0.05))
       if (nrow(val) == 0)
         val <- subset(plot_data, round(dose, 1) <= (17.5 + 0.1) & round(dose, 1) >= (17.5 - 0.1))
-      
+
       if (nrow(val) > 0){
         acmfdata_hs[acmfdata_hs$dose == 17.5,]$rr <- val$RR[1]
       }
-      
+
       sum_hs_tp <- sum(acmfdata$totalpersons * acmfdata_hs$rr, na.rm = T)
-      
-      sum_tp <- sum(acmfdata$totalpersons * acmfdata$rr, na.rm = T) 
-      
+
+      sum_tp <- sum(acmfdata$totalpersons * acmfdata$rr, na.rm = T)
+
       pert_hs <- ((sum_tp - sum_hs_tp) / sum_tp) * 100
-      
+
       acmfdata_hs <- local_var
-      
+
       if (nrow(val) > 0){
         if (removeNA){
           acmfdata_hs[acmfdata_hs$dose == 17.5 & !is.na(acmfdata_ls$uci),]$uci <- val$ub[1]
@@ -363,15 +435,15 @@ shinyServer(function(input, output, session){
           acmfdata_hs[acmfdata_hs$dose == 17.5,]$uci <- val$ub[1]
         }
       }
-      
+
       sum_hs_lower_tp <- sum(acmfdata$totalpersons * acmfdata_hs$uci, na.rm = T)
-      
+
       sum_tp <- sum(acmfdata$totalpersons * acmfdata$uci, na.rm = T)
-      
+
       pert_hs_lower <- ((sum_tp - sum_hs_lower_tp) / sum_tp) * 100
-      
+
       acmfdata_hs <- local_var
-      
+
       if (nrow(val) > 0){
         if (removeNA){
           acmfdata_hs[acmfdata_hs$dose == 17.5 & !is.na(acmfdata_ls$uci),]$lci <- val$lb[1]
@@ -379,13 +451,13 @@ shinyServer(function(input, output, session){
           acmfdata_hs[acmfdata_hs$dose == 17.5,]$lci <- val$lb[1]
         }
       }
-      
+
       sum_hs_upper_tp <- sum(acmfdata$totalpersons * acmfdata_hs$lci, na.rm = T)
-      
+
       sum_tp <- sum(acmfdata$totalpersons * acmfdata$lci, na.rm = T)
-      
+
       pert_hs_upper <- ((sum_tp - sum_hs_upper_tp) / sum_tp) * 100
-      
+
       upper_guideline_value <<- paste0(round(pert_hs, 2) , "% (95% CI: ", round(pert_hs_lower, 2), " - ",  round(pert_hs_upper, 2), ")" )
     }
     
@@ -412,7 +484,7 @@ shinyServer(function(input, output, session){
     #     [13] "dose"           "rr"             "cases"          "lci"           
     #     [17] "uci"            "logrr"          "se"
     
-    overall_data <- subset(overall_data)#, select = c(id,ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
+    overall_data <- subset(overall_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
     # Convert id into factor and then back to numeric for an ordered id
     overall_data$id <- as.numeric(as.factor(overall_data$id))
@@ -433,7 +505,7 @@ shinyServer(function(input, output, session){
     
     sub_population_data <- get_subpopulation_data()
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(id, ref_number, authors, effect_measure, totalpersons, personyears, dose, rr, cases, lci, uci))
+    sub_population_data <- subset(sub_population_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
     # Convert id into factor and then back to numeric for an ordered id
     sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
