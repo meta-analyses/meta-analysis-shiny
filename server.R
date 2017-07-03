@@ -78,7 +78,7 @@ shinyServer(function(input, output, session){
 
     if (nrow(acmfdata) > 0){
 
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
 
       h1 <- Highcharts$new()
@@ -159,7 +159,7 @@ shinyServer(function(input, output, session){
     acmfdata <- get_subpopulation_data()
 
     if (nrow(acmfdata) > 0){
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2], lout = 1000))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
       
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
 
