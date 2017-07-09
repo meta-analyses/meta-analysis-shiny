@@ -3,7 +3,8 @@ rm (list = ls())
 
 # raw_data <- read.csv("../meta-analysis/data/20170623_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, stringsAsFactors = F, skipNul = TRUE)
 
-raw_data <- read.csv("../meta-analysis/data/20170626_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, stringsAsFactors = F, skipNul = TRUE)
+# Set encoding as found at: https://stackoverflow.com/a/14363274
+raw_data <- read.csv("../meta-analysis/data/20170626_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, stringsAsFactors = F, skipNul = TRUE, fileEncoding="latin1")
 
 raw_data$tot_personyrs <- as.numeric(raw_data$tot_personyrs)
 #raw_data[is.na(raw_data$tot_personyrs),]$tot_personyrs <- 0
