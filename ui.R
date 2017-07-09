@@ -3,6 +3,9 @@ source("setup.R")
 # domain
 pa_exposure <- c("LTPA", "TPA")
 
+# Remove TPA
+pa_exposure <- c("LTPA")
+
 # outcome_type
 outcome_type <- c("all",
                   "incidence",
