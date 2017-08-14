@@ -1,3 +1,4 @@
+# Load required packages/libraries
 source("setup.R")
 
 # domain
