@@ -3,7 +3,7 @@ rm (list = ls())
 
 # raw_data <- read.csv("../meta-analysis/data/20170623_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, stringsAsFactors = F, skipNul = TRUE)
 
-on_server <- grepl('^/var/shiny/pct-shiny', getwd())
+on_server <- grepl('^/var/shiny/meta-analysis-shiny', getwd())
 
 raw_data <- NULL
 
