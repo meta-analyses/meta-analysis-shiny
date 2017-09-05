@@ -28,6 +28,12 @@ shinyServer(function(input, output, session){
       # Remove when totalperson is not available for hr, and personsyears for rr/or
       acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyrs) | personyrs == 0) ) | 
                                        (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
+      
+      # Filter studies by study size
+      if (input$in_outcome == "all-cause mortality")
+        acmfdata <- subset(acmfdata, n_baseline > 40000)
+      else
+        acmfdata <- subset(acmfdata, n_baseline > 10000)
     
     }
     acmfdata
