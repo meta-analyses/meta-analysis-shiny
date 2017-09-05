@@ -88,6 +88,12 @@ raw_data[raw_data$outcome == "CVD",]$outcome <- "Cardiovascular Disease"
 # Replace "CHD" with "Coronary Heart Disease"
 raw_data[raw_data$outcome == "CHD",]$outcome <- "Coronary Heart Disease"
 
+
+## Create ref_number for men and women subgroups
+
+raw_data[raw_data$overall != 1 & raw_data$sex_subgroups == 1,]$ref_number <- paste(raw_data[raw_data$overall != 1 & raw_data$sex_subgroups == 1,]$ref_number, "-1")
+raw_data[raw_data$overall != 1 & raw_data$sex_subgroups == 2,]$ref_number <- paste(raw_data[raw_data$overall != 1 & raw_data$sex_subgroups == 2,]$ref_number, "-2")
+
 raw_data <- plyr::arrange(raw_data, outcome)
 
 #data$outcome <- stringi::stri_trans_totitle(data$outcome)
