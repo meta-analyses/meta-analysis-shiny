@@ -3,19 +3,16 @@ rm (list = ls())
 
 # raw_data <- read.csv("../meta-analysis/data/20170623_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, stringsAsFactors = F, skipNul = TRUE)
 
-on_server <- grepl('^/var/shiny/meta-analysis-shiny', getwd())
-
 raw_data <- NULL
 
-if(!on_server){
-  raw_data <- read.csv("../meta-analysis/data/20170905_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, 
-                       stringsAsFactors = F, skipNul = TRUE)
-}else{
+if(grepl('^/var/shiny/meta-analysis-shiny', getwd()) || grepl('"/srv/shiny-server/meta-analysis-shiny', getwd())){
   # Set encoding as found at: https://stackoverflow.com/a/14363274
   # only for server
   raw_data <- read.csv("../meta-analysis/data/20170905_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", fileEncoding="latin1", 
                        header = T, stringsAsFactors = F, skipNul = TRUE)
-  
+}else{
+  raw_data <- read.csv("../meta-analysis/data/20170905_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, 
+                       stringsAsFactors = F, skipNul = TRUE)
 }
 
 raw_data$tot_personyrs <- as.numeric(raw_data$tot_personyrs)
