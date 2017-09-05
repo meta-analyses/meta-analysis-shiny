@@ -5,7 +5,7 @@ rm (list = ls())
 
 raw_data <- NULL
 
-if(grepl('^/var/shiny/meta-analysis-shiny', getwd()) || grepl('"/srv/shiny-server/meta-analysis-shiny', getwd())){
+if(grepl('^/var/shiny/meta-analysis-shiny', getwd()) || grepl('/srv/shiny-server/meta-analysis-shiny', getwd())){
   # Set encoding as found at: https://stackoverflow.com/a/14363274
   # only for server
   raw_data <- read.csv("../meta-analysis/data/20170905_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", fileEncoding="latin1", 
