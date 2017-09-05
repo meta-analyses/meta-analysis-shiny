@@ -1,3 +1,4 @@
+options(shiny.sanitize.errors = F)
 lower_guideline_value <- NA
 upper_guideline_value <- NA
 shinyServer(function(input, output, session){
