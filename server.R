@@ -14,13 +14,12 @@ shinyServer(function(input, output, session){
       acmfdata <- subset(raw_data, 
                          outcome == input$in_outcome & 
                            pa_domain_subgroup == input$in_PA_exposure & 
-                           (overall == 1 | sex_subgroups == 3) & 
                            outcome_type == input$in_outcome_type)
     }else{
       acmfdata <- subset(raw_data, 
                          outcome == input$in_outcome & 
-                           pa_domain_subgroup == input$in_PA_exposure & 
-                           (overall == 1 | sex_subgroups == 3))
+                           pa_domain_subgroup == input$in_PA_exposure)
+                           
       
     }
     
