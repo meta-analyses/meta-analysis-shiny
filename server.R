@@ -95,9 +95,12 @@ shinyServer(function(input, output, session){
 
     if (nrow(acmfdata) > 0){
       
-      #td <<- acmfdata
+      local_cov_method <- F
+      
+      if (isolate(input$in_outcome) == "Coronary Heart Disease")
+        local_cov_method <- T
 
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
 
@@ -264,8 +267,13 @@ shinyServer(function(input, output, session){
     acmfdata <- get_overall_data()
 
     if (nrow(acmfdata) > 0){
+      
+      local_cov_method <- F
+      
+      if (isolate(input$in_outcome) == "Coronary Heart Disease")
+        local_cov_method <- T
 
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
 
       removeNA <- F
