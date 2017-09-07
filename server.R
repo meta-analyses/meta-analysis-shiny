@@ -32,10 +32,17 @@ shinyServer(function(input, output, session){
       
       # Filter studies by study size
       if (input$in_outcome == "all-cause mortality")
-        acmfdata <- subset(acmfdata, n_baseline > 40000)
+        acmfdata <- subset(acmfdata, n_baseline >= 40000)
       else
-        acmfdata <- subset(acmfdata, n_baseline > 10000)
-    
+        acmfdata <- subset(acmfdata, n_baseline >= 10000)
+      
+      if (isolate(input$in_outcome) == "Cardiovascular Disease"){
+        #td <<- acmfdata
+        acmfdata <- subset(acmfdata, !is.na(rr))
+      }
+        
+        
+      
     }
     acmfdata
     
@@ -87,9 +94,12 @@ shinyServer(function(input, output, session){
     acmfdata <- get_overall_data()
 
     if (nrow(acmfdata) > 0){
+      
+      #td <<- acmfdata
 
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
+      
 
       h1 <- Highcharts$new()
       h1$series(
@@ -255,7 +265,7 @@ shinyServer(function(input, output, session){
 
     if (nrow(acmfdata) > 0){
 
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
 
       removeNA <- F
