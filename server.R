@@ -91,174 +91,121 @@ shinyServer(function(input, output, session){
     
   })
   
-  output$plot_overall_analysis <- renderChart({
+  
+  
+  output$plot_overall_analysis <- renderPlotly({
     
     acmfdata <- get_overall_data()
-    h1 <- Highcharts$new()
-
+    
     if (nrow(acmfdata) > 0){
       
       local_cov_method <- F
       
       if (isolate(input$in_outcome) == "Coronary Heart Disease")
         local_cov_method <- T
-
+      
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
-
-      
-      h1$series(
-        data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
-        zIndex = 1,
-        name = "Relative Risk",
-        type = "line"
-      )
-
-      h1$series(
-        data = toJSONArray2(plot_data[,c('dose', 'lb', 'ub')], names = F, json = F),
-        type = 'arearange',
-        fillOpacity = 0.3,
-        lineWidth = 0,
-        color = 'grey',
-        zIndex = 0,
-        name = "Confidence Interval"
-      )
-
-      h1$xAxis(min = 0, max = 80, tickInterval = 2, endOnTick=FALSE, tickPositions = seq(0, 80, by = 10))
-
-      h1$tooltip(formatter = "#! function() {
-                  if (this.series.name == 'Relative Risk'){
-                      return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0;
-                  }else{
-                      return 'CI: <b>' + Math.round(this.point.low * 100.0) / 100.0 + ' - ' + Math.round(this.point.high * 100.0) / 100.0 ;
-                  }
-                 } !#")
-
-      fig_title <- input$in_outcome
+      fig_title <- "all-cause mortality"
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
-
-      fig_title <- paste0("Overall Population - ", fig_title)
-
-      h1$title(text= fig_title)
-      h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']))
-      h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
       
-      h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$id)) , 
-                                    " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
-                                                                      format = "f", big.mark = ",", drop0trailing = TRUE))), 
-                  style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
-
-
+      fig_title <- paste0("Overall Population - ", fig_title, "\n Number of samples: ",  length(unique(acmfdata$id)) , 
+                                                                    " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
+                                                                                                      format = "f", big.mark = ",", drop0trailing = TRUE))
+      getPlot(plot_data, fig_title)
+      
     }else{
-
-      fig_title <- input$in_outcome
-      if (fig_title != toupper(fig_title))
-        fig_title <- stringi::stri_trans_totitle(fig_title)
-
-      fig_title <- paste0("Overall Population - ", fig_title)
-
-      h1$title(text= fig_title)
-
-
-      h1$yAxis(title = list(text = 'Relative Risk'), min = 0)
-      h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
-
-      h1$subtitle(text = HTML("Sorry: There is no data to display"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
-
+      
+      getPlot(NULL, "")
     }
-    
-    h1$set(dom = "plot_overall_analysis")
-    h1$exporting(enabled = F)
-    return (h1)
-    
     
   })
   
-  output$plot_subpopulation_analysis <- renderChart({
+  
+  output$plot_subpopulation_analysis <- renderPlotly({
     
-    h1 <- Highcharts$new()
+    
     acmfdata <- get_subpopulation_data()
-
+    
     if (nrow(acmfdata) > 0){
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
       
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
-
-
-      h1$series(
-        data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
-        zIndex = 1,
-        name = "Relative Risk",
-        type = "line"
-      )
-      h1$series(
-        data = toJSONArray2(plot_data[,c('dose', 'lb', 'ub')], names = F, json = F),
-        type = 'arearange',
-        fillOpacity = 0.3,
-        lineWidth = 0,
-        color = 'grey',
-        zIndex = 0,
-        name = "Confidence Interval"
-      )
-      h1$xAxis(min = 0, max = 80, tickInterval = 2)
-
+      
       gt <- "Male Population"
       if (input$in_sub_population == 2)
         gt <- "Female Population"
-
+      
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
-
-      fig_title <- paste0(gt, " - ", fig_title)
-
-      h1$title(text= fig_title)
-
-      h1$yAxis(title = list(text = 'Relative Risk'), min = 0, max = max(plot_data[,'ub']))
-      h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
-
-      h1$subtitle(text = HTML(paste("Number of samples: ",  length(unique(acmfdata$id)) , " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), format = "f", big.mark = ",", drop0trailing = TRUE))), style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
-
-      h1$tooltip(formatter = "#! function() {
-                  if (this.series.name == 'Relative Risk'){
-                    return 'RR: <b>' + Math.round(this.y * 100.0) / 100.0 + '<br/>' + 'Dose : <b>' + Math.round(this.x * 100.0) / 100.0;
-                  }else{
-                               return 'CI: <b>' + Math.round(this.point.low * 100.0) / 100.0 + ' - ' + Math.round(this.point.high * 100.0) / 100.0 ;
-                  }
-                } !#")
-
+      
+      fig_title <- paste0(gt, " - ", fig_title, "\n Number of samples: ",  
+                          length(unique(acmfdata$id)) , 
+                          " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
+                                                            format = "f", big.mark = ",", drop0trailing = TRUE))
+      getPlot(plot_data, fig_title)
       
     }else{
-
-
+      
       gt <- "Male Population"
       if (input$in_sub_population == 2)
         gt <- "Female Population"
-
+      
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
-
-      fig_title <- paste0(gt, " - ", fig_title)
-
-      h1$title(text= fig_title)
-
-
-      h1$yAxis(title = list(text = 'Relative Risk'), min = 0)
-      h1$xAxis(title = list(text = 'Marginal MET hours per week'), min = 0)
-
-      h1$subtitle(text = HTML("Sorry: There is no data to display"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
-
       
-    }
+      fig_title <- paste0(gt, " - ", fig_title)
+      
+      getPlot(NULL, fig_title)
+  
+  }
     
-    h1$set(dom = "plot_subpopulation_analysis")
-    h1$exporting(enabled = F)
-    return (h1)
+      
+    
   })
   
+  
+  getPlot <- function (dataset, plotTitle, xlab = "Marginal MET hours per week" ){
+    
+    
+    # outfile <- tempfile(fileext='.png')
+    # 
+    # # Generate the PNG
+    # png(outfile, width=400, height=300)
+    
+    if (!is.null(dataset)){
+    
+      q <- quantile(dataset$dose, c(input$in_main_quantile[1], (input$in_main_quantile[1] + input$in_main_quantile[2]) / 2, input$in_main_quantile[2]))
+      
+      gg <- ggplot(dataset, aes(dose, RR)) + 
+        geom_line(data = dataset) + 
+        geom_ribbon(data = dataset, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
+        #coord_cartesian(ylim = c(0, 1), xlim = c(0, xMax)) +
+        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
+        # coord_cartesian(xlim = c(0, 70)) +
+        xlab(paste("\n", xlab, "\n")) +
+        ylab("\nRelative Risk\n") +
+        geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
+        
+        theme(
+          plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+          plot.title = element_text(size = 12, colour = "black", vjust = 7),
+          plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
+          legend.direction = "horizontal",
+          legend.position = c(0.1, 1.05)) + 
+        labs(title = paste(plotTitle)) #+ labs(fill = "") 
+    }else{
+      gg <- ggplot()
+    }
+    
+    p <- ggplotly(gg)
+    # dev.off()
+    p
+  }
   
   set_pif_values <- reactive({
     
