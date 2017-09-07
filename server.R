@@ -86,12 +86,15 @@ shinyServer(function(input, output, session){
       
     }
     
+    acmfdata
+    
     
   })
   
   output$plot_overall_analysis <- renderChart({
     
     acmfdata <- get_overall_data()
+    h1 <- Highcharts$new()
 
     if (nrow(acmfdata) > 0){
       
@@ -104,7 +107,7 @@ shinyServer(function(input, output, session){
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
 
-      h1 <- Highcharts$new()
+      
       h1$series(
         data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
         zIndex = 1,
@@ -148,12 +151,7 @@ shinyServer(function(input, output, session){
                   style = list(font = '14px "Trebuchet MS", Verdana, sans-serif', color = "black"))
 
 
-      h1$set(dom = "plot_overall_analysis")
-      h1$exporting(enabled = T)
-      return (h1)
     }else{
-
-      h1 <- Highcharts$new()
 
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
@@ -169,16 +167,18 @@ shinyServer(function(input, output, session){
 
       h1$subtitle(text = HTML("Sorry: There is no data to display"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
 
-      h1$set(dom = "plot_overall_analysis")
-      h1$exporting(enabled = F)
-      return (h1)
     }
+    
+    h1$set(dom = "plot_overall_analysis")
+    h1$exporting(enabled = F)
+    return (h1)
+    
     
   })
   
   output$plot_subpopulation_analysis <- renderChart({
     
-    h <- Highcharts$new()
+    h1 <- Highcharts$new()
     acmfdata <- get_subpopulation_data()
 
     if (nrow(acmfdata) > 0){
@@ -187,7 +187,6 @@ shinyServer(function(input, output, session){
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
 
 
-      h1 <- Highcharts$new()
       h1$series(
         data = toJSONArray2(plot_data[,c('dose', 'RR')], names = F, json = F),
         zIndex = 1,
@@ -230,12 +229,9 @@ shinyServer(function(input, output, session){
                   }
                 } !#")
 
-      h1$set(dom = "plot_subpopulation_analysis")
-      h1$exporting(enabled = T)
-      return (h1)
+      
     }else{
 
-      h1 <- Highcharts$new()
 
       gt <- "Male Population"
       if (input$in_sub_population == 2)
@@ -255,10 +251,12 @@ shinyServer(function(input, output, session){
 
       h1$subtitle(text = HTML("Sorry: There is no data to display"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
 
-      h1$set(dom = "plot_subpopulation_analysis")
-      h1$exporting(enabled = F)
-      return (h1)
+      
     }
+    
+    h1$set(dom = "plot_subpopulation_analysis")
+    h1$exporting(enabled = F)
+    return (h1)
   })
   
   
