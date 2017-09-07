@@ -12,12 +12,12 @@ shinyServer(function(input, output, session){
     acmfdata <- data.frame()
     
     if (!is.na(input$in_outcome_type) & input$in_outcome_type != 'all'){
-      acmfdata <- subset(raw_data, 
+      acmfdata <- subset(raw_data_tp_ltpa, 
                          outcome == input$in_outcome & 
                            pa_domain_subgroup == input$in_PA_exposure & 
                            outcome_type == input$in_outcome_type)
     }else{
-      acmfdata <- subset(raw_data, 
+      acmfdata <- subset(raw_data_tp_ltpa, 
                          outcome == input$in_outcome & 
                            pa_domain_subgroup == input$in_PA_exposure)
                            
@@ -52,13 +52,13 @@ shinyServer(function(input, output, session){
       return()
     
     if (input$in_outcome_type != 'all'){
-      acmfdata <- subset(raw_data, 
+      acmfdata <- subset(raw_data_gsp_ltpa, 
                        outcome == input$in_outcome & 
                          pa_domain_subgroup == input$in_PA_exposure & 
                          sex_subgroups == input$in_sub_population & 
                          outcome_type == input$in_outcome_type)
     }else{
-      acmfdata <- subset(raw_data, 
+      acmfdata <- subset(raw_data_gsp_ltpa, 
                          outcome == input$in_outcome & 
                            pa_domain_subgroup == input$in_PA_exposure & 
                            sex_subgroups == input$in_sub_population)
