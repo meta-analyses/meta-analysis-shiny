@@ -18,7 +18,6 @@ sub_population <- c("Male Population" = 1,
 
 shinyUI(fluidPage(
   list(tags$title(HTML('Meta-Analysis'))),
-  useShinyjs(),
   width="100%", height="100%",
   sidebarPanel(
     selectInput(inputId = "in_outcome", label = "Select Outcome:", choices =  uoutcome$outcome),
@@ -40,8 +39,8 @@ shinyUI(fluidPage(
   mainPanel(
     tabsetPanel(
       tabPanel("Analysis",
-               showOutput('plot_overall_analysis', "highcharts"),
-               showOutput("plot_subpopulation_analysis", "highcharts")
+               plotlyOutput("plot_overall_analysis"),
+               plotlyOutput("plot_subpopulation_analysis")
       ),
       tabPanel("Outcome-specific Data",
                uiOutput("overall_warning_message"),
