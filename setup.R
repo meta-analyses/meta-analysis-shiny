@@ -1,9 +1,7 @@
 pkgs <- c(
   "DT",
-  "devtools",
-  "shinyjs",
   "ggplot2",
-  "rCharts"
+  "plotly"
 )
 # Which packages do we require?
 # lapply(pkgs, library, character.only = T)
