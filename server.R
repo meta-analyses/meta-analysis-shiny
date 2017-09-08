@@ -107,7 +107,7 @@ shinyServer(function(input, output, session){
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
-      fig_title <- "all-cause mortality"
+      fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
       
