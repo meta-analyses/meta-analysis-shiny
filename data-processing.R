@@ -6,10 +6,10 @@ raw_data <- NULL
 if(grepl('^/var/shiny/meta-analysis-shiny', getwd()) || grepl('/srv/shiny-server/meta-analysis-shiny', getwd())){
   # Set encoding as found at: https://stackoverflow.com/a/14363274
   # only for server
-  raw_data <- read.csv("../meta-analysis/data/20170907_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", fileEncoding="latin1", 
+  raw_data <- read.csv("../meta-analysis/data/20170908_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", fileEncoding="latin1", 
                        header = T, stringsAsFactors = F, skipNul = TRUE)
 }else{
-  raw_data <- read.csv("../meta-analysis/data/20170907_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, 
+  raw_data <- read.csv("../meta-analysis/data/20170908_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, 
                        stringsAsFactors = F, skipNul = TRUE)
 }
 
@@ -91,6 +91,9 @@ uoutcome$outcome <- sort(uoutcome$outcome)
 # Remove the blank outcome
 uoutcome <- dplyr::filter(uoutcome, outcome != "")
 
+### Remove studies with less than 40k for all-cause, or 10k for the rest outcomes
+#raw_data <- subset(raw_data, (outcome == "all-cause mortality" & n_baseline >= 40000 ) |
+#                             (outcome != "all-cause mortality" & n_baseline >= 10000 ))
 
 raw_data_tp_ltpa <- subset(raw_data, pa_domain_subgroup == "LTPA")
 for (i in 1:nrow(uoutcome)){
