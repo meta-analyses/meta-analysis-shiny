@@ -106,8 +106,6 @@ shinyServer(function(input, output, session){
       
       last_knot <- get_last_knot(acmfdata, personyrs_pert = local_personyrs_pert)
       
-      cat("total population ", isolate(input$in_outcome), " ", last_knot, "\n")
-      
       last_knot <- last_knot[2]
       
       local_cov_method <- F
@@ -149,8 +147,6 @@ shinyServer(function(input, output, session){
         local_personyrs_pert <- 0.1
       
       last_knot <- get_last_knot(sub_pop_data, personyrs_pert = local_personyrs_pert)
-      
-      cat("sub population ", isolate(input$in_outcome), " ", last_knot, "\n")
       
       last_knot <- last_knot[2]
       
