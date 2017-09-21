@@ -99,12 +99,14 @@ shinyServer(function(input, output, session){
     
     if (nrow(acmfdata) > 0){
       
+      last_knot <- get_last_knot(acmfdata)
+      
       local_cov_method <- F
       
       if (isolate(input$in_outcome) == "Coronary Heart Disease")
         local_cov_method <- T
       
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2]))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
       fig_title <- input$in_outcome
@@ -114,11 +116,11 @@ shinyServer(function(input, output, session){
       fig_title <- paste0("Overall Population - ", fig_title, "\n Number of samples: ",  length(unique(acmfdata$id)) , 
                                                                     " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
                                                                                                       format = "f", big.mark = ",", drop0trailing = TRUE))
-      getPlot(plot_data, fig_title)
+      getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
       
     }else{
       
-      getPlot(NULL, "")
+      getPlot(datasaet = NULL, last_knot = NULL, plotTitle =  "")
     }
     
   })
@@ -131,8 +133,12 @@ shinyServer(function(input, output, session){
     
     if (nrow(acmfdata) > 0){
       
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = input$in_sub_quantile[1], maxQuantile = input$in_sub_quantile[2]))
+      last_knot <- get_last_knot(acmfdata)
+      
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = 0, maxQuantile = last_knot))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
+      
+      
       
       gt <- "Male Population"
       if (input$in_sub_population == 2)
@@ -146,7 +152,7 @@ shinyServer(function(input, output, session){
                           length(unique(acmfdata$id)) , 
                           " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
                                                             format = "f", big.mark = ",", drop0trailing = TRUE))
-      getPlot(plot_data, fig_title)
+      getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
       
     }else{
       
@@ -160,7 +166,7 @@ shinyServer(function(input, output, session){
       
       fig_title <- paste0(gt, " - ", fig_title)
       
-      getPlot(NULL, fig_title)
+      getPlot(datasaet = NULL, last_knot = NULL, plotTitle =  fig_title)
   
   }
     
@@ -169,7 +175,7 @@ shinyServer(function(input, output, session){
   })
   
   
-  getPlot <- function (dataset, plotTitle, xlab = "Marginal MET hours per week" ){
+  getPlot <- function (dataset, last_knot, plotTitle, xlab = "Marginal MET hours per week" ){
     
     
     # outfile <- tempfile(fileext='.png')
@@ -178,8 +184,9 @@ shinyServer(function(input, output, session){
     # png(outfile, width=400, height=300)
     
     if (!is.null(dataset)){
-    
-      q <- quantile(dataset$dose, c(input$in_main_quantile[1], (input$in_main_quantile[1] + input$in_main_quantile[2]) / 2, input$in_main_quantile[2]))
+      
+      # q <- quantile(dataset$dose, c(input$in_main_quantile[1], (input$in_main_quantile[1] + input$in_main_quantile[2]) / 2, input$in_main_quantile[2]))
+      q<- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
       
       gg <- ggplot(dataset, aes(dose, RR)) + 
         geom_line(data = dataset) + 
