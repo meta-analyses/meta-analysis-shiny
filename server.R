@@ -101,6 +101,10 @@ shinyServer(function(input, output, session){
       
       last_knot <- get_last_knot(acmfdata)
       
+      cat("total population ", isolate(input$in_outcome), " ", last_knot, "\n")
+      
+      last_knot <- last_knot[2]
+      
       local_cov_method <- F
       
       if (isolate(input$in_outcome) == "Coronary Heart Disease")
@@ -129,13 +133,23 @@ shinyServer(function(input, output, session){
   output$plot_subpopulation_analysis <- renderPlotly({
     
     
-    acmfdata <- get_subpopulation_data()
+    sub_pop_data <- get_subpopulation_data()
     
-    if (nrow(acmfdata) > 0){
+    if (nrow(sub_pop_data) > 0){
       
-      last_knot <- get_last_knot(acmfdata)
+      td <<- sub_pop_data
       
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", covMethed = T, returnval = T, minQuantile = 0, maxQuantile = last_knot))
+      local_personyrs_pert <- 0.25
+      if (isolate(input$in_outcome) == "colon cancer" || isolate(input$in_outcome) == "stroke")
+        local_personyrs_pert <- 0.1
+      
+      last_knot <- get_last_knot(sub_pop_data, personyrs_pert = local_personyrs_pert)
+      
+      cat("sub population ", isolate(input$in_outcome), " ", last_knot, "\n")
+      
+      last_knot <- last_knot[2]
+      
+      plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = T, returnval = T, minQuantile = 0, maxQuantile = last_knot))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
       
@@ -149,8 +163,8 @@ shinyServer(function(input, output, session){
         fig_title <- stringi::stri_trans_totitle(fig_title)
       
       fig_title <- paste0(gt, " - ", fig_title, "\n Number of samples: ",  
-                          length(unique(acmfdata$id)) , 
-                          " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
+                          length(unique(sub_pop_data$id)) , 
+                          " & Number of people: " , formatC(round(sum(sub_pop_data$totalpersons, na.rm = T)), 
                                                             format = "f", big.mark = ",", drop0trailing = TRUE))
       getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
       
@@ -191,7 +205,7 @@ shinyServer(function(input, output, session){
       gg <- ggplot(dataset, aes(dose, RR)) + 
         geom_line(data = dataset) + 
         geom_ribbon(data = dataset, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-        #coord_cartesian(ylim = c(0, 1), xlim = c(0, xMax)) +
+        #coord_cartesian(ylim = c(0, 1), xlim = c(0, 100)) +
         scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
         # coord_cartesian(xlim = c(0, 70)) +
         xlab(paste("\n", xlab, "\n")) +
