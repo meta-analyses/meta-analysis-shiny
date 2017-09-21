@@ -99,7 +99,12 @@ shinyServer(function(input, output, session){
     
     if (nrow(acmfdata) > 0){
       
-      last_knot <- get_last_knot(acmfdata)
+      local_personyrs_pert <- 0.25
+      
+      if (isolate(input$in_outcome) == "stroke")
+        local_personyrs_pert <- 0.1
+      
+      last_knot <- get_last_knot(acmfdata, personyrs_pert = local_personyrs_pert)
       
       cat("total population ", isolate(input$in_outcome), " ", last_knot, "\n")
       
@@ -234,8 +239,12 @@ shinyServer(function(input, output, session){
       
       if (isolate(input$in_outcome) == "Coronary Heart Disease")
         local_cov_method <- T
+      
+      last_knot <- get_last_knot(acmfdata)
+      
+      last_knot <- last_knot[2]
 
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = input$in_main_quantile[1], maxQuantile = input$in_main_quantile[2], lout = 1000))
+      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, maxQuantile = last_knot, lout = 1000))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
 
       removeNA <- F
