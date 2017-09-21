@@ -123,7 +123,7 @@ for (i in 1:nrow(uoutcome)){
       if (length(usexgroups) == 1){
         # Remove single gender specific studies
         raw_data_gsp_ltpa <- subset(raw_data_gsp_ltpa, (ref_number != uid[j])) 
-        cat("gsp ",uoutcome$outcome[i], " - ", unique(dat1$ref_number), " - ", unique(dat1$overall), " - ", unique(dat1$sex_subgroups), "\n")
+        # cat("gsp ",uoutcome$outcome[i], " - ", unique(dat1$ref_number), " - ", unique(dat1$overall), " - ", unique(dat1$sex_subgroups), "\n")
       }
     }
   }
