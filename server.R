@@ -199,15 +199,12 @@ shinyServer(function(input, output, session){
     
     if (!is.null(dataset)){
       
-      # q <- quantile(dataset$dose, c(input$in_main_quantile[1], (input$in_main_quantile[1] + input$in_main_quantile[2]) / 2, input$in_main_quantile[2]))
-      q<- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
+      q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
       
       gg <- ggplot(dataset, aes(dose, RR)) + 
         geom_line(data = dataset) + 
         geom_ribbon(data = dataset, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
-        #coord_cartesian(ylim = c(0, 1), xlim = c(0, 100)) +
         scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
-        # coord_cartesian(xlim = c(0, 70)) +
         xlab(paste("\n", xlab, "\n")) +
         ylab("\nRelative Risk\n") +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
@@ -224,7 +221,6 @@ shinyServer(function(input, output, session){
     }
     
     p <- ggplotly(gg)
-    # dev.off()
     p
   }
   
