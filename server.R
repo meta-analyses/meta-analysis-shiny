@@ -129,7 +129,7 @@ shinyServer(function(input, output, session){
       
     }else{
       
-      getPlot(datasaet = NULL, last_knot = NULL, plotTitle =  "")
+      getPlot(dataset = NULL, last_knot = NULL, plotTitle =  "")
     }
     
   })
@@ -185,7 +185,7 @@ shinyServer(function(input, output, session){
       
       fig_title <- paste0(gt, " - ", fig_title)
       
-      getPlot(datasaet = NULL, last_knot = NULL, plotTitle =  fig_title)
+      getPlot(dataset = NULL, last_knot = NULL, plotTitle =  fig_title)
   
   }
     
