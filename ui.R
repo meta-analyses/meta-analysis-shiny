@@ -26,17 +26,25 @@ shinyUI(fluidPage(
     HTML("<hr>"),
     radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE),
     HTML("<hr>"),
-    # sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0, max = 1, value = c(0, 0.65), step = 0.05),
-    # HTML("<hr>"),
-    # sliderInput(inputId = "in_sub_quantile", label = "Sub-population quantiles", min = 0, max = 1, value = c(0, 0.65), step = 0.05),
-    # HTML("<hr>"),
+    sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.05),
+    HTML("<hr>"),
+    sliderInput(inputId = "in_sub_quantile", label = "Sub-population quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.05),
+    HTML("<hr>"),
     uiOutput("lower_guideline"),
     HTML("<hr>"),
     uiOutput("upper_guideline")
     
     
   ),
+  
+  # mainPanel("main panel",
+  #           fluidRow(
+  #             splitLayout(cellWidths = c("50%", "50%"), plotlyOutput("plot_overall_analysis"), plotlyOutput("plot_subpopulation_analysis"))
+  #           )
+  # )
+  
   mainPanel(
+
     tabsetPanel(
       tabPanel("Analysis",
                plotlyOutput("plot_overall_analysis"),
@@ -50,7 +58,7 @@ shinyUI(fluidPage(
                uiOutput("sub_warning_message"),
                DT::dataTableOutput("subpopulation_datatable")
       ),
-      
+
       id = "conditionedPanels"
     )
   )
