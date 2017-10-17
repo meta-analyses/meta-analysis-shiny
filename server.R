@@ -81,9 +81,6 @@ shinyServer(function(input, output, session){
       acmfdata <- subset(acmfdata, !((effect_measure == "hr" & (is.na(personyrs) | personyrs == 0) ) | 
                                      (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
       
-      # Filter studies by study size greater than 10k
-      acmfdata <- subset(acmfdata, n_baseline > 10000)
-      
     }
     
     acmfdata
@@ -99,12 +96,7 @@ shinyServer(function(input, output, session){
     
     if (nrow(acmfdata) > 0){
       
-      local_personyrs_pert <- 0.25
-      
-      if (isolate(input$in_outcome) == "stroke")
-        local_personyrs_pert <- 0.1
-      
-      last_knot <- get_last_knot(acmfdata, personyrs_pert = local_personyrs_pert)
+      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
       
       last_knot <- last_knot[2]
       
@@ -146,7 +138,7 @@ shinyServer(function(input, output, session){
       if (isolate(input$in_outcome) == "colon cancer" || isolate(input$in_outcome) == "stroke")
         local_personyrs_pert <- 0.1
       
-      last_knot <- get_last_knot(sub_pop_data, personyrs_pert = local_personyrs_pert)
+      last_knot <- last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
       
       last_knot <- last_knot[2]
       
@@ -236,7 +228,7 @@ shinyServer(function(input, output, session){
       if (isolate(input$in_outcome) == "Coronary Heart Disease")
         local_cov_method <- T
       
-      last_knot <- get_last_knot(acmfdata)
+      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
       
       last_knot <- last_knot[2]
 
