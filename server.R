@@ -105,12 +105,19 @@ shinyServer(function(input, output, session){
       
       last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
       
+      if (input$total_sub_population == 2)
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        
+      
+      
+      
       last_knot <- last_knot[2]
       
       local_cov_method <- F
       
-      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease")
+      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" || isolate(input$in_outcome) == "stroke")
         local_cov_method <- T
+      
       
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
@@ -154,7 +161,8 @@ shinyServer(function(input, output, session){
       
       local_cov_method <- F
       
-      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease")
+      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" 
+          || isolate(input$in_outcome) == "stroke")
         local_cov_method <- T
       
       last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
@@ -406,11 +414,6 @@ shinyServer(function(input, output, session){
   output$overall_datatable <- DT::renderDataTable({
     
     overall_data <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
-
-    overall_data <- subset(overall_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
-    
-    # Convert id into factor and then back to numeric for an ordered id
-    overall_data$id <- as.numeric(as.factor(overall_data$id))
     
     if(nrow(overall_data) <= 0){
       # Set the warning message that no lines have been selected by the user
@@ -418,6 +421,13 @@ shinyServer(function(input, output, session){
       # Return an empty data.frame
       return(data.frame(File=character()))
     }
+    
+
+    overall_data <- subset(overall_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    
+    # Convert id into factor and then back to numeric for an ordered id
+    overall_data$id <- as.numeric(as.factor(overall_data$id))
+    
     # Empty the warning message - as some lines have been selected by the user
     output$overall_warning_message <- renderUI("")
     DT::datatable(overall_data, options = list(pageLength = 20)) #%>%
@@ -427,20 +437,21 @@ shinyServer(function(input, output, session){
   output$male_population_datatable <- DT::renderDataTable({
     
     sub_population_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
+    if(nrow(sub_population_data) <= 0){
+      # Set the warning message that no lines have been selected by the user
+      output$male_sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
+      # Return an empty data.frame
+      return(data.frame(File=character()))
+    }
+    
     # Subset by columns
     sub_population_data <- subset(sub_population_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
     # Convert id into factor and then back to numeric for an ordered id
     sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
     
-    if(nrow(sub_population_data) <= 0){
-      # Set the warning message that no lines have been selected by the user
-      output$sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
-      # Return an empty data.frame
-      return(data.frame(File=character()))
-    }
     # Empty the warning message - as some lines have been selected by the user
-    output$sub_warning_message <- renderUI("")
+    output$male_sub_warning_message <- renderUI("")
     DT::datatable(sub_population_data, options = list(pageLength = 20)) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
@@ -449,20 +460,21 @@ shinyServer(function(input, output, session){
   output$female_population_datatable <- DT::renderDataTable({
     
     sub_population_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
+    if(nrow(sub_population_data) <= 0){
+      # Set the warning message that no lines have been selected by the user
+      output$female_sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
+      # Return an empty data.frame
+      return(data.frame(File=character()))
+    }
+    
     # Subset by columns
     sub_population_data <- subset(sub_population_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
     # Convert id into factor and then back to numeric for an ordered id
     sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
     
-    if(nrow(sub_population_data) <= 0){
-      # Set the warning message that no lines have been selected by the user
-      output$sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
-      # Return an empty data.frame
-      return(data.frame(File=character()))
-    }
     # Empty the warning message - as some lines have been selected by the user
-    output$sub_warning_message <- renderUI("")
+    output$female_sub_warning_message <- renderUI("")
     DT::datatable(sub_population_data, options = list(pageLength = 20)) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
