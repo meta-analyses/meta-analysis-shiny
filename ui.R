@@ -51,19 +51,19 @@ shinyUI(fluidPage(
                  plotlyOutput("bottom_plot")
                )
       ),
-      # tabPanel("Outcome-specific Total Population Data",
-      #          uiOutput("overall_warning_message"),
-      #          DT::dataTableOutput("overall_datatable")
-      # ),
-      # tabPanel("Outcome-specific Male Population Data",
-      #          uiOutput("sub_warning_message"),
-      #          DT::dataTableOutput("male_population_datatable")
-      # ),
-      # tabPanel("Outcome-specific Female Population Data",
-      #          uiOutput("sub_warning_message"),
-      #          DT::dataTableOutput("female_population_datatable")
-      # ),
-      # 
+      tabPanel("Total Population Data",
+               uiOutput("overall_warning_message"),
+               DT::dataTableOutput("overall_datatable")
+      ),
+      tabPanel("Male Population Data",
+               uiOutput("male_sub_warning_message"),
+               DT::dataTableOutput("male_population_datatable")
+      ),
+      tabPanel("Female Population Data",
+               uiOutput("female_sub_warning_message"),
+               DT::dataTableOutput("female_population_datatable")
+      ),
+
       id = "conditionedPanels"
     )
   )
