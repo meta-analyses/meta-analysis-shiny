@@ -3,23 +3,19 @@ lower_guideline_value <- NA
 upper_guideline_value <- NA
 shinyServer(function(input, output, session){
   
-  get_overall_data <- reactive({
-    input$in_outcome 
-    input$in_outcome_type
-    input$in_PA_exposure
-    input$in_sub_population
+  get_overall_data <- function (PA_exposure, outcome_disease, outcome_types){
     
     acmfdata <- data.frame()
     
-    if (!is.na(input$in_outcome_type) & input$in_outcome_type != 'all'){
+    if (!is.na(outcome_disease) && outcome_types != 'all'){
       acmfdata <- subset(raw_data_tp_ltpa, 
-                         outcome == input$in_outcome & 
-                           pa_domain_subgroup == input$in_PA_exposure & 
-                           outcome_type == input$in_outcome_type)
+                         outcome == outcome_disease & 
+                         pa_domain_subgroup == PA_exposure & 
+                         outcome_type == outcome_types)
     }else{
       acmfdata <- subset(raw_data_tp_ltpa, 
-                         outcome == input$in_outcome & 
-                           pa_domain_subgroup == input$in_PA_exposure)
+                         outcome == outcome_disease & 
+                         pa_domain_subgroup == PA_exposure)
                            
       
     }
@@ -31,44 +27,37 @@ shinyServer(function(input, output, session){
                                        (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
       
       # Filter studies by study size
-      if (input$in_outcome == "all-cause mortality")
-        acmfdata <- subset(acmfdata, n_baseline >= 40000)
-      else
-        acmfdata <- subset(acmfdata, n_baseline >= 10000)
+      # if (input$in_outcome == "all-cause mortality")
+      #   acmfdata <- subset(acmfdata, n_baseline >= 40000)
+      # else
+      #   acmfdata <- subset(acmfdata, n_baseline >= 10000)
       
-      if (isolate(input$in_outcome) == "Cardiovascular Disease"){
-        #td <<- acmfdata
-        acmfdata <- subset(acmfdata, !is.na(rr))
-      }
-        
+      # if (isolate(input$in_outcome) == "Cardiovascular Disease"){
+      #   #td <<- acmfdata
+      #   acmfdata <- subset(acmfdata, !is.na(rr))
+      # }
+      #   
         
       
     }
     acmfdata
     
-  })
+  }
   
-  get_subpopulation_data <- reactive({
-    input$in_outcome 
-    input$in_outcome_type
-    input$in_PA_exposure
-    input$in_sub_population
+  get_subpopulation_data <- function (PA_exposure, outcome_disease, outcome_types, gender){
     
     acmfdata <- data.frame()
-    if (is.na(input$in_outcome_type))
-      return()
-    
-    if (input$in_outcome_type != 'all'){
+    if (outcome_types != 'all'){
       acmfdata <- subset(raw_data_gsp_ltpa, 
-                       outcome == input$in_outcome & 
-                         pa_domain_subgroup == input$in_PA_exposure & 
-                         sex_subgroups == input$in_sub_population & 
-                         outcome_type == input$in_outcome_type)
+                         outcome == outcome_disease & 
+                         pa_domain_subgroup == PA_exposure & 
+                         sex_subgroups == gender &
+                         outcome_type == outcome_types)
     }else{
       acmfdata <- subset(raw_data_gsp_ltpa, 
-                         outcome == input$in_outcome & 
-                           pa_domain_subgroup == input$in_PA_exposure & 
-                           sex_subgroups == input$in_sub_population)
+                         outcome == outcome_disease & 
+                         pa_domain_subgroup == PA_exposure & 
+                         sex_subgroups == gender)#input$in_sub_population)
       
     }
     
@@ -84,15 +73,33 @@ shinyServer(function(input, output, session){
     }
     
     acmfdata
-    
-    
-  })
+  }
   
   
   
-  output$plot_overall_analysis <- renderPlotly({
+  output$top_plot <- renderPlotly({
+    input$in_PA_exposure
+    input$in_outcome
+    input$in_outcome_type
+    input$total_sub_population
     
-    acmfdata <- get_overall_data()
+    pop_title <- "Overall Population"
+    
+    if (input$total_sub_population == 1)
+      acmfdata <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+    else{# Sub-population
+      acmfdata <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
+      pop_title <- "Male Population"
+    }
+    
+    
+    outcome_type <- ""
+    
+    if (input$in_outcome_type != "all"){
+      outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+      
+    }
+    
     
     if (nrow(acmfdata) > 0){
       
@@ -102,7 +109,7 @@ shinyServer(function(input, output, session){
       
       local_cov_method <- F
       
-      if (isolate(input$in_outcome) == "Coronary Heart Disease")
+      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease")
         local_cov_method <- T
       
       plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot))
@@ -112,7 +119,7 @@ shinyServer(function(input, output, session){
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
       
-      fig_title <- paste0("Overall Population - ", fig_title, "\n Number of samples: ",  length(unique(acmfdata$id)) , 
+      fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of samples: ",  length(unique(acmfdata$id)) , 
                                                                     " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
                                                                                                       format = "f", big.mark = ",", drop0trailing = TRUE))
       getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
@@ -125,37 +132,45 @@ shinyServer(function(input, output, session){
   })
   
   
-  output$plot_subpopulation_analysis <- renderPlotly({
+  output$bottom_plot <- renderPlotly({
     
+    input$in_PA_exposure
+    input$in_outcome
+    input$in_outcome_type
+    input$total_sub_population
     
-    sub_pop_data <- get_subpopulation_data()
+    sub_pop_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
+    
+    outcome_type <- ""
+    
+    if (input$in_outcome_type != "all"){
+      outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+      
+    }
     
     if (nrow(sub_pop_data) > 0){
       
       td <<- sub_pop_data
       
-      local_personyrs_pert <- 0.25
-      if (isolate(input$in_outcome) == "colon cancer" || isolate(input$in_outcome) == "stroke")
-        local_personyrs_pert <- 0.1
+      local_cov_method <- F
       
-      last_knot <- last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease")
+        local_cov_method <- T
+      
+      last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
       
       last_knot <- last_knot[2]
       
-      plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = T, returnval = T, minQuantile = 0, maxQuantile = last_knot))
+      plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = local_cov_method, returnval = T, minQuantile = 0, maxQuantile = last_knot))
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
       
-      
-      
-      gt <- "Male Population"
-      if (input$in_sub_population == 2)
-        gt <- "Female Population"
+      gt <- "Female Population"
       
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
         fig_title <- stringi::stri_trans_totitle(fig_title)
       
-      fig_title <- paste0(gt, " - ", fig_title, "\n Number of samples: ",  
+      fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of samples: ",  
                           length(unique(sub_pop_data$id)) , 
                           " & Number of people: " , formatC(round(sum(sub_pop_data$totalpersons, na.rm = T)), 
                                                             format = "f", big.mark = ",", drop0trailing = TRUE))
@@ -163,9 +178,9 @@ shinyServer(function(input, output, session){
       
     }else{
       
-      gt <- "Male Population"
-      if (input$in_sub_population == 2)
-        gt <- "Female Population"
+      gt <- "Female Population"
+      #if (input$in_sub_population == 2)
+      #  gt <- "Female Population"
       
       fig_title <- input$in_outcome
       if (fig_title != toupper(fig_title))
@@ -219,7 +234,7 @@ shinyServer(function(input, output, session){
   
   set_pif_values <- reactive({
     
-    acmfdata <- get_overall_data()
+    acmfdata <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
 
     if (nrow(acmfdata) > 0){
       
@@ -383,14 +398,8 @@ shinyServer(function(input, output, session){
   
   output$overall_datatable <- DT::renderDataTable({
     
-    overall_data <- get_overall_data()
-    # Select only a subset of columns
-    #     [1] "id"             "ref_number"     "study"          "authors"       
-    #     [5] "outcome"        "effect_measure" "type"           "follow_up"     
-    #     [9] "sex_subgroups"  "overall"        "totalpersons"   "personyears"   
-    #     [13] "dose"           "rr"             "cases"          "lci"           
-    #     [17] "uci"            "logrr"          "se"
-    
+    overall_data <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+
     overall_data <- subset(overall_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
     # Convert id into factor and then back to numeric for an ordered id
@@ -408,9 +417,31 @@ shinyServer(function(input, output, session){
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
   
-  output$subpopulation_datatable <- DT::renderDataTable({
+  output$male_population_datatable <- DT::renderDataTable({
     
-    sub_population_data <- get_subpopulation_data()
+    sub_population_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
+    # Subset by columns
+    sub_population_data <- subset(sub_population_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    
+    # Convert id into factor and then back to numeric for an ordered id
+    sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
+    
+    if(nrow(sub_population_data) <= 0){
+      # Set the warning message that no lines have been selected by the user
+      output$sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
+      # Return an empty data.frame
+      return(data.frame(File=character()))
+    }
+    # Empty the warning message - as some lines have been selected by the user
+    output$sub_warning_message <- renderUI("")
+    DT::datatable(sub_population_data, options = list(pageLength = 20)) #%>%
+    #formatRound(columns = names(numeric_line_col_names), digits=2)
+  })
+  
+  
+  output$female_population_datatable <- DT::renderDataTable({
+    
+    sub_population_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
     # Subset by columns
     sub_population_data <- subset(sub_population_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
