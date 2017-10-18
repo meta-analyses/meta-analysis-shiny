@@ -16,6 +16,10 @@ outcome_type <- c("all",
 sub_population <- c("Male Population" = 1,
                     "Female Population" = 2)
 
+
+total_sub_population <- c("Total Population" = 1,
+                          "Sub-population" = 2)
+
 shinyUI(fluidPage(
   list(tags$title(HTML('Meta-Analysis'))),
   width="100%", height="100%",
@@ -24,7 +28,7 @@ shinyUI(fluidPage(
     radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
     radioButtons(inputId = "in_outcome_type", label = "Select Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
-    radioButtons("in_sub_population", "Population: ", sub_population, inline = TRUE),
+    radioButtons("total_sub_population", "Population: ", total_sub_population, inline = TRUE),
     HTML("<hr>"),
     sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.05),
     HTML("<hr>"),
@@ -37,28 +41,29 @@ shinyUI(fluidPage(
     
   ),
   
-  # mainPanel("main panel",
-  #           fluidRow(
-  #             splitLayout(cellWidths = c("50%", "50%"), plotlyOutput("plot_overall_analysis"), plotlyOutput("plot_subpopulation_analysis"))
-  #           )
-  # )
-  
   mainPanel(
 
     tabsetPanel(
       tabPanel("Analysis",
-               plotlyOutput("plot_overall_analysis"),
-               plotlyOutput("plot_subpopulation_analysis")
+               plotlyOutput("top_plot"),
+               conditionalPanel(
+                 condition = "input.total_sub_population != 1",
+                 plotlyOutput("bottom_plot")
+               )
       ),
-      tabPanel("Outcome-specific Data",
-               uiOutput("overall_warning_message"),
-               DT::dataTableOutput("overall_datatable")
-      ),
-      tabPanel("Outcome-specific Sub-population Data",
-               uiOutput("sub_warning_message"),
-               DT::dataTableOutput("subpopulation_datatable")
-      ),
-
+      # tabPanel("Outcome-specific Total Population Data",
+      #          uiOutput("overall_warning_message"),
+      #          DT::dataTableOutput("overall_datatable")
+      # ),
+      # tabPanel("Outcome-specific Male Population Data",
+      #          uiOutput("sub_warning_message"),
+      #          DT::dataTableOutput("male_population_datatable")
+      # ),
+      # tabPanel("Outcome-specific Female Population Data",
+      #          uiOutput("sub_warning_message"),
+      #          DT::dataTableOutput("female_population_datatable")
+      # ),
+      # 
       id = "conditionedPanels"
     )
   )
