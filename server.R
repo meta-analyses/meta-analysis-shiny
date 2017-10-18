@@ -225,7 +225,14 @@ shinyServer(function(input, output, session){
           legend.position = c(0.1, 1.05)) + 
         labs(title = paste(plotTitle)) #+ labs(fill = "") 
     }else{
-      gg <- ggplot()
+      gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
+        theme(
+          plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+          plot.title = element_text(size = 12, colour = "red", vjust = 7),
+          plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="red"),
+          legend.direction = "horizontal",
+          legend.position = c(0.1, 1.05)) +
+        labs (title = "Sorry no data is available")
     }
     
     p <- ggplotly(gg)
