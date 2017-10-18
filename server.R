@@ -424,6 +424,8 @@ shinyServer(function(input, output, session){
     
 
     overall_data <- subset(overall_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    # Remove gender specific suffix from ref_number
+    overall_data$ref_number <- sapply(strsplit(overall_data$ref_number," "), `[`, 1)
     
     # Convert id into factor and then back to numeric for an ordered id
     overall_data$id <- as.numeric(as.factor(overall_data$id))
@@ -449,6 +451,8 @@ shinyServer(function(input, output, session){
     
     # Convert id into factor and then back to numeric for an ordered id
     sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
+    # Remove gender specific suffix from ref_number
+    sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number," "), `[`, 1)
     
     # Empty the warning message - as some lines have been selected by the user
     output$male_sub_warning_message <- renderUI("")
@@ -472,6 +476,8 @@ shinyServer(function(input, output, session){
     
     # Convert id into factor and then back to numeric for an ordered id
     sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
+    # Remove gender specific suffix from ref_number
+    sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number," "), `[`, 1)
     
     # Empty the warning message - as some lines have been selected by the user
     output$female_sub_warning_message <- renderUI("")
