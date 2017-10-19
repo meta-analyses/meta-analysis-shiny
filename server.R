@@ -92,48 +92,64 @@ shinyServer(function(input, output, session){
       pop_title <- "Male Population"
     }
     
-    
-    outcome_type <- ""
-    
-    if (input$in_outcome_type != "all"){
-      outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+    if (input$total_sub_population == 2 && input$plot_options == 2){
       
-    }
-    
-    
-    if (nrow(acmfdata) > 0){
-      
-      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
-      
-      if (input$total_sub_population == 2)
+        if (nrow(acmfdata) > 0){
+        
         last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
         
+        last_knot <- last_knot[2]
+        
+        get_dose_plot(acmfdata, last_knot)
+        }
+        
+    }
+    
+    else{
+    
+      outcome_type <- ""
+      
+      if (input$in_outcome_type != "all"){
+        outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+        
+      }
       
       
-      
-      last_knot <- last_knot[2]
-      
-      local_cov_method <- F
-      
-      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" || isolate(input$in_outcome) == "stroke")
-        local_cov_method <- T
-      
-      
-      plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot))
-      colnames(plot_data) <- c("dose","RR", "lb", "ub")
-      
-      fig_title <- input$in_outcome
-      if (fig_title != toupper(fig_title))
-        fig_title <- stringi::stri_trans_totitle(fig_title)
-      
-      fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of samples: ",  length(unique(acmfdata$id)) , 
-                                                                    " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
-                                                                                                      format = "f", big.mark = ",", drop0trailing = TRUE))
-      getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
-      
-    }else{
-      
-      getPlot(dataset = NULL, last_knot = NULL, plotTitle =  "")
+      if (nrow(acmfdata) > 0){
+        
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
+        
+        if (input$total_sub_population == 2)
+          last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+          
+        
+        
+        
+        last_knot <- last_knot[2]
+        
+        local_cov_method <- F
+        
+        if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" || isolate(input$in_outcome) == "stroke")
+          local_cov_method <- T
+        
+        
+        plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot))
+        colnames(plot_data) <- c("dose","RR", "lb", "ub")
+        
+        fig_title <- input$in_outcome
+        if (fig_title != toupper(fig_title))
+          fig_title <- stringi::stri_trans_totitle(fig_title)
+        
+        fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of samples: ",  length(unique(acmfdata$id)) , 
+                                                                      " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
+                                                                                                        format = "f", big.mark = ",", drop0trailing = TRUE))
+        getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
+        
+      }else{
+        
+        getPlot(dataset = NULL, last_knot = NULL, plotTitle =  "")
+      }
+    
     }
     
   })
@@ -146,63 +162,114 @@ shinyServer(function(input, output, session){
     input$in_outcome_type
     input$total_sub_population
     
-    sub_pop_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
     
-    outcome_type <- ""
-    
-    if (input$in_outcome_type != "all"){
-      outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+    if (input$total_sub_population == 1){
       
-    }
-    
-    if (nrow(sub_pop_data) > 0){
+      acmfdata <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
       
-      td <<- sub_pop_data
-      
-      local_cov_method <- F
-      
-      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" 
-          || isolate(input$in_outcome) == "stroke")
-        local_cov_method <- T
-      
-      last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
       
       last_knot <- last_knot[2]
       
-      plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = local_cov_method, returnval = T, minQuantile = 0, maxQuantile = last_knot))
-      colnames(plot_data) <- c("dose","RR", "lb", "ub")
+      get_dose_plot(acmfdata, last_knot)
       
-      gt <- "Female Population"
-      
-      fig_title <- input$in_outcome
-      if (fig_title != toupper(fig_title))
-        fig_title <- stringi::stri_trans_totitle(fig_title)
-      
-      fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of samples: ",  
-                          length(unique(sub_pop_data$id)) , 
-                          " & Number of people: " , formatC(round(sum(sub_pop_data$totalpersons, na.rm = T)), 
-                                                            format = "f", big.mark = ",", drop0trailing = TRUE))
-      getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
-      
-    }else{
-      
-      gt <- "Female Population"
-      #if (input$in_sub_population == 2)
-      #  gt <- "Female Population"
-      
-      fig_title <- input$in_outcome
-      if (fig_title != toupper(fig_title))
-        fig_title <- stringi::stri_trans_totitle(fig_title)
-      
-      fig_title <- paste0(gt, " - ", fig_title)
-      
-      getPlot(dataset = NULL, last_knot = NULL, plotTitle =  fig_title)
-  
-  }
+    }
     
+    else{
       
+      sub_pop_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
+      
+      if (input$plot_options == 1){
+        
+        outcome_type <- ""
+        
+        if (input$in_outcome_type != "all"){
+          outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+          
+        }
+        
+        if (nrow(sub_pop_data) > 0){
+          
+          td <<- sub_pop_data
+          
+          local_cov_method <- F
+          
+          if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" 
+              || isolate(input$in_outcome) == "stroke")
+            local_cov_method <- T
+          
+          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+          
+          last_knot <- last_knot[2]
+          
+          plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = local_cov_method, returnval = T, minQuantile = 0, maxQuantile = last_knot))
+          colnames(plot_data) <- c("dose","RR", "lb", "ub")
+          
+          gt <- "Female Population"
+          
+          fig_title <- input$in_outcome
+          if (fig_title != toupper(fig_title))
+            fig_title <- stringi::stri_trans_totitle(fig_title)
+          
+          fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of samples: ",  
+                              length(unique(sub_pop_data$id)) , 
+                              " & Number of people: " , formatC(round(sum(sub_pop_data$totalpersons, na.rm = T)), 
+                                                                format = "f", big.mark = ",", drop0trailing = TRUE))
+          getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
+          
+        }else{
+          
+          gt <- "Female Population"
+          #if (input$in_sub_population == 2)
+          #  gt <- "Female Population"
+          
+          fig_title <- input$in_outcome
+          if (fig_title != toupper(fig_title))
+            fig_title <- stringi::stri_trans_totitle(fig_title)
+          
+          fig_title <- paste0(gt, " - ", fig_title)
+          
+          getPlot(dataset = NULL, last_knot = NULL, plotTitle =  fig_title)
+          
+        }
+        
+      }else{
+        
+        
+        last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        
+        last_knot <- last_knot[2]
+        
+        get_dose_plot(sub_pop_data, last_knot)
+        
+      }
+      
+    }
     
   })
+  
+  
+  get_dose_plot <- function (dataset, last_knot){
+    
+    q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
+    
+    ## some descriptives
+    length(unique(dataset$id))
+    table(dataset$id)
+    group_by(dataset, id) %>% select(dose, se) %>%
+      summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
+    gg <- ggplotly(
+      ggplot(dataset, aes(dose, rr, col = ref_number, label = personyrs)) + geom_point() +
+        geom_line() +
+        scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
+        geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
+        theme_classic() + guides(col = FALSE)
+    )
+    
+    p <- ggplotly(gg)
+    p
+    
+  }
   
   
   getPlot <- function (dataset, last_knot, plotTitle, xlab = "Marginal MET hours per week" ){
