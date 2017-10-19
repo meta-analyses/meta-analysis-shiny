@@ -83,7 +83,7 @@ shinyServer(function(input, output, session){
     input$in_outcome_type
     input$total_sub_population
     
-    pop_title <- "Overall Population"
+    pop_title <- "Total Population"
     
     if (input$total_sub_population == 1)
       acmfdata <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
@@ -178,7 +178,7 @@ shinyServer(function(input, output, session){
       
         last_knot <- last_knot[2]
       
-        p_title <- get_title(dataset = acmfdata, pop_type = "female")
+        p_title <- get_title(dataset = acmfdata, pop_type = "total")
       
         get_dose_plot(acmfdata, last_knot, plot_title = p_title)
       }else{
