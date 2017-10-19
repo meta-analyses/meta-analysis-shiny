@@ -96,11 +96,17 @@ shinyServer(function(input, output, session){
       
         if (nrow(acmfdata) > 0){
         
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
-        
-        last_knot <- last_knot[2]
-        
-        get_dose_plot(acmfdata, last_knot)
+          last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+          
+          last_knot <- last_knot[2]
+          
+          p_title <- get_title(dataset = acmfdata, pop_type = "female")
+          
+          get_dose_plot(acmfdata, last_knot, plot_title = p_title)
+        }else{
+          
+          get_dose_plot(NULL, 0, "")
+          
         }
         
     }
@@ -162,16 +168,23 @@ shinyServer(function(input, output, session){
     input$in_outcome_type
     input$total_sub_population
     
-    
     if (input$total_sub_population == 1){
       
       acmfdata <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
       
-      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
+      if (nrow(acmfdata) > 0){
       
-      last_knot <- last_knot[2]
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
       
-      get_dose_plot(acmfdata, last_knot)
+        last_knot <- last_knot[2]
+      
+        p_title <- get_title(dataset = acmfdata, pop_type = "female")
+      
+        get_dose_plot(acmfdata, last_knot, plot_title = p_title)
+      }else{
+        
+        get_dose_plot(NULL, 0, "")
+      }
       
     }
     
@@ -180,13 +193,6 @@ shinyServer(function(input, output, session){
       sub_pop_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
       
       if (input$plot_options == 1){
-        
-        outcome_type <- ""
-        
-        if (input$in_outcome_type != "all"){
-          outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
-          
-        }
         
         if (nrow(sub_pop_data) > 0){
           
@@ -205,17 +211,7 @@ shinyServer(function(input, output, session){
           plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = local_cov_method, returnval = T, minQuantile = 0, maxQuantile = last_knot))
           colnames(plot_data) <- c("dose","RR", "lb", "ub")
           
-          gt <- "Female Population"
-          
-          fig_title <- input$in_outcome
-          if (fig_title != toupper(fig_title))
-            fig_title <- stringi::stri_trans_totitle(fig_title)
-          
-          fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of samples: ",  
-                              length(unique(sub_pop_data$id)) , 
-                              " & Number of people: " , formatC(round(sum(sub_pop_data$totalpersons, na.rm = T)), 
-                                                                format = "f", big.mark = ",", drop0trailing = TRUE))
-          getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
+          getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"))
           
         }else{
           
@@ -229,18 +225,27 @@ shinyServer(function(input, output, session){
           
           fig_title <- paste0(gt, " - ", fig_title)
           
-          getPlot(dataset = NULL, last_knot = NULL, plotTitle =  fig_title)
+          getPlot(dataset = NULL, last_knot = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"))
           
         }
         
       }else{
         
+        if (nrow(sub_pop_data) > 0){
         
-        last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+          
+          last_knot <- last_knot[2]
+          
+          p_title <- get_title(dataset = sub_pop_data, pop_type = "female")
+          
+          get_dose_plot(sub_pop_data, last_knot, plot_title = p_title)
+        }
+          
+        else{
+          get_dose_plot(NULL, 0, "")
+        }
         
-        last_knot <- last_knot[2]
-        
-        get_dose_plot(sub_pop_data, last_knot)
         
       }
       
@@ -248,23 +253,73 @@ shinyServer(function(input, output, session){
     
   })
   
+  get_title <- function(dataset, pop_type ){
+    fig_title <- ""
+    
+    if (nrow(dataset) > 0){
+      outcome_type <- ""
+      
+      if (input$in_outcome_type != "all"){
+        outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+        
+      }
+      
+      gt <- "Total Population"
+      if (pop_type == "female")
+        gt <- "Female Population"
+      else if (pop_type == "male")
+        gt <- "Male Population"
+      
+      fig_title <- input$in_outcome
+      if (fig_title != toupper(fig_title))
+        fig_title <- stringi::stri_trans_totitle(fig_title)
+      
+      fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of samples: ",  
+                          length(unique(dataset$id)) , 
+                          " & Number of people: " , formatC(round(sum(dataset$totalpersons, na.rm = T)), 
+                                                            format = "f", big.mark = ",", drop0trailing = TRUE))
+      
+      }
+    
+    fig_title
+    
+    
+  }
   
-  get_dose_plot <- function (dataset, last_knot){
+  
+  get_dose_plot <- function (dataset, last_knot, plot_title){
     
-    q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
     
-    ## some descriptives
-    length(unique(dataset$id))
-    table(dataset$id)
-    group_by(dataset, id) %>% select(dose, se) %>%
-      summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
-    gg <- ggplotly(
-      ggplot(dataset, aes(dose, rr, col = ref_number, label = personyrs)) + geom_point() +
-        geom_line() +
-        scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
-        geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
-        theme_classic() + guides(col = FALSE)
-    )
+    if (!is.null(dataset)){
+    
+      q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
+      
+      ## some descriptives
+      length(unique(dataset$id))
+      table(dataset$id)
+      group_by(dataset, id) %>% select(dose, se) %>%
+        summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
+      gg <- ggplotly(
+        ggplot(dataset, aes(dose, rr, col = ref_number, label = personyrs)) + geom_point() +
+          geom_line() +
+          scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
+          geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
+          theme_classic() + guides(col = FALSE) + 
+          xlab("\nMarginal MET hours per week\n") +
+          ylab("\nRelative Risk\n") +
+          labs(title = paste(plot_title))
+      )
+    
+    }else{
+      gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
+        theme(
+          plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+          plot.title = element_text(size = 12, colour = "red", vjust = 7),
+          plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="red"),
+          legend.direction = "horizontal",
+          legend.position = c(0.1, 1.05)) +
+        labs (title = "Sorry no data is available")
+    }
     
     p <- ggplotly(gg)
     p
