@@ -302,12 +302,19 @@ shinyServer(function(input, output, session){
       gg <- ggplotly(
         ggplot(dataset, aes(dose, rr, col = ref_number, label = personyrs)) + geom_point() +
           geom_line() +
-          scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
+          #scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
+          scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
           geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
           theme_classic() + guides(col = FALSE) + 
           xlab("\nMarginal MET hours per week\n") +
           ylab("\nRelative Risk\n") +
-          labs(title = paste(plot_title))
+          labs(title = paste(plot_title)) +
+          theme(
+            plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+            plot.title = element_text(size = 12, colour = "black", vjust = 7),
+            plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
+            legend.direction = "horizontal",
+            legend.position = c(0.1, 1.05))
       )
     
     }else{
