@@ -2,10 +2,7 @@
 source("setup.R")
 
 # domain
-pa_exposure <- c("LTPA", "TPA")
-
-# Remove TPA
-pa_exposure <- c("LTPA")
+#pa_exposure <- c("LTPA", "TPA")
 
 # outcome_type
 outcome_type <- c("all",
@@ -29,14 +26,14 @@ shinyUI(fluidPage(
   width="100%", height="100%",
   sidebarPanel(
     selectInput(inputId = "in_outcome", label = "Select Outcome:", choices =  uoutcome$outcome),
-    radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
+    # radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
     radioButtons(inputId = "in_outcome_type", label = "Select Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
     radioButtons("total_sub_population", "Population: ", total_sub_population, inline = TRUE),
     HTML("<hr>"),
     conditionalPanel(
       condition = "input.total_sub_population != 1",
-      radioButtons("plot_options", "Plot Options: ", plot_options, inline = TRUE),
+      radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE),
       HTML("<hr>")
     ),
     sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.05),

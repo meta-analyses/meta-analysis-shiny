@@ -78,7 +78,6 @@ shinyServer(function(input, output, session){
   
   
   output$top_plot <- renderPlotly({
-    input$in_PA_exposure
     input$in_outcome
     input$in_outcome_type
     input$total_sub_population
@@ -86,9 +85,9 @@ shinyServer(function(input, output, session){
     pop_title <- "Total Population"
     
     if (input$total_sub_population == 1)
-      acmfdata <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+      acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
     else{# Sub-population
-      acmfdata <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
+      acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
       pop_title <- "Male Population"
     }
     
@@ -163,14 +162,13 @@ shinyServer(function(input, output, session){
   
   output$bottom_plot <- renderPlotly({
     
-    input$in_PA_exposure
     input$in_outcome
     input$in_outcome_type
     input$total_sub_population
     
     if (input$total_sub_population == 1){
       
-      acmfdata <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+      acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
       
       if (nrow(acmfdata) > 0){
       
@@ -190,7 +188,7 @@ shinyServer(function(input, output, session){
     
     else{
       
-      sub_pop_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
+      sub_pop_data <- get_subpopulation_data(PA_exposure = pa_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
       
       if (input$plot_options == 1){
         
@@ -378,7 +376,7 @@ shinyServer(function(input, output, session){
   
   set_pif_values <- reactive({
     
-    acmfdata <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+    acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
 
     if (nrow(acmfdata) > 0){
       
@@ -542,7 +540,7 @@ shinyServer(function(input, output, session){
   
   output$overall_datatable <- DT::renderDataTable({
     
-    overall_data <- get_overall_data(PA_exposure = input$in_PA_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+    overall_data <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
     
     if(nrow(overall_data) <= 0){
       # Set the warning message that no lines have been selected by the user
@@ -567,7 +565,7 @@ shinyServer(function(input, output, session){
   
   output$male_population_datatable <- DT::renderDataTable({
     
-    sub_population_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
+    sub_population_data <- get_subpopulation_data(PA_exposure = pa_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
     if(nrow(sub_population_data) <= 0){
       # Set the warning message that no lines have been selected by the user
       output$male_sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
@@ -592,7 +590,7 @@ shinyServer(function(input, output, session){
   
   output$female_population_datatable <- DT::renderDataTable({
     
-    sub_population_data <- get_subpopulation_data(PA_exposure = input$in_PA_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
+    sub_population_data <- get_subpopulation_data(PA_exposure = pa_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
     if(nrow(sub_population_data) <= 0){
       # Set the warning message that no lines have been selected by the user
       output$female_sub_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
