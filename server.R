@@ -95,16 +95,16 @@ shinyServer(function(input, output, session){
       
         if (nrow(acmfdata) > 0){
           
-          dataset <- data.frame(metaAnalysis(acmfdata, returnval = T, 
-                                             ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
+          #dataset <- data.frame(metaAnalysis(acmfdata, returnval = T, 
+                                             # ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
           
-          colnames(dataset) <- c("dose","RR", "lb", "ub")
+          #colnames(dataset) <- c("dose","RR", "lb", "ub")
         
-          last_knot <- get_last_knot(dataset, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+          last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
           
           last_knot <- last_knot[2]
           
-          q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
+          q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
           
           p_title <- get_title(dataset = acmfdata, pop_type = "female")
           
@@ -134,10 +134,9 @@ shinyServer(function(input, output, session){
         if (input$total_sub_population == 2)
           last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
           
-        
-        
-        
         last_knot <- last_knot[2]
+        
+        
         
         local_cov_method <- F
         
@@ -155,11 +154,13 @@ shinyServer(function(input, output, session){
         fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of samples: ",  length(unique(acmfdata$id)) , 
                                                                       " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
                                                                                                         format = "f", big.mark = ",", drop0trailing = TRUE))
-        getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = fig_title)
+        q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
+        
+        getPlot(dataset = plot_data, q = q, plotTitle = fig_title)
         
       }else{
         
-        getPlot(dataset = NULL, last_knot = NULL, plotTitle =  "")
+        getPlot(dataset = NULL, q = NULL, plotTitle =  "")
       }
     
     }
@@ -181,16 +182,16 @@ shinyServer(function(input, output, session){
       
         p_title <- get_title(dataset = acmfdata, pop_type = "total")
         
-        dataset <- data.frame(metaAnalysis(acmfdata, returnval = T, 
-                                           ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
-        
-        colnames(dataset) <- c("dose","RR", "lb", "ub")
-        
-        last_knot <- get_last_knot(dataset, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        # dataset <- data.frame(metaAnalysis(acmfdata, returnval = T, 
+        #                                    ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
+        # 
+        # colnames(dataset) <- c("dose","RR", "lb", "ub")
+        # 
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
         
         last_knot <- last_knot[2]
         
-        q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
+        q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
       
         get_dose_plot(acmfdata, q, plot_title = p_title)
       }else{
@@ -223,7 +224,10 @@ shinyServer(function(input, output, session){
           plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = local_cov_method, returnval = T, minQuantile = 0, maxQuantile = last_knot))
           colnames(plot_data) <- c("dose","RR", "lb", "ub")
           
-          getPlot(dataset = plot_data, last_knot = last_knot, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"))
+          q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
+          
+          
+          getPlot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"))
           
         }else{
           
@@ -237,7 +241,7 @@ shinyServer(function(input, output, session){
           
           fig_title <- paste0(gt, " - ", fig_title)
           
-          getPlot(dataset = NULL, last_knot = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"))
+          getPlot(dataset = NULL, q = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"))
           
         }
         
@@ -246,16 +250,16 @@ shinyServer(function(input, output, session){
         if (nrow(sub_pop_data) > 0){
           
           
-          dataset <- data.frame(metaAnalysis(sub_pop_data, returnval = T, 
-                                             ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
-          
-          colnames(dataset) <- c("dose","RR", "lb", "ub")
-          
-          last_knot <- get_last_knot(dataset, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+          # dataset <- data.frame(metaAnalysis(sub_pop_data, returnval = T, 
+          #                                    ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
+          # 
+          # colnames(dataset) <- c("dose","RR", "lb", "ub")
+          # 
+          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
           
           last_knot <- last_knot[2]
           
-          q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
+          q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
           p_title <- get_title(dataset = sub_pop_data, pop_type = "female")
           
@@ -349,7 +353,7 @@ shinyServer(function(input, output, session){
   }
   
   
-  getPlot <- function (dataset, last_knot, plotTitle, xlab = "Marginal MET hours per week" ){
+  getPlot <- function (dataset, q, plotTitle, xlab = "Marginal MET hours per week" ){
     
     
     # outfile <- tempfile(fileext='.png')
@@ -359,8 +363,7 @@ shinyServer(function(input, output, session){
     
     if (!is.null(dataset)){
       
-      q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
-      
+    
       gg <- ggplot(dataset, aes(dose, RR)) + 
         geom_line(data = dataset) + 
         geom_ribbon(data = dataset, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
