@@ -187,7 +187,7 @@ shinyServer(function(input, output, session){
         # 
         # colnames(dataset) <- c("dose","RR", "lb", "ub")
         # 
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
         
         last_knot <- last_knot[2]
         
