@@ -644,15 +644,24 @@ shinyServer(function(input, output, session){
       plot_data <- data.frame(metaAnalysis(overall_data, ptitle = "", returnval = T, covMethed = local_cov_method, maxQuantile = last_knot))
       
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
+      
+      
     
-      dat <- data.frame(MMET = c(4.375, 8.75, 17.5),  RR = c(round(plot_data$RR[which.min(abs(plot_data$dose - 4.375))], 2),
-                             round(plot_data$RR[which.min(abs(plot_data$dose - 8.75))], 2),
-                             round(plot_data$RR[which.min(abs(plot_data$dose - 17.5))], 2)))
+      dat <- data.frame(MMET = c(4.375, 8.75, 17.5),  RR = get_ma_table(plot_data, "RR"), LB = get_ma_table(plot_data, "lb"),
+                        UB = get_ma_table(plot_data, "ub"))
     
       #row.names(dat) <- NULL#c("4.375", "8.75")
     }
     
     DT::datatable(dat, options = list(paging = F, dom = 't'), rownames= FALSE) #%>%
   })
+  
+  
+  get_ma_table <- function(plot_data, colname = "RR"){
+    
+    c(round(plot_data[[colname]][which.min(abs(plot_data$dose - 4.375))], 2),
+      round(plot_data[[colname]][which.min(abs(plot_data$dose - 8.75))], 2),
+      round(plot_data[[colname]][which.min(abs(plot_data$dose - 17.5))], 2))
+  }
   
 })
