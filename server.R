@@ -621,4 +621,33 @@ shinyServer(function(input, output, session){
     DT::datatable(sub_population_data, options = list(pageLength = 20)) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
+  
+  
+  
+  output$dose_range <- DT::renderDataTable({
+    
+    overall_data <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+    
+    dat <- data.frame()
+    
+    if (nrow(overall_data) > 0){
+      
+      last_knot <- get_last_knot(overall_data, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
+      
+      last_knot <- last_knot[2]
+      
+      plot_data <- data.frame(metaAnalysis(overall_data, ptitle = "", returnval = T, covMethed = T, maxQuantile = last_knot, lout = 1000))
+      
+      colnames(plot_data) <- c("dose","RR", "lb", "ub")
+    
+      dat <- data.frame(MMET = c(4.375, 8.75, 17.5),  RR = c(round(plot_data$RR[which.min(abs(plot_data$dose - 4.375))], 2),
+                             round(plot_data$RR[which.min(abs(plot_data$dose - 8.75))], 2),
+                             round(plot_data$RR[which.min(abs(plot_data$dose - 17.5))], 2)))
+    
+      #row.names(dat) <- NULL#c("4.375", "8.75")
+    }
+    
+    DT::datatable(dat, options = list(paging = F, dom = 't'), rownames= FALSE) #%>%
+  })
+  
 })
