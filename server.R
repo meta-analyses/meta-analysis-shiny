@@ -632,11 +632,16 @@ shinyServer(function(input, output, session){
     
     if (nrow(overall_data) > 0){
       
+      local_cov_method <- F
+      
+      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" || isolate(input$in_outcome) == "stroke")
+        local_cov_method <- T
+      
       last_knot <- get_last_knot(overall_data, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
       
       last_knot <- last_knot[2]
       
-      plot_data <- data.frame(metaAnalysis(overall_data, ptitle = "", returnval = T, covMethed = T, maxQuantile = last_knot, lout = 1000))
+      plot_data <- data.frame(metaAnalysis(overall_data, ptitle = "", returnval = T, covMethed = local_cov_method, maxQuantile = last_knot))
       
       colnames(plot_data) <- c("dose","RR", "lb", "ub")
     
