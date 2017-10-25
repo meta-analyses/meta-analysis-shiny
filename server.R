@@ -27,17 +27,7 @@ shinyServer(function(input, output, session){
                                        (effect_measure != "hr" & (is.na(totalpersons | totalpersons == 0) ) ) ))
       
       # Filter studies by study size
-      # if (input$in_outcome == "all-cause mortality")
-      #   acmfdata <- subset(acmfdata, n_baseline >= 40000)
-      # else
-      #   acmfdata <- subset(acmfdata, n_baseline >= 10000)
-      
-      # if (isolate(input$in_outcome) == "Cardiovascular Disease"){
-      #   #td <<- acmfdata
-      #   acmfdata <- subset(acmfdata, !is.na(rr))
-      # }
-      #   
-        
+      acmfdata <- subset(acmfdata, n_baseline >= 10000)
       
     }
     acmfdata
