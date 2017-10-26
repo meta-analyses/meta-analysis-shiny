@@ -566,6 +566,12 @@ shinyServer(function(input, output, session){
     # Remove gender specific suffix from ref_number
     overall_data$ref_number <- sapply(strsplit(overall_data$ref_number," "), `[`, 1)
     
+    
+    # Round relevant columns
+    overall_data$totalpersons <- round(overall_data$totalpersons)
+    overall_data$personyrs <- round(overall_data$personyrs)
+    
+    
     # Convert id into factor and then back to numeric for an ordered id
     overall_data$id <- as.numeric(as.factor(overall_data$id))
     
@@ -612,6 +618,10 @@ shinyServer(function(input, output, session){
     
     # Subset by columns
     sub_population_data <- subset(sub_population_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    
+    # Round relevant columns
+    sub_population_data$totalpersons <- round(sub_population_data$totalpersons)
+    sub_population_data$personyrs <- round(sub_population_data$personyrs)
     
     # Convert id into factor and then back to numeric for an ordered id
     sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
