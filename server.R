@@ -130,9 +130,8 @@ shinyServer(function(input, output, session){
         
         local_cov_method <- F
         
-        if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" || isolate(input$in_outcome) == "stroke")
+        if (input$in_outcome == "Coronary Heart Disease" || input$in_outcome == "Cardiovascular Disease" || input$in_outcome == "stroke")
           local_cov_method <- T
-        
         
         plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot))
         colnames(plot_data) <- c("dose","RR", "lb", "ub")
