@@ -305,6 +305,7 @@ shinyServer(function(input, output, session){
     
     
     if (!is.null(dataset)){
+      dataset$personyrs <- round(dataset$personyrs)
       
       group_by(dataset, id) %>% select(dose, se) %>%
         summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
@@ -312,8 +313,8 @@ shinyServer(function(input, output, session){
         ggplot(dataset, aes(dose, rr, col = ref_number, label = personyrs)) + geom_point() +
           geom_line() +
           #scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
-          #scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
-          xlim(c(0, max(dataset$dose))) +
+          scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
+          coord_cartesian(xlim = c(0, max(dataset$dose))) +
           geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
           theme_classic() + guides(col = FALSE) + 
           xlab("\nMarginal MET hours per week\n") +
@@ -359,7 +360,8 @@ shinyServer(function(input, output, session){
         geom_line(data = dataset) + 
         geom_ribbon(data = dataset, aes(ymin=`lb`,ymax=`ub`),alpha=0.4) +
         #scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
-        xlim(c(0, max(dataset$dose))) +
+        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
+        coord_cartesian(xlim = c(0, max(dataset$dose))) +
         xlab(paste("\n", xlab, "\n")) +
         ylab("\nRelative Risk\n") +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
