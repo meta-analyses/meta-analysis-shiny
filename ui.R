@@ -36,9 +36,9 @@ shinyUI(fluidPage(
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE),
       HTML("<hr>")
     ),
-    sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.05),
+    sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.01),
     HTML("<hr>"),
-    sliderInput(inputId = "in_sub_quantile", label = "Sub-population quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.05),
+    sliderInput(inputId = "in_sub_quantile", label = "Sub-population quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.01),
     HTML("<hr>"),
     uiOutput("lower_guideline"),
     HTML("<hr>"),
