@@ -40,14 +40,20 @@ shinyUI(fluidPage(
     HTML("<hr>"),
     sliderInput(inputId = "in_sub_quantile", label = "Sub-population quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.01),
     HTML("<hr>"),
+    uiOutput("lowest_guideline"),
+    HTML("<hr>"),
     uiOutput("lower_guideline"),
     HTML("<hr>"),
     uiOutput("upper_guideline"),
-    conditionalPanel(
-      condition = "input.total_sub_population == 1",
+    #conditionalPanel(
+    #  condition = "input.total_sub_population == 1",
       HTML("<hr>"),
       DT::dataTableOutput("dose_range")
-    )
+    #)#,
+    
+  #  downloadButton('downloadPlot', 'Download Plot')
+    
+    
     
   ),
   
