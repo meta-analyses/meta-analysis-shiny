@@ -528,6 +528,7 @@ shinyServer(function(input, output, session){
     # Remove gender specific suffix from ref_number
     overall_data$ref_number <- sapply(strsplit(overall_data$ref_number," "), `[`, 1)
     
+    fname <- "total_population"
     
     # Round relevant columns
     overall_data$totalpersons <- round(overall_data$totalpersons)
@@ -535,8 +536,25 @@ shinyServer(function(input, output, session){
     
     # Empty the warning message - as some lines have been selected by the user
     output$overall_warning_message <- renderUI("")
-    DT::datatable(overall_data, options = list(pageLength = 20), rownames = F) #%>%
-    #formatRound(columns = names(numeric_line_col_names), digits=2)
+    DT::datatable(overall_data, 
+                  extensions = 'Buttons',
+                  escape = FALSE,
+                  rownames = FALSE,
+                  options = list(dom = 'Bfrtip',
+                                 buttons = 
+                                   list('colvis', list(
+                                     extend = 'collection',
+                                     buttons = list(list(extend='csv',
+                                                         filename = fname),
+                                                    list(extend='excel',
+                                                         filename = fname),
+                                                    list(extend='pdf',
+                                                         filename= fname)),
+                                     text = 'Download'
+                                   )),
+                                 scrollX = TRUE,
+                                 pageLength = nrow(overall_data),
+                                 order=list(list(2,'desc'))))
   })
   
   output$male_population_datatable <- DT::renderDataTable({
@@ -555,10 +573,29 @@ shinyServer(function(input, output, session){
     # Remove gender specific suffix from ref_number
     sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number," "), `[`, 1)
     
+    fname <- "male_population"
+    
     # Empty the warning message - as some lines have been selected by the user
     output$male_sub_warning_message <- renderUI("")
-    DT::datatable(sub_population_data, options = list(pageLength = 20), rownames = F) #%>%
-    #formatRound(columns = names(numeric_line_col_names), digits=2)
+    DT::datatable(sub_population_data, 
+                  extensions = 'Buttons',
+                  escape = FALSE,
+                  rownames = FALSE,
+                  options = list(dom = 'Bfrtip',
+                                 buttons = 
+                                   list('colvis', list(
+                                     extend = 'collection',
+                                     buttons = list(list(extend='csv',
+                                                         filename = fname),
+                                                    list(extend='excel',
+                                                         filename = fname),
+                                                    list(extend='pdf',
+                                                         filename= fname)),
+                                     text = 'Download'
+                                   )),
+                                 scrollX = TRUE,
+                                 pageLength = nrow(sub_population_data),
+                                 order=list(list(2,'desc'))))
   })
   
   
@@ -579,13 +616,32 @@ shinyServer(function(input, output, session){
     sub_population_data$totalpersons <- round(sub_population_data$totalpersons)
     sub_population_data$personyrs <- round(sub_population_data$personyrs)
     
+    fname <- "female_population"
+    
     # Remove gender specific suffix from ref_number
     sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number," "), `[`, 1)
     
     # Empty the warning message - as some lines have been selected by the user
     output$female_sub_warning_message <- renderUI("")
-    DT::datatable(sub_population_data, options = list(pageLength = 20), rownames = F) #%>%
-    #formatRound(columns = names(numeric_line_col_names), digits=2)
+    DT::datatable(sub_population_data, 
+                  extensions = 'Buttons',
+                  escape = FALSE,
+                  rownames = FALSE,
+                  options = list(dom = 'Bfrtip',
+                                 buttons = 
+                                   list('colvis', list(
+                                     extend = 'collection',
+                                     buttons = list(list(extend='csv',
+                                                         filename = fname),
+                                                    list(extend='excel',
+                                                         filename = fname),
+                                                    list(extend='pdf',
+                                                         filename= fname)),
+                                     text = 'Download'
+                                   )),
+                                 scrollX = TRUE,
+                                 pageLength = nrow(sub_population_data),
+                                 order=list(list(2,'desc'))))
   })
   
   
@@ -769,6 +825,5 @@ shinyServer(function(input, output, session){
     }
     
   }
-  
-  
+
 })
