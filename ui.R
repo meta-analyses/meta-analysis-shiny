@@ -63,10 +63,6 @@ shinyUI(fluidPage(
       tabPanel("Analysis",
                plotlyOutput("top_plot"),
                plotlyOutput("bottom_plot")
-               # conditionalPanel(
-               #   condition = "input.total_sub_population != 1",
-               #   plotlyOutput("bottom_plot")
-               # )
       ),
       tabPanel("Total Population Data",
                uiOutput("overall_warning_message"),
