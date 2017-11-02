@@ -327,12 +327,14 @@ shinyServer(function(input, output, session){
           xlab("\nMarginal MET hours per week\n") +
           ylab("\nRelative Risk\n") +
           labs(title = paste(plot_title)) +
-          theme(
-            plot.margin = unit(c(2, 1, 1, 1), "cm"), 
-            plot.title = element_text(size = 12, colour = "black", vjust = 7),
-            plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
-            legend.direction = "horizontal",
-            legend.position = c(0.1, 1.05))
+          theme(legend.position="none")
+          
+          # theme(
+          #   plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+          #   plot.title = element_text(size = 12, colour = "black", vjust = 7),
+          #   plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
+          #   legend.direction = "horizontal",
+          #   legend.position = c(0.1, 1.05))
       )
     
     }else{
