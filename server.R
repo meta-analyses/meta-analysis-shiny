@@ -548,9 +548,7 @@ shinyServer(function(input, output, session){
                                      buttons = list(list(extend='csv',
                                                          filename = fname),
                                                     list(extend='excel',
-                                                         filename = fname),
-                                                    list(extend='pdf',
-                                                         filename= fname)),
+                                                         filename = fname)),
                                      text = 'Download'
                                    )),
                                  scrollX = TRUE,
@@ -590,9 +588,7 @@ shinyServer(function(input, output, session){
                                      buttons = list(list(extend='csv',
                                                          filename = fname),
                                                     list(extend='excel',
-                                                         filename = fname),
-                                                    list(extend='pdf',
-                                                         filename= fname)),
+                                                         filename = fname)),
                                      text = 'Download'
                                    )),
                                  scrollX = TRUE,
@@ -637,9 +633,7 @@ shinyServer(function(input, output, session){
                                      buttons = list(list(extend='csv',
                                                          filename = fname),
                                                     list(extend='excel',
-                                                         filename = fname),
-                                                    list(extend='pdf',
-                                                         filename= fname)),
+                                                         filename = fname)),
                                      text = 'Download'
                                    )),
                                  scrollX = TRUE,
