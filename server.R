@@ -526,7 +526,7 @@ shinyServer(function(input, output, session){
 
     overall_data <- subset(overall_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     # Remove gender specific suffix from ref_number
-    overall_data$ref_number <- sapply(strsplit(overall_data$ref_number," "), `[`, 1)
+    overall_data$ref_number <- sapply(strsplit(overall_data$ref_number,"-"), `[`, 1)
     
     fname <- "total_population"
     
@@ -571,7 +571,7 @@ shinyServer(function(input, output, session){
     sub_population_data <- subset(sub_population_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
     # Remove gender specific suffix from ref_number
-    sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number," "), `[`, 1)
+    sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number,"-"), `[`, 1)
     
     fname <- "male_population"
     
@@ -619,7 +619,7 @@ shinyServer(function(input, output, session){
     fname <- "female_population"
     
     # Remove gender specific suffix from ref_number
-    sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number," "), `[`, 1)
+    sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number,"-"), `[`, 1)
     
     # Empty the warning message - as some lines have been selected by the user
     output$female_sub_warning_message <- renderUI("")
