@@ -540,7 +540,8 @@ shinyServer(function(input, output, session){
                   extensions = 'Buttons',
                   escape = FALSE,
                   rownames = FALSE,
-                  options = list(dom = 'Bfrtip',
+                  options = list(pageLength = 20,
+                                 dom = 'Bfrtip',
                                  buttons = 
                                    list('colvis', list(
                                      extend = 'collection',
@@ -581,7 +582,8 @@ shinyServer(function(input, output, session){
                   extensions = 'Buttons',
                   escape = FALSE,
                   rownames = FALSE,
-                  options = list(dom = 'Bfrtip',
+                  options = list(pageLength = 20,
+                                 dom = 'Bfrtip',
                                  buttons = 
                                    list('colvis', list(
                                      extend = 'collection',
@@ -627,7 +629,8 @@ shinyServer(function(input, output, session){
                   extensions = 'Buttons',
                   escape = FALSE,
                   rownames = FALSE,
-                  options = list(dom = 'Bfrtip',
+                  options = list(pageLength = 20,
+                                 dom = 'Bfrtip',
                                  buttons = 
                                    list('colvis', list(
                                      extend = 'collection',
