@@ -317,7 +317,7 @@ shinyServer(function(input, output, session){
       group_by(dataset, id) %>% select(dose, se) %>%
         summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
       gg <- ggplotly(
-        ggplot(dataset, aes(dose, rr, col = ref_number, label = personyrs)) + geom_point() +
+        ggplot(dataset, aes(dose, rr, col = ref_number, label = personyrs)) + geom_point(size = 4 * (dataset$personyrs - min(dataset$personyrs))/diff(range(dataset$personyrs))) +
           geom_line() +
           #scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
           scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
