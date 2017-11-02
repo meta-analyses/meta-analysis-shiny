@@ -539,7 +539,7 @@ shinyServer(function(input, output, session){
     
     # Empty the warning message - as some lines have been selected by the user
     output$overall_warning_message <- renderUI("")
-    DT::datatable(overall_data, options = list(pageLength = 20)) #%>%
+    DT::datatable(overall_data, options = list(pageLength = 20), rownames = F) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
   
@@ -563,7 +563,7 @@ shinyServer(function(input, output, session){
     
     # Empty the warning message - as some lines have been selected by the user
     output$male_sub_warning_message <- renderUI("")
-    DT::datatable(sub_population_data, options = list(pageLength = 20)) #%>%
+    DT::datatable(sub_population_data, options = list(pageLength = 20), rownames = F) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
   
@@ -592,7 +592,7 @@ shinyServer(function(input, output, session){
     
     # Empty the warning message - as some lines have been selected by the user
     output$female_sub_warning_message <- renderUI("")
-    DT::datatable(sub_population_data, options = list(pageLength = 20)) #%>%
+    DT::datatable(sub_population_data, options = list(pageLength = 20), rownames = F) #%>%
     #formatRound(columns = names(numeric_line_col_names), digits=2)
   })
   
@@ -631,7 +631,8 @@ shinyServer(function(input, output, session){
       
       local_cov_method <- F
       
-      if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" || isolate(input$in_outcome) == "stroke")
+      if (input$in_outcome == "Coronary Heart Disease" || input$in_outcome == "Cardiovascular Disease" || input$in_outcome == "stroke"
+          || input$in_outcome == "colon cancer")
         local_cov_method <- T
       
       m_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
@@ -643,8 +644,8 @@ shinyServer(function(input, output, session){
         
       }
       
-        
       w_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
+      td <<- w_acmfdata
       if(nrow(m_acmfdata) > 0){
         w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
         w_last_knot <- w_last_knot[2]
@@ -665,7 +666,7 @@ shinyServer(function(input, output, session){
       
     }
     
-    DT::datatable(dat, options = list(paging = F, dom = 't'), rownames= FALSE) #%>%
+    DT::datatable(dat, options = list(paging = F, dom = 't'), rownames = FALSE) #%>%
   })
   
   
