@@ -524,7 +524,7 @@ shinyServer(function(input, output, session){
     }
     
 
-    overall_data <- subset(overall_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    overall_data <- subset(overall_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     # Remove gender specific suffix from ref_number
     overall_data$ref_number <- sapply(strsplit(overall_data$ref_number," "), `[`, 1)
     
@@ -532,10 +532,6 @@ shinyServer(function(input, output, session){
     # Round relevant columns
     overall_data$totalpersons <- round(overall_data$totalpersons)
     overall_data$personyrs <- round(overall_data$personyrs)
-    
-    
-    # Convert id into factor and then back to numeric for an ordered id
-    overall_data$id <- as.numeric(as.factor(overall_data$id))
     
     # Empty the warning message - as some lines have been selected by the user
     output$overall_warning_message <- renderUI("")
@@ -554,10 +550,8 @@ shinyServer(function(input, output, session){
     }
     
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    sub_population_data <- subset(sub_population_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
-    # Convert id into factor and then back to numeric for an ordered id
-    sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
     # Remove gender specific suffix from ref_number
     sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number," "), `[`, 1)
     
@@ -579,14 +573,12 @@ shinyServer(function(input, output, session){
     }
     
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(id, ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    sub_population_data <- subset(sub_population_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
     
     # Round relevant columns
     sub_population_data$totalpersons <- round(sub_population_data$totalpersons)
     sub_population_data$personyrs <- round(sub_population_data$personyrs)
     
-    # Convert id into factor and then back to numeric for an ordered id
-    sub_population_data$id <- as.numeric(as.factor(sub_population_data$id))
     # Remove gender specific suffix from ref_number
     sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number," "), `[`, 1)
     
