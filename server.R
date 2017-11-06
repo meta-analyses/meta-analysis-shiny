@@ -1,7 +1,15 @@
 options(shiny.sanitize.errors = F)
 lower_guideline_value <- NA
 upper_guideline_value <- NA
+
+to_download <- NULL
 shinyServer(function(input, output, session){
+  
+  # To set initialize to_download
+  observe({
+    to_download$top_plot_data <<- NULL
+    to_download$bottom_plot_data <<- NULL
+  })
   
   get_overall_data <- function (PA_exposure, outcome_disease, outcome_types){
     
@@ -93,6 +101,8 @@ shinyServer(function(input, output, session){
           
           p_title <- get_title(dataset = acmfdata, pop_type = "female")
           
+          to_download$top_plot_data <<- acmfdata
+          
           get_dose_plot(acmfdata, q, plot_title = p_title)
         }else{
           
@@ -103,7 +113,8 @@ shinyServer(function(input, output, session){
     }
     
     else{
-    
+      
+      
       outcome_type <- ""
       
       if (input$in_outcome_type != "all"){
@@ -130,6 +141,8 @@ shinyServer(function(input, output, session){
         
         plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot, lout = 1000))
         colnames(plot_data) <- c("dose","RR", "lb", "ub")
+        
+        to_download$top_plot_data <<- plot_data
         
         fig_title <- input$in_outcome
         if (fig_title != toupper(fig_title))
@@ -171,6 +184,8 @@ shinyServer(function(input, output, session){
         last_knot <- last_knot[2]
         
         q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
+        
+        to_download$bottom_plot_data <<- acmfdata
       
         get_dose_plot(acmfdata, q, plot_title = p_title)
       }else{
@@ -202,6 +217,8 @@ shinyServer(function(input, output, session){
           plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = local_cov_method, returnval = T, minQuantile = 0, maxQuantile = last_knot, lout = 1000))
           colnames(plot_data) <- c("dose","RR", "lb", "ub")
           
+          to_download$bottom_plot_data <<- plot_data
+          
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
           getPlot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", input$in_outcome, input$in_outcome_type)
@@ -231,6 +248,8 @@ shinyServer(function(input, output, session){
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
           p_title <- get_title(dataset = sub_pop_data, pop_type = "female")
+          
+          to_download$bottom_plot_data <<- sub_pop_data
           
           get_dose_plot(sub_pop_data, q, plot_title = p_title)
         }
@@ -766,5 +785,26 @@ shinyServer(function(input, output, session){
     }
     
   }
+  
+  
+  output$download_top_data <- downloadHandler(
+    filename = function() {
+      paste(input$in_outcome, "-", input$in_outcome_type, ".csv", sep="")
+    },
+    content = function(file) {
+      # cat(summary(to_download$top_plot_data), "\n")
+      write.csv(to_download$top_plot_data, file)
+    }
+  )
+  
+  
+  output$download_bottom_data <- downloadHandler(
+    filename = function() {
+      paste(input$in_outcome, "-", input$in_outcome_type, ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(to_download$bottom_plot_data, file)
+    }
+  )
 
 })
