@@ -85,11 +85,6 @@ shinyServer(function(input, output, session){
       
         if (nrow(acmfdata) > 0){
           
-          #dataset <- data.frame(metaAnalysis(acmfdata, returnval = T, 
-                                             # ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
-          
-          #colnames(dataset) <- c("dose","RR", "lb", "ub")
-        
           last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
           
           last_knot <- last_knot[2]
@@ -171,11 +166,6 @@ shinyServer(function(input, output, session){
       
         p_title <- get_title(dataset = acmfdata, pop_type = "total")
         
-        # dataset <- data.frame(metaAnalysis(acmfdata, returnval = T, 
-        #                                    ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
-        # 
-        # colnames(dataset) <- c("dose","RR", "lb", "ub")
-        # 
         last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
         
         last_knot <- last_knot[2]
@@ -219,8 +209,6 @@ shinyServer(function(input, output, session){
         }else{
           
           gt <- "Female Population"
-          #if (input$in_sub_population == 2)
-          #  gt <- "Female Population"
           
           fig_title <- input$in_outcome
           if (fig_title != toupper(fig_title))
@@ -236,12 +224,6 @@ shinyServer(function(input, output, session){
         
         if (nrow(sub_pop_data) > 0){
           
-          
-          # dataset <- data.frame(metaAnalysis(sub_pop_data, returnval = T, 
-          #                                    ptitle = "", covMethed = T, minQuantile = 0, maxQuantile = input$in_sub_quantile[2]))
-          # 
-          # colnames(dataset) <- c("dose","RR", "lb", "ub")
-          # 
           last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
           
           last_knot <- last_knot[2]
@@ -318,13 +300,6 @@ shinyServer(function(input, output, session){
           ylab("\nRelative Risk\n") +
           labs(title = paste(plot_title)) +
           theme(legend.position="none")
-          
-          # theme(
-          #   plot.margin = unit(c(2, 1, 1, 1), "cm"), 
-          #   plot.title = element_text(size = 12, colour = "black", vjust = 7),
-          #   plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
-          #   legend.direction = "horizontal",
-          #   legend.position = c(0.1, 1.05))
       )
     
     }else{
@@ -495,12 +470,6 @@ shinyServer(function(input, output, session){
     
   })
   
-  
-  # output$upper_guideline <- renderUI({
-  #   set_pif_values()
-  #   HTML("PIF for meeting the upper WHO guideline (MMET >= 17.5 per week): ", upper_guideline_value , "\n")
-  # })
-  
   output$overall_datatable <- DT::renderDataTable({
     
     overall_data <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
@@ -518,7 +487,6 @@ shinyServer(function(input, output, session){
     overall_data$ref_number <- sapply(strsplit(overall_data$ref_number,"-"), `[`, 1)
     
     fname <- "total_population"
-    
     # Round relevant columns
     overall_data$totalpersons <- round(overall_data$totalpersons)
     overall_data$personyrs <- round(overall_data$personyrs)
@@ -634,9 +602,7 @@ shinyServer(function(input, output, session){
     dat <- data.frame()
     
     if (input$total_sub_population == 1){
-    
       overall_data <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
-      
       dat <- data.frame()
       
       if (nrow(overall_data) > 0){
@@ -683,8 +649,6 @@ shinyServer(function(input, output, session){
         w_plot_data <- data.frame(metaAnalysis(w_acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, maxQuantile = w_last_knot))
         colnames(w_plot_data) <- c("dose","RR", "lb", "ub")
       }
-      
-      
       # MMET = c(4.375, 8.75, 17.5),  
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
         dat <- data.frame(MMET = c(4.375, 8.75, 17.5), 'Male RR' = paste(get_ma_table(m_plot_data, "RR"), " (", get_ma_table(m_plot_data, "lb"),
@@ -693,10 +657,7 @@ shinyServer(function(input, output, session){
                                       " - ", get_ma_table(w_plot_data, "ub"), ")", sep = ""), check.names = FALSE)
       
       }
-        
-      
     }
-    
     DT::datatable(dat, options = list(paging = F, dom = 't'), rownames = FALSE) #%>%
   })
   
@@ -706,10 +667,7 @@ shinyServer(function(input, output, session){
     c(round(plot_data[[colname]][which.min(abs(plot_data$dose - 4.375))], 2),
       round(plot_data[[colname]][which.min(abs(plot_data$dose - 8.75))], 2),
       round(plot_data[[colname]][which.min(abs(plot_data$dose - 17.5))], 2))#,
-      #round(plot_data[[colname]][which.min(abs(plot_data$dose - 35))], 2))
   }
-  
-  
   
   get_pif_values <- function(dataset, last_knot, dose_value){
     
