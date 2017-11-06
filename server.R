@@ -341,7 +341,7 @@ shinyServer(function(input, output, session){
   getPlot <- function (dataset, q, plotTitle, pop_type , outcome, outcome_type ){
     
     if (!is.null(dataset)){
-      gg <- ggplot(dataset, aes(dose, RR)) + 
+      gg <- ggplot() + 
         geom_line(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, y = RR)) +
         geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
         geom_ribbon(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
