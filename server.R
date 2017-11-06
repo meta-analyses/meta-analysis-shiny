@@ -404,12 +404,9 @@ shinyServer(function(input, output, session){
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("<b>","Male","</b> <br/>", 
-             "PIF for meeting the half the lower WHO guideline (MMET >= 4.375 per week): ", 
-             get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 4.375), "<br/>",
-             "<b>","Female","</b> <br/>", 
-             "PIF for meeting the half the lower WHO guideline (MMET >= 4.375 per week)", 
-             get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 4.375), "\n")
+        HTML("PIF for meeting the half the lower WHO guideline (MMET >= 4.375 per week) <br/>",
+             "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 4.375), "<br/>",
+             "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 4.375))
       }
     }
   })
@@ -443,12 +440,9 @@ shinyServer(function(input, output, session){
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("<b>","Male","</b> <br/>", 
-             "PIF for meeting the lower WHO guideline (MMET >= 8.75 per week): ", 
-             get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 8.75), "<br/>",
-             "<b>","Female","</b> <br/>", 
-             "PIF for meeting the lower WHO guideline (MMET >= 8.75 per week): ", 
-             get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 8.75), "<br/>")
+        HTML("PIF for meeting the lower WHO guideline (MMET >= 8.75 per week) <br/>",
+             "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 8.75), "<br/>",
+             "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 8.75))
       }
     }
   })
@@ -477,13 +471,9 @@ shinyServer(function(input, output, session){
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        
-        HTML("<b>","Male","</b> <br/>", 
-             "PIF for meeting the upper WHO guideline (MMET >= 17.5 per week): ", 
-             get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 17.5), "<br/>",
-            "<b>","Female","</b> <br/>", 
-             "\n PIF for meeting the upper WHO guideline (MMET >= 17.5 per week): ", 
-            get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 17.5), "<br/>")
+        HTML("PIF for meeting the upper WHO guideline (MMET >= 17.5 per week): <br/>",
+             "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 17.5), "<br/>",
+             "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 17.5))
       }
     }
     
