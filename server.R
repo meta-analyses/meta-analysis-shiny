@@ -133,17 +133,8 @@ shinyServer(function(input, output, session){
         if (input$in_outcome == "Coronary Heart Disease" || input$in_outcome == "Cardiovascular Disease" || input$in_outcome == "stroke")
           local_cov_method <- T
         
-        plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot))
+        plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot, lout = 1000))
         colnames(plot_data) <- c("dose","RR", "lb", "ub")
-        
-        
-        # cat("top plot \n")
-        # print(data.frame(MMET = c(4.375, 8.75, 17.5, 35),  RR = get_ma_table(plot_data, "RR"), LB = get_ma_table(plot_data, "lb"),
-        #                  UB = get_ma_table(plot_data, "ub")), quote = F, row.names = FALSE)
-        
-        
-        
-        
         
         fig_title <- input$in_outcome
         if (fig_title != toupper(fig_title))
@@ -218,11 +209,10 @@ shinyServer(function(input, output, session){
           last_knot <- last_knot[2]
           
           # cat("bottom plot \n")
-          plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = local_cov_method, returnval = T, minQuantile = 0, maxQuantile = last_knot))
+          plot_data <- data.frame(metaAnalysis(sub_pop_data, ptitle = "", covMethed = local_cov_method, returnval = T, minQuantile = 0, maxQuantile = last_knot, lout = 1000))
           colnames(plot_data) <- c("dose","RR", "lb", "ub")
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
-          
           
           getPlot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", input$in_outcome, input$in_outcome_type)
           
