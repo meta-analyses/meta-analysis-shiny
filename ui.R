@@ -49,15 +49,8 @@ shinyUI(fluidPage(
     uiOutput("lower_guideline"),
     HTML("<hr>"),
     uiOutput("upper_guideline"),
-    #conditionalPanel(
-    #  condition = "input.total_sub_population == 1",
-      HTML("<hr>"),
-      DT::dataTableOutput("dose_range")
-    #)#,
-    
-  #  downloadButton('downloadPlot', 'Download Plot')
-    
-    
+    HTML("<hr>"),
+    DT::dataTableOutput("dose_range")
     
   ),
   
