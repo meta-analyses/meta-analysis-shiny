@@ -51,17 +51,17 @@ raw_data$cases <- as.numeric(raw_data$cases)
 
 
 # ## FOR SENSITIVITY ANALYSIS
-raw_data$dose <- raw_data$Final.Harmonised.exposure..MMET.hrs.wk...FOR.SENSITIVITY.ANALYSIS
+#raw_data$dose <- raw_data$Final.Harmonised.exposure..MMET.hrs.wk...FOR.SENSITIVITY.ANALYSIS
 
 
 ## FOR THE CURRENT ASSUMPTIONS
-# raw_data$dose <- raw_data$Final.Harmonised.exposure..MMET.hrs.wk.
+raw_data$dose <- round(raw_data$Final.Harmonised.exposure..MMET.hrs.wk., 2)
 
 raw_data$Final.Harmonised.exposure..MMET.hrs.wk. <- NULL
-raw_data$rr <- raw_data$effect
+raw_data$RR <- raw_data$effect
 
 raw_data <- subset(raw_data, select = c(ref_number, Author, outcome, outcome_type, pa_domain_subgroup, overall, sex_subgroups, effect_measure, type, n_baseline, totalpersons, tot_personyrs, personyrs,
-                                        mean_followup, dose, rr, effect, uci_effect, lci_effect, cases))
+                                        mean_followup, dose, RR, effect, uci_effect, lci_effect, cases))
 
 
 ## Populate missing totalpersons and personyrs
