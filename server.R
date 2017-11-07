@@ -304,15 +304,19 @@ shinyServer(function(input, output, session){
     
     if (!is.null(dataset)){
       dataset$personyrs <- round(dataset$personyrs)
-      
       group_by(dataset, id) %>% select(dose, se) %>%
         summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
       gg <- ggplotly(
         ggplot(dataset, aes(dose, RR, col = ref_number, label = personyrs)) + geom_point(size = 4 * (dataset$personyrs - min(dataset$personyrs))/diff(range(dataset$personyrs))) +
           geom_line() +
+          scale_x_continuous(expand = c(0, 0),
+                             breaks = seq(from = 0, to = max(dataset$dose, na.rm = T), by = 5)) +
+          scale_y_continuous(expand = c(0, 0),
+                             breaks = seq(from = 0, to = (max(dataset$RR, na.rm = T) + 0.4), by = 0.2),
+                             limits = c(0, NA)) +
           #scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
-          scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
-          coord_cartesian(xlim = c(0, max(dataset$dose))) +
+          #scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
+          # coord_cartesian(xlim = c(0, max(dataset$dose))) +
           geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
           theme_classic() + guides(col = FALSE) + 
           xlab("\nMarginal MET hours per week\n") +
@@ -346,7 +350,6 @@ shinyServer(function(input, output, session){
         geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
         geom_ribbon(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
         geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
-        #scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
         scale_y_continuous(expand = c(0, 0),
