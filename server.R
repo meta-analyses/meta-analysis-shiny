@@ -60,7 +60,7 @@ shinyServer(function(input, output, session){
     }
     
     # Remove where both dose and response are null
-    acmfdata <- subset(acmfdata, !is.na(rr) & !is.na(dose))
+    acmfdata <- subset(acmfdata, !is.na(RR) & !is.na(dose))
     
     if (nrow(acmfdata) > 0){
       acmfdata <- getMissingVariables(acmfdata, infertotalpersons = T, kcases = T)
@@ -308,7 +308,7 @@ shinyServer(function(input, output, session){
       group_by(dataset, id) %>% select(dose, se) %>%
         summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
       gg <- ggplotly(
-        ggplot(dataset, aes(dose, rr, col = ref_number, label = personyrs)) + geom_point(size = 4 * (dataset$personyrs - min(dataset$personyrs))/diff(range(dataset$personyrs))) +
+        ggplot(dataset, aes(dose, RR, col = ref_number, label = personyrs)) + geom_point(size = 4 * (dataset$personyrs - min(dataset$personyrs))/diff(range(dataset$personyrs))) +
           geom_line() +
           #scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
           scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
@@ -494,7 +494,7 @@ shinyServer(function(input, output, session){
     }
     
 
-    overall_data <- subset(overall_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    overall_data <- subset(overall_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, RR, cases, lci_effect, uci_effect))
     # Remove gender specific suffix from ref_number
     overall_data$ref_number <- sapply(strsplit(overall_data$ref_number,"-"), `[`, 1)
     
@@ -535,7 +535,7 @@ shinyServer(function(input, output, session){
     }
     
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    sub_population_data <- subset(sub_population_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, RR, cases, lci_effect, uci_effect))
     
     # Remove gender specific suffix from ref_number
     sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number,"-"), `[`, 1)
@@ -575,7 +575,7 @@ shinyServer(function(input, output, session){
     }
     
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, rr, cases, lci_effect, uci_effect))
+    sub_population_data <- subset(sub_population_data, select = c(ref_number, Author, effect_measure, totalpersons, personyrs, dose, RR, cases, lci_effect, uci_effect))
     
     # Round relevant columns
     sub_population_data$totalpersons <- round(sub_population_data$totalpersons)
@@ -704,7 +704,7 @@ shinyServer(function(input, output, session){
       for (i in 1:nrow(dataset)){
         val <- subset(plot_data, round(dose, 1) <= (dataset$dose[i] + 0.05) & round(dose, 1) >= (dataset$dose[i] - 0.05))
         if (nrow(val) > 0){
-          dataset$rr[i] <- val$RR[1]
+          dataset$RR[i] <- val$RR[1]
           if (removeNA){
             if (!is.na(dataset$lci[i]))
               dataset$lci[i] <- val$lb[1]
@@ -717,7 +717,7 @@ shinyServer(function(input, output, session){
         }
       }
       
-      sum_tp <- sum(dataset$totalpersons * dataset$rr, na.rm = T)
+      sum_tp <- sum(dataset$totalpersons * dataset$RR, na.rm = T)
       
       dataset_ls <- dataset
       
@@ -729,9 +729,9 @@ shinyServer(function(input, output, session){
       val <- subset(plot_data, round(dose, 1) <= (dose_value + 0.05) & round(dose, 1) >= (dose_value - 0.05))
       
       if (nrow(val) > 0)
-        dataset_ls[dataset_ls$dose == dose_value,]$rr <- val$RR[1]
+        dataset_ls[dataset_ls$dose == dose_value,]$RR <- val$RR[1]
       
-      sum_ls_tp <- sum(dataset$totalpersons * dataset_ls$rr, na.rm = T)
+      sum_ls_tp <- sum(dataset$totalpersons * dataset_ls$RR, na.rm = T)
       
       pert_ls <- ((sum_tp - sum_ls_tp) / sum_tp) * 100
       
