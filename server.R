@@ -347,7 +347,10 @@ shinyServer(function(input, output, session){
         geom_ribbon(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
         geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
         #scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) + 
-        scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
+        scale_x_continuous(expand = c(0, 0),
+                           breaks = seq(from = 0, to = 35, by = 5)) + 
+        scale_y_continuous(expand = c(0, 0),
+                           breaks = seq(from = 0, to = max(dataset$ub), by = 0.1)) +
         coord_cartesian(xlim = c(0, 35)) +
         xlab(paste("\n", "Marginal MET hours per week", "\n")) +
         ylab("\nRelative Risk\n") +
