@@ -138,7 +138,7 @@ for (i in 1:nrow(uoutcome)){
 raw_data_gsp_ltpa <- subset(raw_data, pa_domain_subgroup == "LTPA" & (sex_subgroups %in% c(1,2)))
 
 for (i in 1:nrow(uoutcome)){
-  if (!i %in% c(2,6)){
+  if (!uoutcome$outcome[i] %in% c('Breast cancer','Endometrial cancer')){
     dat <- subset(raw_data_gsp_ltpa, outcome == uoutcome$outcome[i])
     uid <- unique(dat$ref_number)
     for (j in 1:length(uid)){
