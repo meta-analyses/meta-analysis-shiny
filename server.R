@@ -394,7 +394,7 @@ shinyServer(function(input, output, session){
       acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
       last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
       last_knot <- last_knot[2]
-      HTML("PIF for meeting the half the lower WHO guideline (MMET >= 4.375 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 4.375), "\n")
+      HTML("PIF for meeting the half the lower WHO guideline (MMETh >= 4.375 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 4.375), "\n")
       
     }
     else{# Sub-population
@@ -411,7 +411,7 @@ shinyServer(function(input, output, session){
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("PIF for meeting the half the lower WHO guideline (MMET >= 4.375 per week) <br/>",
+        HTML("PIF for meeting the half the lower WHO guideline (MMETh >= 4.375 per week) <br/>",
              "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 4.375), "<br/>",
              "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 4.375))
       }
@@ -428,7 +428,7 @@ shinyServer(function(input, output, session){
       if (nrow(acmfdata) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
         last_knot <- last_knot[2]
-        HTML("PIF for meeting the lower WHO guideline (MMET >= 8.75 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 8.75), "\n")
+        HTML("PIF for meeting the lower WHO guideline (MMETh >= 8.75 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 8.75), "\n")
       }
       
     }
@@ -447,7 +447,7 @@ shinyServer(function(input, output, session){
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("PIF for meeting the lower WHO guideline (MMET >= 8.75 per week) <br/>",
+        HTML("PIF for meeting the lower WHO guideline (MMETh >= 8.75 per week) <br/>",
              "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 8.75), "<br/>",
              "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 8.75))
       }
@@ -462,7 +462,7 @@ shinyServer(function(input, output, session){
       acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
       last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
       last_knot <- last_knot[2]
-      HTML("PIF for meeting the upper WHO guideline (MMET >= 17.5 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 17.5), "\n")
+      HTML("PIF for meeting the upper WHO guideline (MMETh >= 17.5 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 17.5), "\n")
     }
     else{# Sub-population
       m_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
@@ -478,7 +478,7 @@ shinyServer(function(input, output, session){
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("PIF for meeting the upper WHO guideline (MMET >= 17.5 per week): <br/>",
+        HTML("PIF for meeting the upper WHO guideline (MMETh >= 17.5 per week): <br/>",
              "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 17.5), "<br/>",
              "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 17.5))
       }
@@ -636,7 +636,7 @@ shinyServer(function(input, output, session){
         
         colnames(plot_data) <- c("dose","RR", "lb", "ub")
         #MMET = c(4.375, 8.75, 17.5),  
-        dat <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(plot_data, "RR"), " (", get_ma_table(plot_data, "lb"),
+        dat <- data.frame(MMETh = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(plot_data, "RR"), " (", get_ma_table(plot_data, "lb"),
                           " - ", get_ma_table(plot_data, "ub"), ")", sep = ""))
   
       }
@@ -667,7 +667,7 @@ shinyServer(function(input, output, session){
       }
       # MMET = c(4.375, 8.75, 17.5),  
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        dat <- data.frame(MMET = c(4.375, 8.75, 17.5), 'Male RR' = paste(get_ma_table(m_plot_data, "RR"), " (", get_ma_table(m_plot_data, "lb"),
+        dat <- data.frame(MMETh = c(4.375, 8.75, 17.5), 'Male RR' = paste(get_ma_table(m_plot_data, "RR"), " (", get_ma_table(m_plot_data, "lb"),
                                      " - ", get_ma_table(m_plot_data, "ub"), ")", sep = ""),
                           'Female RR' = paste(get_ma_table(w_plot_data, "RR"), " (", get_ma_table(w_plot_data, "lb"),
                                       " - ", get_ma_table(w_plot_data, "ub"), ")", sep = ""), check.names = FALSE)
