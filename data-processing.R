@@ -89,13 +89,31 @@ raw_data[raw_data$outcome == "CVD",]$outcome <- "Cardiovascular Disease"
 # Replace "CHD" with "Coronary Heart Disease"
 raw_data[raw_data$outcome == "CHD",]$outcome <- "Coronary Heart Disease"
 
+# 
+raw_data$outcome <- stringi::stri_trans_totitle(raw_data$outcome, opts_brkiter = stringi::stri_opts_brkiter(type = "sentence"))
+
 # Identify unique outcomes
 uoutcome <- data.frame(outcome = as.character(unique(raw_data$outcome)))
 uoutcome$outcome <- as.character(uoutcome$outcome)
+
+#uoutcome$outcome <- stringi::stri_trans_totitle(uoutcome$outcome, opts_brkiter = stringi::stri_opts_brkiter(type = "sentence"))
+
 # Sort
 uoutcome$outcome <- sort(uoutcome$outcome)
+
 # Remove the blank outcome
 uoutcome <- dplyr::filter(uoutcome, outcome != "")
+
+# All-cause mortality
+# Cardiovascular diseases
+# Coronary heart disease
+# Stroke
+# Breast cancer
+# Colon cancer
+# Endometrial cancer
+# Lung cancer
+# Total cancer
+uoutcome$outcome <- uoutcome[c(1, 3, 5, 9, 2, 4, 6, 8, 10, 7),]
 
 ### Remove studies with less than 40k for all-cause, or 10k for the rest outcomes
 #raw_data <- subset(raw_data, (outcome == "all-cause mortality" & n_baseline >= 40000 ) |
