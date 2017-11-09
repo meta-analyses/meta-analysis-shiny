@@ -3,7 +3,7 @@ rm (list = ls())
 raw_data <- NULL
 
 # Read the data from the meta-analysis repo
-if(grepl('^/var/shiny/meta-analysis-shiny', getwd()) || grepl('/srv/shiny-server/meta-analysis-shiny', getwd())){
+if(grepl('^/var/shiny/meta-analysis-shiny', getwd()) || grepl('/srv/shiny-server/meta-analyses-physical-activity', getwd())){
   # Set encoding as found at: https://stackoverflow.com/a/14363274
   # only for server
   raw_data <- read.csv("../meta-analysis/data/20171020_MASTER_PA_Dose_Metananalysis_Data_Extraction_Mortality10000update.csv", fileEncoding="latin1", 
