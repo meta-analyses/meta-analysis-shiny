@@ -38,6 +38,7 @@ shinyServer(function(input, output, session){
       acmfdata <- subset(acmfdata, n_baseline >= 10000)
       
     }
+    
     acmfdata
     
   }
@@ -136,7 +137,7 @@ shinyServer(function(input, output, session){
         
         local_cov_method <- F
         
-        if (input$in_outcome == "Coronary Heart Disease" || input$in_outcome == "Cardiovascular Disease" || input$in_outcome == "stroke")
+        if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
           local_cov_method <- T
         
         plot_data <- data.frame(metaAnalysis(acmfdata, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot, lout = 1000))
@@ -205,8 +206,7 @@ shinyServer(function(input, output, session){
           
           local_cov_method <- F
           
-          if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" 
-              || isolate(input$in_outcome) == "stroke")
+          if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
             local_cov_method <- T
           
           last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
@@ -625,7 +625,7 @@ shinyServer(function(input, output, session){
         
         local_cov_method <- F
         
-        if (isolate(input$in_outcome) == "Coronary Heart Disease" || isolate(input$in_outcome) == "Cardiovascular Disease" || isolate(input$in_outcome) == "stroke")
+        if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
           local_cov_method <- T
         
         last_knot <- get_last_knot(overall_data, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
@@ -644,8 +644,8 @@ shinyServer(function(input, output, session){
       
       local_cov_method <- F
       
-      if (input$in_outcome == "Coronary Heart Disease" || input$in_outcome == "Cardiovascular Disease" || input$in_outcome == "stroke"
-          || input$in_outcome == "colon cancer")
+      if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke"
+          || input$in_outcome == "Colon cancer")
         local_cov_method <- T
       
       m_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
@@ -696,7 +696,7 @@ shinyServer(function(input, output, session){
       
       local_cov_method <- F
       
-      if (input$in_outcome == "Coronary Heart Disease" || input$in_outcome == "Cardiovascular Disease" || input$in_outcome == "stroke")
+      if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
         local_cov_method <- T
       
       plot_data <- data.frame(metaAnalysis(dataset, ptitle = "", returnval = T, covMethed = local_cov_method, maxQuantile = last_knot, lout = 1000))
