@@ -83,8 +83,10 @@ shinyServer(function(input, output, session){
     
     pop_title <- "Total Population"
     
-    if (input$total_sub_population == 1)
+    if (input$total_sub_population == 1){
       acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+      
+    }
     else{# Sub-population
       acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
       pop_title <- "Male Population"
@@ -777,7 +779,7 @@ shinyServer(function(input, output, session){
       
       pert_ls_upper <- ((sum_tp - sum_ls_upper_tp) / sum_tp) * 100
       
-      lower_guideline_value <- paste0(round(pert_ls, 2) , "% (95% CI: ", round(pert_ls_lower, 2), " - ",  round(pert_ls_upper, 2), ")" )
+      lower_guideline_value <- paste0(round(pert_ls, 1) , "% (95% CI: ", round(pert_ls_lower, 1), " - ",  round(pert_ls_upper, 1), ")" )
       
     }
     
