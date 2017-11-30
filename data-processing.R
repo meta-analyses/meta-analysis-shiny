@@ -6,10 +6,10 @@ raw_data <- NULL
 if(grepl('^/var/shiny/meta-analysis-shiny', getwd()) || grepl('/srv/shiny-server/meta-analyses-physical-activity', getwd())){
   # Set encoding as found at: https://stackoverflow.com/a/14363274
   # only for server
-  raw_data <- read.csv("../meta-analysis/data/20171020_MASTER_PA_Dose_Metananalysis_Data_Extraction_Mortality10000update.csv", fileEncoding="latin1", 
+  raw_data <- read.csv("../meta-analysis/data/20171129_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", fileEncoding="latin1", 
                        header = T, stringsAsFactors = F, skipNul = TRUE)
 }else{
-  raw_data <- read.csv("../meta-analysis/data/20171020_MASTER_PA_Dose_Metananalysis_Data_Extraction_Mortality10000update.csv", header = T, 
+  raw_data <- read.csv("../meta-analysis/data/20171129_MASTER_PA_Dose_Metananalysis_Data_Extraction.csv", header = T, 
                        stringsAsFactors = F, skipNul = TRUE)
 }
 
