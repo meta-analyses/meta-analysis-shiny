@@ -708,7 +708,8 @@ shinyServer(function(input, output, session){
       
       # Update RR from the lookup table
       for (i in 1:nrow(dataset)){
-        val <- subset(plot_data, round(dose, 1) <= (dataset$dose[i] + 0.05) & round(dose, 1) >= (dataset$dose[i] - 0.05))
+        val_rr <- plot_data[["RR"]][which.min(abs(plot_data$dose - dataset$dose[i]))]
+        val <- subset(plot_data, RR == val_rr)
         if (nrow(val) > 0){
           dataset$RR[i] <- val$RR[1]
           if (removeNA){
@@ -732,7 +733,8 @@ shinyServer(function(input, output, session){
       
       local_var <- dataset_ls
       
-      val <- subset(plot_data, round(dose, 1) <= (dose_value + 0.05) & round(dose, 1) >= (dose_value - 0.05))
+      val_rr <- plot_data[["RR"]][which.min(abs(plot_data$dose - dose_value))]
+      val <- subset(plot_data, RR == val_rr)
       
       if (nrow(val) > 0)
         dataset_ls[dataset_ls$dose == dose_value,]$RR <- val$RR[1]
