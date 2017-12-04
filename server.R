@@ -351,6 +351,10 @@ shinyServer(function(input, output, session){
       dataset$RR <- round(dataset$RR, 3)
       dataset$dose <- round(dataset$dose, 3)
       
+      # Round confidence interval as well
+      dataset$ub <- round(dataset$ub, 3)
+      dataset$lb <- round(dataset$lb, 3)
+      
       gg <- ggplot() + 
         geom_line(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, y = RR)) +
         geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
