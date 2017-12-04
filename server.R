@@ -347,6 +347,10 @@ shinyServer(function(input, output, session){
   getPlot <- function (dataset, q, plotTitle, pop_type , outcome, outcome_type ){
     
     if (!is.null(dataset)){
+      # Round to three decimal points
+      dataset$RR <- round(dataset$RR, 3)
+      dataset$dose <- round(dataset$dose, 3)
+      
       gg <- ggplot() + 
         geom_line(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, y = RR)) +
         geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
