@@ -1,24 +1,27 @@
-rm (list = ls())
 source("setup.R")
 
-total_population <- T
-sub_population <- F
-g <- 2
+total_population <- F
+sub_population <- T
+g <- 1
 local_last_knot <- 0.75
-fpath <- ""
+fpath <- "output/main/"
 
 low_quantile <- F
 
 if (low_quantile){
   local_last_knot <- 0.85
-  fpath <- "85/"
+  fpath <- "output/85/"
 }
 
 conservative <- F
 
 if (conservative){
-  fpath <- "conservative/"
+  
+  ## CHANGE variable name in data-processing.R
+  fpath <- "output/conservative/"
 }
+
+cat(fpath, "\n")
 
 ## FUNCTIONS
 
@@ -264,7 +267,7 @@ if (total_population){
               scale_y_continuous(expand = c(0, 0),
                                  breaks = seq(from = 0, to = ifelse(i == 1, max(dataset2$ub), max(dataset$RR)) + 0.2, by = 0.2)) + #,
               #limits = c(0, NA)) +
-              coord_cartesian(ylim = c(0, ifelse(i == 1, max(dataset2$ub), max(dataset$RR)) + 0.2), expand = T) +
+              coord_cartesian(ylim = c(0, ifelse(uoutcome$outcome[i] == 'Cardiovascular disease', max(dataset2$ub), max(dataset$RR)) + 0.2), expand = T) +
               # xlim = c(0, max(dataset$dose) + 3)) + 
               theme(legend.position="none",
                     plot.title = element_text(hjust = 0.5)) +
@@ -315,11 +318,10 @@ if (total_population){
 # 4)	All  Cancers 
 # 5)	Each Individual Cancer (conditional on accrual of sufficient studies)
 
-# mortality figures
+# incidence figures
 
 if (total_population){
   for (i in c(2, 3, 4, 9, 5, 7, 6, 8)){#:nrow(uoutcome)){
-    #i <- 2
     cat("Total Population - Outcome: ", uoutcome$outcome[i], " and i ", i, "\n")
     acmfdata <- get_overall_data(PA_exposure = "LTPA", outcome_disease = uoutcome$outcome[i], 
                                  outcome_types = "incidence")
@@ -327,9 +329,13 @@ if (total_population){
     if (uoutcome$outcome[i] == "Coronary heart disease" || uoutcome$outcome[i] == "Cardiovascular disease" || uoutcome$outcome[i] == "Stroke")
       local_cov_method <- T
     
+    local_loop_last_knot <- local_last_knot
+    if (conservative && uoutcome$outcome[i] == "Colon cancer")
+      local_loop_last_knot <- 0.82
+    
     if (nrow(acmfdata) > 0){
       acmfdata <- subset(acmfdata, select = c(id, ref_number, Author, effect_measure, type, totalpersons, personyrs, dose, RR, logrr, cases, uci_effect, lci_effect, se))
-      last_knot <- get_last_knot(acmfdata, dose_pert = local_last_knot , personyrs_pert = local_last_knot)
+      last_knot <- get_last_knot(acmfdata, dose_pert = local_loop_last_knot , personyrs_pert = local_loop_last_knot)
       last_knot <- last_knot[2]
       if (nrow(acmfdata) > 0){
         dataset <- acmfdata
@@ -403,206 +409,120 @@ if (total_population){
   }
 }
 
+if (!sub_population){
+  write.csv(tab_data_incidence, file = paste(fpath, "tab_data_incidence.csv"), row.names = F)
+  write.csv(tab_data_mortality, file = paste(fpath, "tab_data_mortality.csv"), row.names = F)
+}
 
-write.csv(tab_data_incidence, file = paste(fpath, "tab_data_incidence.csv"), row.names = F)
-write.csv(tab_data_mortality, file = paste(fpath, "tab_data_mortality.csv"), row.names = F)
+# Mortality: all-cause and CVD.
+# Incidence: colon cancer.
 
-# Mortality: all-cause and CVD. 
-# Incidence: colon cancer. 
+if (sub_population){
+  for (i in 1:nrow(uoutcome)){
+    if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease', 'Colon cancer')){
+      pop <- "Male"
+      if (g == 2)
+        pop <- "Female"
+      cat(pop, " Population - Outcome: ", uoutcome$outcome[i], " and i ", i, "\n")
+      local_outcome_type <- "mortality"
+      if (uoutcome$outcome[i] == "Colon cancer")
+        local_outcome_type <- "incidence"
+      
+      local_loop_last_knot <- local_last_knot
+      if (uoutcome$outcome[i] == "Colon cancer" && g == 2)
+        local_loop_last_knot <- 0.78
+      acmfdata <- get_subpopulation_data(PA_exposure = "LTPA", outcome_disease = uoutcome$outcome[i],
+                                         outcome_types = local_outcome_type, gender = g)
+      local_cov_method <- F
+      if (uoutcome$outcome[i] == "Coronary heart disease" || uoutcome$outcome[i] == "Cardiovascular disease" || uoutcome$outcome[i] == "Stroke")
+        local_cov_method <- T
 
-# if (sub_population){
-#   
-#   for (i in 1:nrow(uoutcome)){
-#     if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease')){
-#       pop <- "Male"
-#       if (g == 2)
-#         pop <- "Female"
-#       cat(pop, " Population - Outcome: ", uoutcome$outcome[i], " and i ", i, "\n")
-#       acmfdata <- get_subpopulation_data(PA_exposure = "LTPA", outcome_disease = uoutcome$outcome[i], 
-#                                          outcome_types = "mortality", gender = g)
-#       local_cov_method <- F
-#       if (uoutcome$outcome[i] == "Coronary heart disease" || uoutcome$outcome[i] == "Cardiovascular disease" || uoutcome$outcome[i] == "Stroke")
-#         local_cov_method <- T
-#       
-#       if (nrow(acmfdata) > 0){
-#         acmfdata <- subset(acmfdata, select = c(id, ref_number, Author, effect_measure, type, totalpersons, personyrs, dose, RR, logrr, cases, uci_effect, lci_effect, se))
-#         last_knot <- get_last_knot(acmfdata, dose_pert = local_last_knot , personyrs_pert = local_last_knot)
-#         last_knot <- last_knot[2]
-#         if (nrow(acmfdata) > 0){
-#           dataset <- acmfdata
-#           q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
-#           if (!is.null(dataset)){
-#             dataset$personyrs <- round(dataset$personyrs)
-#             group_by(dataset, id) %>% select(dose, se) %>%
-#               summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
-#             dataset2 <- data.frame(metaAnalysis(dataset, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot, lout = 1000))
-#             colnames(dataset2) <- c("dose","RR", "lb", "ub")
-#             
-#             plotTitle <- paste0( uoutcome$outcome[i] ,  " - ", pop , " Population")
-#             if (!uoutcome$outcome[i] == 'All-cause mortality')
-#               plotTitle <- paste0( uoutcome$outcome[i] ,  " - ", pop ," Population")
-#             
-#             plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of entries: ',
-#                                  length(unique(acmfdata$id)),
-#                                  ' \nNumber of people: ' , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
-#                                                                    format = "f", big.mark = ",", drop0trailing = TRUE))
-#             
-#             cat("highest val ", ifelse(i == 1, min(dataset2$ub), max(dataset$dose)), "\n")
-#             
-#             p <- ggplot() +
-#               geom_line(data = dataset, aes(dose, RR, col = factor(ref_number), label = personyrs)) +
-#               geom_point(data = dataset, aes(dose, RR, col = factor(ref_number)), size = 4 * (dataset$personyrs - min(dataset$personyrs))/diff(range(dataset$personyrs))) +
-#               geom_line(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, y = RR), size = 0.8) +
-#               geom_line(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, y = RR), size = 0.8, linetype = "dashed") +
-#               geom_ribbon(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
-#               geom_ribbon(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
-#               geom_vline(xintercept= q, linetype="dotted", alpha = 0.6) +
-#               scale_x_continuous(expand = c(0, 0),
-#                                  breaks = seq(from = 0, to = 80, by = 10) ,
-#                                  limits = c(0, max(dataset$dose) + 10)) + 
-#               scale_y_continuous(expand = c(0, 0),
-#                                  breaks = seq(from = 0, to = ifelse(i == 1, max(dataset2$ub), max(dataset$RR)) + 0.2, by = 0.2)) + #,
-#               #limits = c(0, NA)) +
-#               coord_cartesian(ylim = c(0, ifelse(i == 1, max(dataset2$ub), max(dataset$RR)) + 0.2), expand = T) +
-#               # xlim = c(0, max(dataset$dose) + 3)) + 
-#               theme(legend.position="none",
-#                     plot.title = element_text(hjust = 0.5)) +
-#               xlab("\nMarginal MET hours per week\n") +
-#               ylab("\nRelative Risk\n") +
-#               labs(title = paste(plotTitle))
-#             #p
-#             #print(p)
-#             ggsave(paste0(fpath, uoutcome$outcome[i], "-mortality", ".png"), height=5, width=10, units='in', dpi=600, scale = 1)
-#             
-#             if (nrow(tab_data_mortality) == 0){
-#               tab_data_mortality <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
-#                                                                                        " - ", get_ma_table(dataset2, "ub"), ")", sep = ""),
-#                                                PIF = c(get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 4.375),
-#                                                        get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 8.75),
-#                                                        get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 17.5))
-#                                                
-#               )
-#               colnames(tab_data_mortality) <- c("MMETh",paste("RR", uoutcome$outcome[i]), paste("PIF", uoutcome$outcome[i]))
-#               
-#             }else{
-#               dat <- data.frame(RR = paste(get_ma_table(dataset2, "RR"), " \n (", get_ma_table(dataset2, "lb"),
-#                                            " - ", get_ma_table(dataset2, "ub"), ")", sep = ""),
-#                                 PIF = c(get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 4.375),
-#                                         get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 8.75),
-#                                         get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 17.5))
-#                                 
-#               )
-#               
-#               colnames(dat) <- c(paste("RR", uoutcome$outcome[i]), paste("PIF", uoutcome$outcome[i]))
-#               
-#               tab_data_mortality <- cbind(tab_data_mortality, dat)
-#             }
-#             
-#             
-#             
-#           }
-#         }
-#       }
-#     }
-#   }
-# }
+      if (nrow(acmfdata) > 0){
+        acmfdata <- subset(acmfdata, select = c(id, ref_number, Author, effect_measure, type, totalpersons, personyrs, dose, RR, logrr, cases, uci_effect, lci_effect, se))
+        last_knot <- get_last_knot(acmfdata, dose_pert = local_loop_last_knot , personyrs_pert = local_loop_last_knot)
+        last_knot <- last_knot[2]
+        if (nrow(acmfdata) > 0){
+          dataset <- acmfdata
+          q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
+          if (!is.null(dataset)){
+            dataset$personyrs <- round(dataset$personyrs)
+            group_by(dataset, id) %>% select(dose, se) %>%
+              summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
+            dataset2 <- data.frame(metaAnalysis(dataset, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot, lout = 1000))
+            colnames(dataset2) <- c("dose","RR", "lb", "ub")
 
-# Incidence :
-# 1)	CVD
-# 2)	Coronary Heart Disease
-# 3)	Stroke
-# 
-# 4)	All  Cancers 
-# 5)	Each Individual Cancer (conditional on accrual of sufficient studies)
+            plotTitle <- paste0( uoutcome$outcome[i] ,  " - ", pop , " Population")
+            if (!uoutcome$outcome[i] == 'All-cause mortality')
+              plotTitle <- paste0( uoutcome$outcome[i] ,  " - ", tools::toTitleCase(local_outcome_type), " - ", pop ," Population")
 
-# mortality figures
+            plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of entries: ',
+                                 length(unique(acmfdata$id)),
+                                 ' \nNumber of people: ' , formatC(round(sum(acmfdata$totalpersons, na.rm = T)),
+                                                                   format = "f", big.mark = ",", drop0trailing = TRUE))
 
-# if (sub_population){
-#   for (i in c(1,2,4, 5, 6, 8, 9, 10)){#:nrow(uoutcome)){
-#     # i <- 1
-#     cat("Total Population - Outcome: ", uoutcome$outcome[i], " and i ", i, "\n")
-#     acmfdata <- get_overall_data(PA_exposure = "LTPA", outcome_disease = uoutcome$outcome[i], 
-#                                  outcome_types = "incidence")
-#     local_cov_method <- F
-#     if (uoutcome$outcome[i] == "Coronary heart disease" || uoutcome$outcome[i] == "Cardiovascular disease" || uoutcome$outcome[i] == "Stroke")
-#       local_cov_method <- T
-#     
-#     if (nrow(acmfdata) > 0){
-#       acmfdata <- subset(acmfdata, select = c(id, ref_number, Author, effect_measure, type, totalpersons, personyrs, dose, RR, logrr, cases, uci_effect, lci_effect, se))
-#       last_knot <- get_last_knot(acmfdata, dose_pert = local_last_knot , personyrs_pert = local_last_knot)
-#       last_knot <- last_knot[2]
-#       if (nrow(acmfdata) > 0){
-#         dataset <- acmfdata
-#         q <- quantile(dataset$dose, c(0, last_knot / 2, last_knot))
-#         if (!is.null(dataset)){
-#           dataset$personyrs <- round(dataset$personyrs)
-#           group_by(dataset, id) %>% select(dose, se) %>%
-#             summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
-#           dataset2 <- data.frame(metaAnalysis(dataset, ptitle = "", returnval = T, covMethed = local_cov_method, minQuantile = 0, maxQuantile = last_knot, lout = 1000))
-#           colnames(dataset2) <- c("dose","RR", "lb", "ub")
-#           
-#           plotTitle <- paste0( uoutcome$outcome[i] ,  " - Total Population")
-#           if (i != 3)
-#             plotTitle <- paste0( uoutcome$outcome[i] ,  " - Incidence - Total Population")
-#           
-#           plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of entries: ',
-#                                length(unique(acmfdata$id)),
-#                                ' \nNumber of people: ' , formatC(round(sum(acmfdata$totalpersons, na.rm = T)),
-#                                                                  format = "f", big.mark = ",", drop0trailing = TRUE))
-#           
-#           p <- ggplot() +
-#             geom_line(data = dataset, aes(dose, RR, col = factor(ref_number), label = personyrs)) +
-#             geom_point(data = dataset, aes(dose, RR, col = factor(ref_number)), size = 4 * (dataset$personyrs - min(dataset$personyrs))/diff(range(dataset$personyrs))) +
-#             geom_line(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, y = RR), size = 0.8) +
-#             geom_line(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, y = RR), size = 0.8, linetype = "dashed") +
-#             geom_ribbon(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
-#             geom_ribbon(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
-#             geom_vline(xintercept= q, linetype="dotted", alpha = 0.6) +
-#             scale_x_continuous(expand = c(0, 0),
-#                                breaks = seq(from = 0, to = 80, by = 10) ,
-#                                limits = c(0, max(dataset$dose) + 10)) +
-#             scale_y_continuous(expand = c(0, 0),
-#                                breaks = seq(from = 0, to = max(dataset$RR) + 0.2, by = 0.2)) + #,
-#             #limits = c(0, NA)) +
-#             coord_cartesian(ylim = c(0, max(dataset$RR) + 0.2), expand = T) +
-#             # xlim = c(0, max(dataset$dose) + 3)) +
-#             theme(legend.position="none",
-#                   plot.title = element_text(hjust = 0.5)) +
-#             xlab("\nMarginal MET hours per week\n") +
-#             ylab("\nRelative Risk\n") +
-#             labs(title = paste(plotTitle))
-#           print(p)
-#           #ggsave(paste0(fpath, uoutcome$outcome[i], "-incidence", ".png"), height=5, width=10, units='in', dpi=600, scale = 1)
-#           
-#           if (nrow(tab_data_incidence) == 0){
-#             tab_data_incidence <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
-#                                                                                      " - ", get_ma_table(dataset2, "ub"), ")", sep = ""),
-#                                              PIF = c(get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 4.375),
-#                                                      get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 8.75),
-#                                                      get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 17.5))
-#                                              
-#             )
-#             colnames(tab_data_incidence) <- c("MMETh",paste("RR", uoutcome$outcome[i]), paste("PIF", uoutcome$outcome[i]))
-#             
-#           }else{
-#             dat <- data.frame(RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
-#                                          " - ", get_ma_table(dataset2, "ub"), ")", sep = ""),
-#                               PIF = c(get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 4.375),
-#                                       get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 8.75),
-#                                       get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 17.5))
-#                               
-#             )
-#             
-#             colnames(dat) <- c(paste("RR", uoutcome$outcome[i]), paste("PIF", uoutcome$outcome[i]))
-#             
-#             tab_data_incidence <- cbind(tab_data_incidence, dat)
-#           }
-#         }
-#       }
-#     }
-#   }
-# }
+            cat("highest val ", ifelse(i == 1, min(dataset2$ub), max(dataset$dose)), "\n")
 
+            p <- ggplot() +
+              geom_line(data = dataset, aes(dose, RR, col = factor(ref_number), label = personyrs)) +
+              geom_point(data = dataset, aes(dose, RR, col = factor(ref_number)), size = 4 * (dataset$personyrs - min(dataset$personyrs))/diff(range(dataset$personyrs))) +
+              geom_line(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, y = RR), size = 0.8) +
+              geom_line(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, y = RR), size = 0.8, linetype = "dashed") +
+              geom_ribbon(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
+              geom_ribbon(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
+              geom_vline(xintercept= q, linetype="dotted", alpha = 0.6) +
+              scale_x_continuous(expand = c(0, 0),
+                                 breaks = seq(from = 0, to = 80, by = 10) ,
+                                 limits = c(0, max(dataset$dose) + 10)) +
+              scale_y_continuous(expand = c(0, 0),
+                                 breaks = seq(from = 0, to = ifelse(i == 1, max(dataset2$ub), max(dataset$RR)) + 0.2, by = 0.2)) + #,
+              #limits = c(0, NA)) +
+              coord_cartesian(ylim = c(0, ifelse(i == 1, max(dataset2$ub), max(dataset$RR)) + 0.2), expand = T) +
+              # xlim = c(0, max(dataset$dose) + 3)) +
+              theme(legend.position="none",
+                    plot.title = element_text(hjust = 0.5)) +
+              xlab("\nMarginal MET hours per week\n") +
+              ylab("\nRelative Risk\n") +
+              labs(title = paste(plotTitle))
+            #p
+            print(p)
+            ggsave(paste0(fpath, pop, "-", uoutcome$outcome[i], "-", local_outcome_type, ".png"), height=5, width=10, units='in', dpi=600, scale = 1)
+
+            if (nrow(tab_data_mortality) == 0){
+              tab_data_mortality <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
+                                                                                       " - ", get_ma_table(dataset2, "ub"), ")", sep = ""),
+                                               PIF = c(get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 4.375),
+                                                       get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 8.75),
+                                                       get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 17.5))
+
+              )
+              colnames(tab_data_mortality) <- c("MMETh",paste("RR", uoutcome$outcome[i]), paste("PIF", uoutcome$outcome[i]))
+
+            }else{
+              dat <- data.frame(RR = paste(get_ma_table(dataset2, "RR"), " \n (", get_ma_table(dataset2, "lb"),
+                                           " - ", get_ma_table(dataset2, "ub"), ")", sep = ""),
+                                PIF = c(get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 4.375),
+                                        get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 8.75),
+                                        get_pif_values(dataset = acmfdata, uoutcome$outcome[i], last_knot = last_knot , dose_value = 17.5))
+
+              )
+
+              colnames(dat) <- c(paste("RR", uoutcome$outcome[i]), paste("PIF", uoutcome$outcome[i]))
+
+              tab_data_mortality <- cbind(tab_data_mortality, dat)
+            }
+
+
+
+          }
+        }
+      }
+    }
+  }
+}
+
+if (sub_population){
+  write.csv(tab_data_mortality, file = paste(fpath, g, "tab_data_mortality.csv"), row.names = F)
+}
 
 
 
