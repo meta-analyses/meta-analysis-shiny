@@ -2,7 +2,7 @@ source("setup.R")
 
 total_population <- F
 sub_population <- T
-g <- 1
+g <- 2
 local_last_knot <- 0.75
 fpath <- "output/main/"
 
@@ -275,7 +275,7 @@ if (total_population){
               ylab("\nRelative Risk\n") +
               labs(title = paste(plotTitle))
             print(p)
-            ggsave(paste0(fpath, uoutcome$outcome[i], "-mortality", ".png"), height=5, width=10, units='in', dpi=600, scale = 1)
+            ggsave(paste0(fpath, uoutcome$outcome[i], "-mortality", ".wmf"), height=5, width=10, units='in', dpi=150, scale = 1)
             
             if (nrow(tab_data_mortality) == 0){
               tab_data_mortality <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
@@ -378,7 +378,7 @@ if (total_population){
             ylab("\nRelative Risk\n") +
             labs(title = paste(plotTitle))
           print(p)
-          ggsave(paste0(fpath, uoutcome$outcome[i], "-incidence", ".png"), height=5, width=10, units='in', dpi=600, scale = 1)
+          ggsave(paste0(fpath, uoutcome$outcome[i], "-incidence", ".wmf"), height=5, width=10, units='in', dpi=150, scale = 1)
           
           if (nrow(tab_data_incidence) == 0){
             tab_data_incidence <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
@@ -485,7 +485,7 @@ if (sub_population){
               labs(title = paste(plotTitle))
             #p
             print(p)
-            ggsave(paste0(fpath, pop, "-", uoutcome$outcome[i], "-", local_outcome_type, ".png"), height=5, width=10, units='in', dpi=600, scale = 1)
+            ggsave(paste0(fpath, pop, "-", uoutcome$outcome[i], "-", local_outcome_type, ".wmf"), height=5, width=10, units='in', dpi=150, scale = 1)
 
             if (nrow(tab_data_mortality) == 0){
               tab_data_mortality <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
