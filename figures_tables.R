@@ -1,8 +1,9 @@
 source("setup.R")
 
-total_population <- F
-sub_population <- T
-g <- 2
+total_population <- T
+sub_population <- F
+local_dpi <- 600
+g <- 1
 local_last_knot <- 0.75
 fpath <- "output/main/"
 
@@ -219,7 +220,12 @@ tab_data_incidence <- data.frame()
 
 if (total_population){
   for (i in 1:nrow(uoutcome)){ 
-    if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease', 'Total cancer')){
+    if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease', 'Total cancer', 'Coronary heart disease', 'Stroke')){
+      
+      local_loop_last_knot <- local_last_knot
+      if (uoutcome$outcome[i] == "Coronary heart disease")
+        local_loop_last_knot <- 0.77
+      
       cat("Total Population - Outcome: ", uoutcome$outcome[i], " and i ", i, "\n")
       acmfdata <- get_overall_data(PA_exposure = "LTPA", outcome_disease = uoutcome$outcome[i], 
                                    outcome_types = "mortality")
@@ -229,7 +235,7 @@ if (total_population){
       
       if (nrow(acmfdata) > 0){
         acmfdata <- subset(acmfdata, select = c(id, ref_number, Author, effect_measure, type, totalpersons, personyrs, dose, RR, logrr, cases, uci_effect, lci_effect, se))
-        last_knot <- get_last_knot(acmfdata, dose_pert = local_last_knot , personyrs_pert = local_last_knot)
+        last_knot <- get_last_knot(acmfdata, dose_pert = local_loop_last_knot , personyrs_pert = local_loop_last_knot)
         last_knot <- last_knot[2]
         if (nrow(acmfdata) > 0){
           dataset <- acmfdata
@@ -269,13 +275,14 @@ if (total_population){
               #limits = c(0, NA)) +
               coord_cartesian(ylim = c(0, ifelse(uoutcome$outcome[i] == 'Cardiovascular disease', max(dataset2$ub), max(dataset$RR)) + 0.2), expand = T) +
               # xlim = c(0, max(dataset$dose) + 3)) + 
-              theme(legend.position="none",
-                    plot.title = element_text(hjust = 0.5)) +
+              theme_classic() + theme(
+                legend.position="none",
+                plot.title = element_text(hjust = 0.5)) +
               xlab("\nMarginal MET hours per week\n") +
               ylab("\nRelative Risk\n") +
               labs(title = paste(plotTitle))
             print(p)
-            ggsave(paste0(fpath, uoutcome$outcome[i], "-mortality", ".wmf"), height=5, width=10, units='in', dpi=150, scale = 1)
+            ggsave(paste0(fpath, uoutcome$outcome[i], "-mortality", ".png"), height=5, width=10, units='in', dpi = local_dpi, scale = 1)
             
             if (nrow(tab_data_mortality) == 0){
               tab_data_mortality <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
@@ -368,17 +375,17 @@ if (total_population){
                                breaks = seq(from = 0, to = 80, by = 10) ,
                                limits = c(0, max(dataset$dose) + 10)) +
             scale_y_continuous(expand = c(0, 0),
-                               breaks = seq(from = 0, to = max(dataset$RR) + 0.2, by = 0.2)) + #,
-            #limits = c(0, NA)) +
+                               breaks = seq(from = 0, to = max(dataset$RR) + 0.2, by = 0.2)) +
             coord_cartesian(ylim = c(0, max(dataset$RR) + 0.2), expand = T) +
-            # xlim = c(0, max(dataset$dose) + 3)) +
-            theme(legend.position="none",
-                  plot.title = element_text(hjust = 0.5)) +
+            theme_classic() + theme(
+              legend.position="none",
+              plot.title = element_text(hjust = 0.5)) +
             xlab("\nMarginal MET hours per week\n") +
             ylab("\nRelative Risk\n") +
-            labs(title = paste(plotTitle))
+            labs(title = paste(plotTitle)) 
+            # + annotate("segment", x = 3, xend = 5 , y= 0.5, yend = 0.8, arrow = arrow(), label = "Some text")
           print(p)
-          ggsave(paste0(fpath, uoutcome$outcome[i], "-incidence", ".wmf"), height=5, width=10, units='in', dpi=150, scale = 1)
+          ggsave(paste0(fpath, uoutcome$outcome[i], "-incidence", ".png"), height=5, width=10, units='in', dpi = local_dpi, scale = 1)
           
           if (nrow(tab_data_incidence) == 0){
             tab_data_incidence <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
@@ -477,15 +484,16 @@ if (sub_population){
                                  breaks = seq(from = 0, to = ifelse(i == 1, max(dataset2$ub), max(dataset$RR)) + 0.2, by = 0.2)) + #,
               #limits = c(0, NA)) +
               coord_cartesian(ylim = c(0, ifelse(i == 1, max(dataset2$ub), max(dataset$RR)) + 0.2), expand = T) +
-              # xlim = c(0, max(dataset$dose) + 3)) +
-              theme(legend.position="none",
-                    plot.title = element_text(hjust = 0.5)) +
+              theme_classic() + 
+              theme(
+                legend.position="none",
+                plot.title = element_text(hjust = 0.5)) +
               xlab("\nMarginal MET hours per week\n") +
               ylab("\nRelative Risk\n") +
               labs(title = paste(plotTitle))
             #p
             print(p)
-            ggsave(paste0(fpath, pop, "-", uoutcome$outcome[i], "-", local_outcome_type, ".wmf"), height=5, width=10, units='in', dpi=150, scale = 1)
+            ggsave(paste0(fpath, pop, "-", uoutcome$outcome[i], "-", local_outcome_type, ".png"), height=5, width=10, units='in', dpi = local_dpi, scale = 1)
 
             if (nrow(tab_data_mortality) == 0){
               tab_data_mortality <- data.frame(MMET = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(dataset2, "RR"), " (", get_ma_table(dataset2, "lb"),
