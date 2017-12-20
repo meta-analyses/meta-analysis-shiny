@@ -220,11 +220,11 @@ tab_data_incidence <- data.frame()
 
 if (total_population){
   for (i in 1:nrow(uoutcome)){ 
-    if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease', 'Total cancer', 'Coronary heart disease', 'Stroke')){
+    if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease', 'Total cancer')){#, 'Coronary heart disease', 'Stroke')){
       
       local_loop_last_knot <- local_last_knot
-      if (uoutcome$outcome[i] == "Coronary heart disease")
-        local_loop_last_knot <- 0.77
+      # if (uoutcome$outcome[i] == "Coronary heart disease")
+      #   local_loop_last_knot <- 0.77
       
       cat("Total Population - Outcome: ", uoutcome$outcome[i], " and i ", i, "\n")
       acmfdata <- get_overall_data(PA_exposure = "LTPA", outcome_disease = uoutcome$outcome[i], 
