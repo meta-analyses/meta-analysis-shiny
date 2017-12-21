@@ -2,8 +2,8 @@ source("setup.R")
 
 total_population <- T
 sub_population <- F
-local_dpi <- 600
-g <- 1
+local_dpi <- 300
+g <- 2
 local_last_knot <- 0.75
 fpath <- "output/main/"
 
@@ -21,8 +21,6 @@ if (conservative){
   ## CHANGE variable name in data-processing.R
   fpath <- "output/conservative/"
 }
-
-cat(fpath, "\n")
 
 ## FUNCTIONS
 
@@ -59,7 +57,6 @@ get_overall_data <- function (PA_exposure, outcome_disease, outcome_types){
   
 }
 
-
 get_subpopulation_data <- function (PA_exposure, outcome_disease, outcome_types, gender){
   
   acmfdata <- data.frame()
@@ -90,8 +87,6 @@ get_subpopulation_data <- function (PA_exposure, outcome_disease, outcome_types,
   
   acmfdata
 }
-
-
 
 get_ma_table <- function(plot_data, colname = "RR"){
   
@@ -220,11 +215,14 @@ tab_data_incidence <- data.frame()
 
 if (total_population){
   for (i in 1:nrow(uoutcome)){ 
-    if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease', 'Total cancer')){#, 'Coronary heart disease', 'Stroke')){
+    if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease', 'Total cancer', 'Coronary heart disease', 'Stroke')){
       
       local_loop_last_knot <- local_last_knot
-      # if (uoutcome$outcome[i] == "Coronary heart disease")
-      #   local_loop_last_knot <- 0.77
+      if (uoutcome$outcome[i] == "Coronary heart disease" && !conservative)
+        local_loop_last_knot <- 0.77
+      
+      if (uoutcome$outcome[i] == "Coronary heart disease" && conservative)
+        local_loop_last_knot <- 0.83
       
       cat("Total Population - Outcome: ", uoutcome$outcome[i], " and i ", i, "\n")
       acmfdata <- get_overall_data(PA_exposure = "LTPA", outcome_disease = uoutcome$outcome[i], 
@@ -266,7 +264,7 @@ if (total_population){
               geom_line(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, y = RR), size = 0.8, linetype = "dashed") +
               geom_ribbon(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
               geom_ribbon(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
-              geom_vline(xintercept= q, linetype="dotted", alpha = 0.6) +
+              geom_vline(xintercept = round(q, 3), linetype="dotted", alpha = 0.6) +
               scale_x_continuous(expand = c(0, 0),
                                  breaks = seq(from = 0, to = 80, by = 10) ,
                                  limits = c(0, max(dataset$dose) + 10)) + 
