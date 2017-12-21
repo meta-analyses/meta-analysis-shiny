@@ -36,9 +36,9 @@ shinyUI(fluidPage(
     radioButtons(inputId = "in_outcome_type", label = "Select Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
     radioButtons("total_sub_population", "Population: ", total_sub_population, inline = TRUE),
-    HTML("<hr>"),
     conditionalPanel(
       condition = "input.total_sub_population != 1",
+      HTML("<hr>"),
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE)
     ),
     HTML("<hr>"),
