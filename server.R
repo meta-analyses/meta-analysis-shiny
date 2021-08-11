@@ -324,8 +324,7 @@ shinyServer(function(input, output, session){
             fig_title <- stringi::stri_trans_totitle(fig_title)
           
           fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of entries: ",  length(unique(acmfdata$id)) , 
-                              " & Number of people: " , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
-                                                                format = "f", big.mark = ",", drop0trailing = TRUE))
+                              " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
           q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
           
           getPlot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, input$in_outcome, outcome_type)
@@ -467,8 +466,7 @@ shinyServer(function(input, output, session){
       
       fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of entries: ",  
                           length(unique(dataset$id)) , 
-                          " & Number of people: " , formatC(round(sum(dataset$totalpersons, na.rm = T)), 
-                                                            format = "f", big.mark = ",", drop0trailing = TRUE))
+                          " & Person-years: ", format(round(sum(dataset$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
       
     }
     
