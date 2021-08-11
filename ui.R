@@ -5,9 +5,9 @@ source("setup.R")
 #pa_exposure <- c("LTPA", "TPA")
 
 # outcome_type
-outcome_type <- c("all",
-                  "incidence",
-                  "mortality")
+outcome_type <- c("Both",
+                  "Fatal",
+                  "Non-fatal")
 
 # "Overall Population"
 sub_population <- c("Male Population" = 1,
