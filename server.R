@@ -482,29 +482,55 @@ shinyServer(function(input, output, session){
       dataset$personyrs <- round(dataset$personyrs)
       group_by(dataset, id) %>% select(dose, se) %>%
         summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
-      gg <- ggplotly(
-        ggplot(dataset, aes(dose, RR, col = ref_number, label = personyrs)) + geom_point(size = 4 * (dataset$personyrs - min(dataset$personyrs))/diff(range(dataset$personyrs))) +
-          geom_line() +
-          scale_x_continuous(expand = c(0, 0),
-                             breaks = seq(from = 0, to = max(dataset$dose, na.rm = T), by = 5)) +
-          scale_y_continuous(expand = c(0, 0),
-                             breaks = seq(from = 0, to = (max(dataset$RR, na.rm = T) + 0.4), by = 0.2),
-                             limits = c(0, NA)) +
-          # annotate("text", label=paste(names(qg)[2], "q"), x=round(q[2],1), y = 0.3, parse=T, size=3) +
-          # annotate("text", label=paste(names(qg)[3], "q"), x=round(q[3],1) , y = 0.3, parse=T, size=3) +
-          # annotate("text", label = paste(100 * (input$in_main_quantile[2] - input$in_main_quantile[1]) / 2, "% (pyrs)"), x=round(q[2],1) - 2.5, y = 0.15, parse=T, size=3) +
-          # annotate("text", label = paste(100 * input$in_main_quantile[2], "% (pyrs)"), x=round(q[3],1) - 2.5 , y = 0.15, parse=T, size=3) +
-          # annotate("segment", label="1-beta", x = 5, xend = 7, y = 0.3, yend = 0.5, arrow = arrow()) +
-          #scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
-          #scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
-          # coord_cartesian(xlim = c(0, max(dataset$dose))) +
-          geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
-          theme_classic() + guides(col = FALSE) + 
-          xlab("\nMarginal MET hours per week\n") +
-          ylab("\nRelative Risk\n") +
-          labs(title = paste(plot_title)) +
-          theme(legend.position="none")
-      )
+      
+      # browser()
+      dataset$ref_number <- as.factor(dataset$ref_number)
+      # Create plot
+      gg <- ggplot() +
+        geom_line(data = dataset, aes(dose, RR, col = ref_number, group = ref_number)) +
+        geom_point(data = dataset, aes(dose, RR, col = ref_number, label = first_author, group = personyrs), size = 4 * (dataset$personyrs - min(dataset$personyrs)) / diff(range(dataset$personyrs))) +
+        geom_vline(xintercept = q, linetype = "dotted", alpha = 0.6) +
+        scale_x_continuous(expand = c(0, 0),
+                           breaks = seq(from = 0, to = 35, by = 5)) + 
+        scale_y_continuous(expand = c(0, 0),
+                           breaks = seq(from = 0, to = max(dataset$uci_effect, na.rm = T), by = 0.2),
+                           limits = c(0, NA)) +
+        coord_cartesian(xlim = c(0, 35)) +
+        geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
+        theme(
+          plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+          plot.title = element_text(size = 12, colour = "black", vjust = 7),
+          plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
+          legend.direction = "horizontal",
+          legend.position = "none") +
+        xlab("\nMarginal MET hours per week\n") +
+        ylab("\nRelative Risk\n") +
+        labs(title = paste(plot_title))
+        
+      # gg <- ggplotly(
+      #   ggplot(dataset, aes(dose, RR, col = ref_number, label = personyrs)) + 
+      #     geom_point(data = dataset, aes(dose, RR, col = ref_number, label = first_author, group = personyrs), size = 4 * (dataset$personyrs - min(dataset$personyrs)) / diff(range(dataset$personyrs))) +
+      #     geom_line() +
+      #     scale_x_continuous(expand = c(0, 0),
+      #                        breaks = seq(from = 0, to = max(dataset$dose, na.rm = T), by = 5)) +
+      #     scale_y_continuous(expand = c(0, 0),
+      #                        breaks = seq(from = 0, to = (max(dataset$RR, na.rm = T) + 0.4), by = 0.2),
+      #                        limits = c(0, NA)) +
+      #     # annotate("text", label=paste(names(qg)[2], "q"), x=round(q[2],1), y = 0.3, parse=T, size=3) +
+      #     # annotate("text", label=paste(names(qg)[3], "q"), x=round(q[3],1) , y = 0.3, parse=T, size=3) +
+      #     # annotate("text", label = paste(100 * (input$in_main_quantile[2] - input$in_main_quantile[1]) / 2, "% (pyrs)"), x=round(q[2],1) - 2.5, y = 0.15, parse=T, size=3) +
+      #     # annotate("text", label = paste(100 * input$in_main_quantile[2], "% (pyrs)"), x=round(q[3],1) - 2.5 , y = 0.15, parse=T, size=3) +
+      #     # annotate("segment", label="1-beta", x = 5, xend = 7, y = 0.3, yend = 0.5, arrow = arrow()) +
+      #     #scale_y_continuous(trans = "log", breaks = c(.1, .25, .5, .75, 1, 1.25)) +
+      #     #scale_x_continuous(expand = c(0, 0)) + scale_y_continuous(expand = c(0, 0)) +
+      #     # coord_cartesian(xlim = c(0, max(dataset$dose))) +
+      #     geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
+      #     theme_classic() + guides(col = FALSE) + 
+      #     xlab("\nMarginal MET hours per week\n") +
+      #     ylab("\nRelative Risk\n") +
+      #     labs(title = paste(plot_title)) +
+      #     theme(legend.position="none")
+      # )
       
     }else{
       gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
