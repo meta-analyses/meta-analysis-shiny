@@ -2,14 +2,77 @@ options(shiny.sanitize.errors = F)
 lower_guideline_value <- NA
 upper_guideline_value <- NA
 
+raw_data <- NULL
+dose_res_data <- NULL
+
 to_download <- NULL
 shinyServer(function(input, output, session){
+  
+  # input_list <- reactiveValues(in_outcome = NA,
+  #                              in_outcome_type = NA,
+  #                              total_sub_population = NA,
+  #                              plot_options = NA,
+  #                              in_main_quantile = NA,
+  #                              in_sub_quantile = NA)
+  # 
+  # ## Set  values of region
+  # observe({
+  #   
+  #   if (is.na(input_list$in_outcome))
+  #     input_list$in_outcome <- input$in_outcome
+  #   if (is.na(input_list$in_outcome_type))
+  #     input_list$in_outcome_type <- input$in_outcome_type
+  #   if (is.na(input_list$total_sub_population))
+  #     input_list$total_sub_population <- input$total_sub_population
+  #   if (is.na(input_list$plot_options))
+  #     input_list$plot_options <- input$plot_options
+  #   if (is.na(input_list$in_main_quantile))
+  #     input_list$in_main_quantile <- input$in_main_quantile
+  #   if (is.na(input_list$in_sub_quantile))
+  #     input_list$in_sub_quantile <- input$in_sub_quantile
+  # })
+  
+  raw_data <- reactive({
+    
+    snake_case_outcome <- gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower()
+    snake_case_outcome_type <- ifelse(input$in_outcome_type == 'Both', "fatal-and-non-fatal", 
+                                      gsub(x = input$in_outcome_type, pattern = " ", replacement = "-")) %>% 
+      tolower()
+    ma_filename <- paste0(snake_case_outcome, "-", snake_case_outcome_type)
+    
+   overall_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+    
+  }) %>% bindCache(input$in_outcome,
+                         input$in_outcome_type,
+                         input$in_main_quantile)
+  
+  dose_res_data <- reactive({
+    
+    snake_case_outcome <- gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower()
+    snake_case_outcome_type <- ifelse(input$in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = input$in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+    ma_filename <- paste0(ifelse(input$total_sub_population == "1", "male-", "female-"), snake_case_outcome, "-", snake_case_outcome_type)
+    
+    gender_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_sub_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+    
+  }) %>% bindCache(input$in_outcome,
+                  input$in_outcome_type,
+                  input$total_sub_population,
+                  input$in_main_quantile)
   
   # To set initialize to_download
   observe({
     to_download$top_plot_data <<- NULL
     to_download$bottom_plot_data <<- NULL
   })
+    
+  get_tbls_data <- function(fname){
+    acmfdata <- data.frame()
+    if (!is.na(fname)){
+      
+      acmfdata
+      
+    }
+  }
   
   get_overall_data <- function (PA_exposure, outcome_disease, outcome_types){
     
@@ -233,31 +296,40 @@ shinyServer(function(input, output, session){
     
   }
   
-  
-  
   output$top_plot <- renderPlotly({
+    
     input$in_outcome
     input$in_outcome_type
     input$total_sub_population
+    input$in_main_quantile
+    input$in_sub_quantile
+    input$plot_options
     
-    # browser()
+    isolate({
+      in_outcome <- input$in_outcome
+      in_outcome_type <- input$in_outcome_type
+      total_sub_population <- input$total_sub_population
+      in_main_quantile <- input$in_main_quantile
+      in_sub_quantile <- input$in_sub_quantile
+      plot_options <- input$plot_options
+    })
     
     pop_title <- "Total Population"
     
-    if (input$total_sub_population == "1"){
-      acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+    if (total_sub_population == "1"){
+      acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = in_outcome, outcome_types = in_outcome_type)
       
     }
     else{# Sub-population
-      acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
+      acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = in_outcome, outcome_types = in_outcome_type, gender = 1)
       pop_title <- "Male Population"
     }
     
-    if (input$total_sub_population == "2" && input$plot_options == "2"){
+    if (total_sub_population == "2" && plot_options == "2"){
       
       if (nrow(acmfdata) > 0){
         
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_sub_quantile %>% as.numeric(), dose_pert = in_sub_quantile %>% as.numeric())
         
         last_knot <- last_knot[2]
         
@@ -281,63 +353,73 @@ shinyServer(function(input, output, session){
       
       outcome_type <- ""
       
-      if (input$in_outcome_type != "all"){
-        outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+      if (in_outcome_type != "all"){
+        outcome_type <- paste(stringi::stri_trans_totitle(in_outcome_type), "- ")
         
       }
       
       
       if (nrow(acmfdata) > 0){
         
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
-        
-        if (input$total_sub_population == "2")
-          last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
-        
-        last_knot <- last_knot[2]
-        
-        
-        
-        local_cov_method <- F
-        
-        if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
-          local_cov_method <- T
-        
         # browser()
         
-        res <- get_convergent_ma(data = acmfdata, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = last_knot, lout = 1000)
+        #snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
+        #snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+        #ma_filename <- paste0(snake_case_outcome, "-", snake_case_outcome_type)
+        
+        plot_data <- raw_data()#  overall_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+        
+        # last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
+        # 
+        # if (input$total_sub_population == "2")
+        #   last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        # 
+        # last_knot <- last_knot[2]
+        # 
+        # 
+        # 
+        # local_cov_method <- F
+        # 
+        # if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
+        #   local_cov_method <- T
+        # 
+        # # browser()
+        # 
+        # res <- get_convergent_ma(data = acmfdata, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = last_knot, lout = 1000)
         
         # acmfdata <- read_csv('temp.csv')
         
-        if (!is.null(res)){
+        if (!is.null(plot_data) && nrow(plot_data) > 0){
           
-          # browser()
-          
-          # Save results as data frame
-          plot_data <- data.frame(cbind(res[[1]], res[[2]]))
-          colnames(plot_data) <- c("dose","RR", "lb", "ub")
+          # # Save results as data frame
+          # plot_data <- data.frame(cbind(res[[1]], res[[2]]))
+          # colnames(plot_data) <- c("dose","RR", "lb", "ub")
           
           to_download$top_plot_data <<- plot_data
           
-          fig_title <- input$in_outcome
+          fig_title <- in_outcome
           if (fig_title != toupper(fig_title))
             fig_title <- stringi::stri_trans_totitle(fig_title)
           
           fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of entries: ",  length(unique(acmfdata$id)) , 
                               " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
-          q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
-          
-          getPlot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, input$in_outcome, outcome_type)
+          q <- quantile(acmfdata$dose, c(0, in_main_quantile %>% as.numeric() / 2, in_main_quantile %>% as.numeric()))
+          getPlot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
         }
         
       }else{
         
-        getPlot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, input$in_outcome, outcome_type)
+        getPlot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
       }
       
     }
     
-  })
+  }) %>% bindCache(input$in_outcome,
+                   input$in_outcome_type,
+                   input$total_sub_population,
+                   input$in_main_quantile,
+                   input$in_sub_quantile,
+                   input$plot_options)
   
   
   output$bottom_plot <- renderPlotly({
@@ -345,16 +427,28 @@ shinyServer(function(input, output, session){
     input$in_outcome
     input$in_outcome_type
     input$total_sub_population
+    input$in_main_quantile
+    input$in_sub_quantile
+    input$plot_options
     
-    if (input$total_sub_population == "1"){
+    isolate({
+      in_outcome <- input$in_outcome
+      in_outcome_type <- input$in_outcome_type
+      total_sub_population <- input$total_sub_population
+      in_main_quantile <- input$in_main_quantile
+      in_sub_quantile <- input$in_sub_quantile
+      plot_options <- input$plot_options
+    })
+    
+    if (total_sub_population == "1"){
       
-      acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+      acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = in_outcome, outcome_types = in_outcome_type)
       
       if (nrow(acmfdata) > 0){
         
         p_title <- get_title(dataset = acmfdata, pop_type = "total")
         
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         
         last_knot <- last_knot[2]
         
@@ -372,46 +466,54 @@ shinyServer(function(input, output, session){
     
     else{
       
-      sub_pop_data <- get_subpopulation_data(PA_exposure = pa_exposure, outcome = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
+      sub_pop_data <- get_subpopulation_data(PA_exposure = pa_exposure, outcome = in_outcome, outcome_types = in_outcome_type, gender = 2)
       
-      if (input$plot_options == "1"){
+      if (plot_options == "1"){
         
         if (nrow(sub_pop_data) > 0){
+          snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
+          snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+          ma_filename <- paste0(ifelse(total_sub_population == "1", "male-", "female-"), snake_case_outcome, "-", snake_case_outcome_type)
           
-          local_cov_method <- F
+          plot_data <- gender_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
           
-          if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
-            local_cov_method <- T
           
-          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
-          
+          # local_cov_method <- F
+          # 
+          # if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
+          #   local_cov_method <- T
+          # 
+          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = in_sub_quantile %>% as.numeric(), dose_pert = in_sub_quantile %>% as.numeric())
+
           last_knot <- last_knot[2]
-          
-          get_convergent_ma
-          
-          res <- get_convergent_ma(data = sub_pop_data, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = last_knot, lout = 1000)
+          # 
+          # res <- get_convergent_ma(data = sub_pop_data, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = last_knot, lout = 1000)
           
           # Save results as data frame
-          plot_data <- data.frame(cbind(res[[1]], res[[2]]))
-          colnames(plot_data) <- c("dose","RR", "lb", "ub")
+          #plot_data <- data.frame(cbind(res[[1]], res[[2]]))
+          #colnames(plot_data) <- c("dose","RR", "lb", "ub")
           
           to_download$bottom_plot_data <<- plot_data
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
-          getPlot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", input$in_outcome, input$in_outcome_type)
+          if (!is.null(plot_data) && nrow(plot_data) > 0)
+            getPlot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", in_outcome, in_outcome_type)
+          else  
+            getPlot(dataset = NULL, q = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", in_outcome, in_outcome_type)
+          
           
         }else{
           
           gt <- "Female Population"
           
-          fig_title <- input$in_outcome
+          fig_title <- in_outcome
           if (fig_title != toupper(fig_title))
             fig_title <- stringi::stri_trans_totitle(fig_title)
           
           fig_title <- paste0(gt, " - ", fig_title)
           
-          getPlot(dataset = NULL, q = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", input$in_outcome, input$in_outcome_type)
+          getPlot(dataset = NULL, q = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", in_outcome, in_outcome_type)
           
         }
         
@@ -419,8 +521,15 @@ shinyServer(function(input, output, session){
         
         if (nrow(sub_pop_data) > 0){
           
-          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+          #snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
+          #snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+          #ma_filename <- paste0(ifelse(total_sub_population == "1", "male-", "female-"), snake_case_outcome, "-", snake_case_outcome_type)
           
+          #sub_pop_data <- gender_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+          
+          
+          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+          # 
           last_knot <- last_knot[2]
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
@@ -429,7 +538,10 @@ shinyServer(function(input, output, session){
           
           to_download$bottom_plot_data <<- sub_pop_data
           
+          #if (nrow(sub_pop_data) > 0)
           get_dose_plot(sub_pop_data, q, plot_title = p_title)
+          #else
+          #  get_dose_plot(NULL, 0, "")
         }
         
         else{
@@ -608,28 +720,29 @@ shinyServer(function(input, output, session){
     
     if (input$total_sub_population == "1"){
       acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
-      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
+      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
       last_knot <- last_knot[2]
-      HTML("PIF for meeting the half the lower WHO guideline (MMETh >= 4.375 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 4.375), "\n")
+      #HTML("PIF for meeting the half the lower WHO guideline (MMETh >= 4.375 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 4.375), "\n")
       
     }
     else{# Sub-population
       m_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
       if (nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
         m_last_knot <- m_last_knot[2]
       }
       
       w_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
       if (nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
         w_last_knot <- w_last_knot[2]
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("PIF for meeting the half the lower WHO guideline (MMETh >= 4.375 per week) <br/>",
-             "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 4.375), "<br/>",
-             "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 4.375))
+        HTML("")
+        # HTML("PIF for meeting the half the lower WHO guideline (MMETh >= 4.375 per week) <br/>",
+        #      "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 4.375), "<br/>",
+        #      "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 4.375))
       }
     }
   })
@@ -642,9 +755,9 @@ shinyServer(function(input, output, session){
     if (input$total_sub_population == "1"){
       acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
       if (nrow(acmfdata) > 0){
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
-        HTML("PIF for meeting the lower WHO guideline (MMETh >= 8.75 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 8.75), "\n")
+        #HTML("PIF for meeting the lower WHO guideline (MMETh >= 8.75 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 8.75), "\n")
       }
       
     }
@@ -652,20 +765,21 @@ shinyServer(function(input, output, session){
       
       m_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
       if (nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
         m_last_knot <- m_last_knot[2]
       }
       
       w_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
       if (nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
         w_last_knot <- w_last_knot[2]
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("PIF for meeting the lower WHO guideline (MMETh >= 8.75 per week) <br/>",
-             "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 8.75), "<br/>",
-             "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 8.75))
+        HTML("")
+        #HTML("PIF for meeting the lower WHO guideline (MMETh >= 8.75 per week) <br/>",
+        #     "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 8.75), "<br/>",
+        #     "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 8.75))
       }
     }
   })
@@ -676,27 +790,29 @@ shinyServer(function(input, output, session){
     
     if (input$total_sub_population == "1"){
       acmfdata <- get_overall_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
-      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
+      last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
       last_knot <- last_knot[2]
-      HTML("PIF for meeting the upper WHO guideline (MMETh >= 17.5 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 17.5), "\n")
+      HTML("")
+      #HTML("PIF for meeting the upper WHO guideline (MMETh >= 17.5 per week): ", get_pif_values(dataset = acmfdata, last_knot = last_knot , dose_value = 17.5), "\n")
     }
     else{# Sub-population
       m_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
       if (nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
         m_last_knot <- m_last_knot[2]
       }
       
       w_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
       if (nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
         w_last_knot <- w_last_knot[2]
       }
       
       if (nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("PIF for meeting the upper WHO guideline (MMETh >= 17.5 per week): <br/>",
-             "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 17.5), "<br/>",
-             "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 17.5))
+        HTML("")
+        # HTML("PIF for meeting the upper WHO guideline (MMETh >= 17.5 per week): <br/>",
+        #      "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, last_knot = m_last_knot , dose_value = 17.5), "<br/>",
+        #      "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, last_knot = w_last_knot , dose_value = 17.5))
       }
     }
     
@@ -833,6 +949,20 @@ shinyServer(function(input, output, session){
   
   output$dose_range <- DT::renderDataTable({
     
+    input$in_outcome
+    input$in_outcome_type
+    input$total_sub_population
+    input$in_sub_quantile
+    input$plot_options
+    
+    isolate({
+      in_outcome <- input$in_outcome
+      in_outcome_type <- input$in_outcome_type
+      total_sub_population <- input$total_sub_population
+      in_main_quantile <- input$in_main_quantile
+      plot_options <- input$plot_options
+    })
+    
     dat <- data.frame()
     
     if (input$total_sub_population == "1"){
@@ -846,14 +976,21 @@ shinyServer(function(input, output, session){
         if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
           local_cov_method <- T
         
-        last_knot <- get_last_knot(overall_data, personyrs_pert = input$in_main_quantile[2], dose_pert = input$in_main_quantile[2])
+        last_knot <- get_last_knot(overall_data, personyrs_pert = input$in_main_quantile %>% as.numeric() %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric() %>% as.numeric())
         
         last_knot <- last_knot[2]
         
-        res <- get_convergent_ma(data = overall_data, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = last_knot, lout = 1000)
+        snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
+        snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+        ma_filename <- paste0(snake_case_outcome, "-", snake_case_outcome_type)
+        
+        plot_data <- overall_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+        
+        
+        #res <- get_convergent_ma(data = overall_data, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = last_knot, lout = 1000)
         
         # Save results as data frame
-        plot_data <- data.frame(cbind(res[[1]], res[[2]]))
+        #plot_data <- data.frame(cbind(res[[1]], res[[2]]))
         
         colnames(plot_data) <- c("dose","RR", "lb", "ub")
         #MMET = c(4.375, 8.75, 17.5),  
@@ -871,12 +1008,18 @@ shinyServer(function(input, output, session){
       
       m_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 1)
       if(nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
         m_last_knot <- m_last_knot[2]
         
-        res <- get_convergent_ma(data = m_acmfdata, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = m_last_knot, lout = 1000)
+        snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
+        snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+        ma_filename <- paste0("male-", snake_case_outcome, "-", snake_case_outcome_type)
+        
+        m_plot_data <- gender_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+        
+        #res <- get_convergent_ma(data = m_acmfdata, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = m_last_knot, lout = 1000)
         # Save results as data frame
-        m_plot_data <- data.frame(cbind(res[[1]], res[[2]]))
+        #m_plot_data <- data.frame(cbind(res[[1]], res[[2]]))
         
         colnames(m_plot_data) <- c("dose","RR", "lb", "ub")
         
@@ -885,11 +1028,18 @@ shinyServer(function(input, output, session){
       w_acmfdata <- get_subpopulation_data(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type, gender = 2)
       td <<- w_acmfdata
       if(nrow(m_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile[2], dose_pert = input$in_sub_quantile[2])
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
         w_last_knot <- w_last_knot[2]
-        res <- get_convergent_ma(data = m_acmfdata, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = w_last_knot, lout = 1000)        
+        
+        snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
+        snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+        ma_filename <- paste0("female-", snake_case_outcome, "-", snake_case_outcome_type)
+        
+        w_plot_data <- gender_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+        
+        #res <- get_convergent_ma(data = m_acmfdata, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = w_last_knot, lout = 1000)        
         # Save results as data frame
-        w_plot_data <- data.frame(cbind(res[[1]], res[[2]]))
+        #w_plot_data <- data.frame(cbind(res[[1]], res[[2]]))
         colnames(w_plot_data) <- c("dose","RR", "lb", "ub")
       }
       # MMET = c(4.375, 8.75, 17.5),  
