@@ -141,6 +141,10 @@ uoutcome <- dplyr::filter(uoutcome, outcome != "")
 # Total cancer
 #uoutcome$outcome <- uoutcome[c(1, 3, 5, 9, 2, 4, 6, 8, 10, 7),]
 
+overall_pop_tbles <- read_csv("../meta-analysis/data/csv/MA-DR/combined_tables.csv")
+
+gender_pop_tbles <- read_csv("../meta-analysis/data/csv/MA-DR/combined_tables_by_gender.csv")
+
 source("../meta-analysis/script/all-functions.R")
 
 
@@ -351,8 +355,6 @@ raw_data_gsp_ltpa$id <- as.integer(as.factor(raw_data_gsp_ltpa$ref_number))
 raw_data_gsp_ltpa <- plyr::arrange(raw_data_gsp_ltpa, outcome)
 
 get_convergent_ma <- function(data, ptitle, returnval, covMethed, minQuantile = 0, maxQuantile, lout = 1000){
-  
-  # browser()
   
   # data = read_csv("temp.csv")
   # ptitle = ""
