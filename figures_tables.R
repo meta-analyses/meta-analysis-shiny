@@ -22,6 +22,9 @@ if (conservative){
   fpath <- "output/conservative/"
 }
 
+
+local_annotate_size <- 2
+
 ## FUNCTIONS
 
 get_overall_data <- function (PA_exposure, outcome_disease, outcome_types){
@@ -218,7 +221,7 @@ if (total_population){
     if (uoutcome$outcome[i] %in% c('All-cause mortality','Cardiovascular disease', 'Total cancer', 'Coronary heart disease', 'Stroke')){
       
       local_loop_last_knot <- local_last_knot
-      if (uoutcome$outcome[i] == "Coronary heart disease" && !conservative)
+      if (uoutcome$outcome[i] == "Coronary heart disease" && !conservative && !low_quantile)
         local_loop_last_knot <- 0.77
       
       if (uoutcome$outcome[i] == "Coronary heart disease" && conservative)
@@ -250,7 +253,7 @@ if (total_population){
             if (uoutcome$outcome[i] != 'All-cause mortality')
               plotTitle <- paste0( uoutcome$outcome[i] ,  " - Mortality - Total Population")
             
-            plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of entries: ',
+            plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of associations: ',
                                  length(unique(acmfdata$id)),
                                  ' \nNumber of people: ' , formatC(round(sum(acmfdata$totalpersons, na.rm = T)), 
                                                                    format = "f", big.mark = ",", drop0trailing = TRUE))
@@ -265,6 +268,11 @@ if (total_population){
               geom_ribbon(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
               geom_ribbon(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
               geom_vline(xintercept = round(q, 3), linetype="dotted", alpha = 0.6) +
+              
+              annotate("text", label = paste0(100 * (local_loop_last_knot / 2 ), "% (person-yrs)"), x=round(q[2],1) + (max(dataset$dose) / 20), y = 0.15, size = local_annotate_size) +
+              annotate("text", label = paste0(100 * local_loop_last_knot, "% (person-yrs)"), x=round(q[3],1) + (max(dataset$dose) / 20) , y = ifelse(uoutcome$outcome[i] != "Stroke", 0.15, 0.25), size = local_annotate_size) +
+              
+              
               scale_x_continuous(expand = c(0, 0),
                                  breaks = seq(from = 0, to = 80, by = 10) ,
                                  limits = c(0, max(dataset$dose) + 10)) + 
@@ -276,8 +284,8 @@ if (total_population){
               theme_classic() + theme(
                 legend.position="none",
                 plot.title = element_text(hjust = 0.5)) +
-              xlab("\nMarginal MET hours per week\n") +
-              ylab("\nRelative Risk\n") +
+              xlab("\nMMET.h/week\n") +
+              ylab("\nHazard Ratio\n") +
               labs(title = paste(plotTitle))
             print(p)
             ggsave(paste0(fpath, uoutcome$outcome[i], "-mortality", ".png"), height=5, width=10, units='in', dpi = local_dpi, scale = 1)
@@ -356,7 +364,7 @@ if (total_population){
           if (uoutcome$outcome[i] != "All-cause mortality")
             plotTitle <- paste0( uoutcome$outcome[i] ,  " - Incidence - Total Population")
 
-          plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of entries: ',
+          plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of associations: ',
                                length(unique(acmfdata$id)),
                                ' \nNumber of people: ' , formatC(round(sum(acmfdata$totalpersons, na.rm = T)),
                                                                  format = "f", big.mark = ",", drop0trailing = TRUE))
@@ -368,6 +376,9 @@ if (total_population){
             geom_line(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, y = RR), size = 0.8, linetype = "dashed") +
             geom_ribbon(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
             geom_ribbon(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
+            
+            annotate("text", label = paste0(100 * (local_loop_last_knot / 2 ), "% (person-yrs)"), x=round(q[2],1) + (max(dataset$dose) / 20), y = 0.15, size = local_annotate_size) +
+            annotate("text", label = paste0(100 * local_loop_last_knot, "% (person-yrs)"), x=round(q[3],1) + (max(dataset$dose) / 20) , y = ifelse(uoutcome$outcome[i] != "Stroke", 0.15, 0.25), size = local_annotate_size) +            
             geom_vline(xintercept= q, linetype="dotted", alpha = 0.6) +
             scale_x_continuous(expand = c(0, 0),
                                breaks = seq(from = 0, to = 80, by = 10) ,
@@ -378,8 +389,8 @@ if (total_population){
             theme_classic() + theme(
               legend.position="none",
               plot.title = element_text(hjust = 0.5)) +
-            xlab("\nMarginal MET hours per week\n") +
-            ylab("\nRelative Risk\n") +
+            xlab("\nMMET.h/week\n") +
+            ylab("\nHazard Ratio\n") +
             labs(title = paste(plotTitle)) 
             # + annotate("segment", x = 3, xend = 5 , y= 0.5, yend = 0.8, arrow = arrow(), label = "Some text")
           print(p)
@@ -460,7 +471,7 @@ if (sub_population){
             if (!uoutcome$outcome[i] == 'All-cause mortality')
               plotTitle <- paste0( uoutcome$outcome[i] ,  " - ", tools::toTitleCase(local_outcome_type), " - ", pop ," Population")
 
-            plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of entries: ',
+            plotTitle <-  paste0(simpleCap(plotTitle), ' \nNumber of associations: ',
                                  length(unique(acmfdata$id)),
                                  ' \nNumber of people: ' , formatC(round(sum(acmfdata$totalpersons, na.rm = T)),
                                                                    format = "f", big.mark = ",", drop0trailing = TRUE))
@@ -475,6 +486,10 @@ if (sub_population){
               geom_ribbon(data = subset(dataset2, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
               geom_ribbon(data = subset(dataset2, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
               geom_vline(xintercept= q, linetype="dotted", alpha = 0.6) +
+              
+              annotate("text", label = paste0(100 * (local_loop_last_knot / 2 ), "% (person-yrs)"), x=round(q[2],1) + (max(dataset$dose) / 20), y = 0.15, size = local_annotate_size) +
+              annotate("text", label = paste0(100 * local_loop_last_knot, "% (person-yrs)"), x=round(q[3],1) + (max(dataset$dose) / 20) , y = ifelse(uoutcome$outcome[i] != "Stroke", 0.15, 0.25), size = local_annotate_size) +            
+              
               scale_x_continuous(expand = c(0, 0),
                                  breaks = seq(from = 0, to = 80, by = 10) ,
                                  limits = c(0, max(dataset$dose) + 10)) +
@@ -486,11 +501,15 @@ if (sub_population){
               theme(
                 legend.position="none",
                 plot.title = element_text(hjust = 0.5)) +
-              xlab("\nMarginal MET hours per week\n") +
-              ylab("\nRelative Risk\n") +
+              xlab("\nMMET.h/week\n") +
+              ylab("\nHazard Ratio\n") +
               labs(title = paste(plotTitle))
             #p
             print(p)
+            
+            cat(paste0(100 * (local_loop_last_knot / 2 ), "% (person-yrs)"), "\n")
+            cat(paste0(100 * local_loop_last_knot, "% (person-yrs)"), "\n")
+            
             ggsave(paste0(fpath, pop, "-", uoutcome$outcome[i], "-", local_outcome_type, ".png"), height=5, width=10, units='in', dpi = local_dpi, scale = 1)
 
             if (nrow(tab_data_mortality) == 0){
