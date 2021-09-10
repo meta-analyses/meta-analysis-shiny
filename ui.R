@@ -19,8 +19,6 @@ total_sub_population <- c("Total Population" = 1,
 
 plot_options <- c("Meta-Analysis" = 1,
                   "Dose range" = 2)
-
-
 shinyUI(fluidPage(
   titlePanel(fluidRow(
     column(4, tags$a(img(src="mrc-cam.png", style = "height:50px"), href="http://www.mrc-epid.cam.ac.uk", target="_blank", align="left")),
@@ -31,6 +29,10 @@ shinyUI(fluidPage(
     , "Meta-Analyses Physical Activity"),
   width="100%", height="100%",
   sidebarPanel(
+    
+    # ChoiceGroup.shinyInput("choice", value = "B", options = options),
+    # textOutput("groupValue"),
+    
     selectInput(inputId = "in_outcome", label = "Select Outcome:", choices =  uoutcome$outcome),
     # radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
     radioButtons(inputId = "in_outcome_type", label = "Select Outcome type:", choices =  outcome_type),
@@ -44,12 +46,19 @@ shinyUI(fluidPage(
     HTML("<hr>"),
     conditionalPanel(
       condition = "input.total_sub_population == 1",
-      sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.01),
+      #sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0.75, max = 0.95, value = 0.75, step = 1, ticks = F),
+      radioButtons(inputId = "in_main_quantile", label = "Last knot (quantiles)",
+                   c("0.75",
+                     "0.85",
+                     "0.95")),
       HTML("<hr>")
     ),
     conditionalPanel(
       condition = "input.total_sub_population != 1",
-      sliderInput(inputId = "in_sub_quantile", label = "Sub-population quantiles", min = 0, max = 1, value = c(0, 0.75), step = 0.01),
+      radioButtons(inputId = "in_sub_quantile", label = "Sub-population quantiles",
+                   c("0.75",
+                     "0.85",
+                     "0.95")),
       HTML("<hr>")
     ),
     uiOutput("lowest_guideline"),
