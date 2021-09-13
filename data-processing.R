@@ -145,7 +145,7 @@ overall_pop_tbles <- read_csv("../meta-analysis/data/csv/MA-DR/combined_tables.c
 
 gender_pop_tbles <- read_csv("../meta-analysis/data/csv/MA-DR/combined_tables_by_gender.csv")
 
-source("../meta-analysis/script/all-functions.R")
+#source("../meta-analysis/script/all-functions.R")
 
 
 # raw_data$tot_personyrs <- as.numeric(raw_data$tot_personyrs)
@@ -354,44 +354,44 @@ raw_data_gsp_ltpa$id <- as.integer(as.factor(raw_data_gsp_ltpa$ref_number))
 
 raw_data_gsp_ltpa <- plyr::arrange(raw_data_gsp_ltpa, outcome)
 
-get_convergent_ma <- function(data, ptitle, returnval, covMethed, minQuantile = 0, maxQuantile, lout = 1000){
-  
-  # data = read_csv("temp.csv")
-  # ptitle = ""
-  # returnval = TRUE
-  # covMethed = TRUE
-  # minQuantile = 0
-  # last_knot = 0.6870229
-  # lout = 1000
-  
-  # By default run the analysis with Hamling method to approximate covariance
-  res <- metaAnalysis(data, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = maxQuantile, lout = 1000)
-  
-  if (is.null(res)){
-    # If it fails, use the default by Greenland and Longnecker (gl)
-    res <- metaAnalysis(data, ptitle = "", returnval = TRUE, covMethed = FALSE, minQuantile = 0, maxQuantile = maxQuantile, lout = 1000)
-  }
-  
-  # if (is.null(res) || is.na(res)) {
-  #   # If this too fails, increase last_knot by 5% until it converges
-  #   for (nq in seq(from = local_last_knot, to = 1, by = 0.01)) {
-  #     print(nq)
-  #     last_knot <- get_last_knot(data, dose_pert = nq, personyrs_pert = nq)
-  #     q <- quantile(data$dose, prob = last_knot[2])
-  #     local_res <- metaAnalysis(data, ptitle = "", returnval = TRUE, covMethed = FALSE, minQuantile = 0, maxQuantile = last_knot[2], lout = 1000)
-  #     if (!is.null(res)) {
-  #       last_quintile <- gsub("%", "", names(q)) %>%
-  #         as.numeric() %>%
-  #         round(1)
-  #       last_knot_title <- paste0(last_quintile, "% dose (using ", (nq * 100), "% person years)")
-  #       break
-  #     }
-  #     
-  #   }
-  # }
-  
-  
-  return(res)
-  
-}
+# get_convergent_ma <- function(data, ptitle, returnval, covMethed, minQuantile = 0, maxQuantile, lout = 1000){
+#   
+#   # data = read_csv("temp.csv")
+#   # ptitle = ""
+#   # returnval = TRUE
+#   # covMethed = TRUE
+#   # minQuantile = 0
+#   # last_knot = 0.6870229
+#   # lout = 1000
+#   
+#   # By default run the analysis with Hamling method to approximate covariance
+#   res <- metaAnalysis(data, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = maxQuantile, lout = 1000)
+#   
+#   if (is.null(res)){
+#     # If it fails, use the default by Greenland and Longnecker (gl)
+#     res <- metaAnalysis(data, ptitle = "", returnval = TRUE, covMethed = FALSE, minQuantile = 0, maxQuantile = maxQuantile, lout = 1000)
+#   }
+#   
+#   # if (is.null(res) || is.na(res)) {
+#   #   # If this too fails, increase last_knot by 5% until it converges
+#   #   for (nq in seq(from = local_last_knot, to = 1, by = 0.01)) {
+#   #     print(nq)
+#   #     last_knot <- get_last_knot(data, dose_pert = nq, personyrs_pert = nq)
+#   #     q <- quantile(data$dose, prob = last_knot[2])
+#   #     local_res <- metaAnalysis(data, ptitle = "", returnval = TRUE, covMethed = FALSE, minQuantile = 0, maxQuantile = last_knot[2], lout = 1000)
+#   #     if (!is.null(res)) {
+#   #       last_quintile <- gsub("%", "", names(q)) %>%
+#   #         as.numeric() %>%
+#   #         round(1)
+#   #       last_knot_title <- paste0(last_quintile, "% dose (using ", (nq * 100), "% person years)")
+#   #       break
+#   #     }
+#   #     
+#   #   }
+#   # }
+#   
+#   
+#   return(res)
+#   
+# }
 
