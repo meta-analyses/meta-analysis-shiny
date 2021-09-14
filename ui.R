@@ -33,9 +33,8 @@ shinyUI(fluidPage(
     # ChoiceGroup.shinyInput("choice", value = "B", options = options),
     # textOutput("groupValue"),
     
-    selectInput(inputId = "in_outcome", label = "Select Outcome:", choices =  uoutcome$outcome),
-    # radioButtons(inputId = "in_PA_exposure", label = "Select Physical Activity Exposure:", choices =  pa_exposure),
-    radioButtons(inputId = "in_outcome_type", label = "Select Outcome type:", choices =  outcome_type),
+    selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome),
+    radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
     radioButtons("total_sub_population", "Population: ", total_sub_population, inline = TRUE),
     conditionalPanel(
