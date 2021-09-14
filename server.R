@@ -81,7 +81,8 @@ shinyServer(function(input, output, session){
     if (!is.na(input$in_outcome)){
       
       local_outcome <- isolate({input$in_outcome})
-      local_outcome_type <- isolate({input$in_outcome_type})
+      local_outcome_type <- isolate({input$in_outcome_type}) 
+      local_outcome_type <- gsub(x = local_outcome_type, pattern = " ", replacement = "-") 
       
       # Subset according to outcome, domain and outcome type
       acmfdata <- subset(raw_data_tp_ltpa, 
@@ -90,7 +91,7 @@ shinyServer(function(input, output, session){
                            outcome_type == local_outcome_type)
       
       # Add additional "fatal" studies that had no "both" types
-      if (local_outcome_type == "Fatal and non-fatal") {
+      if (local_outcome_type == "Fatal-and-non-fatal") {
         # Subset fatal types
         add_fdata <- subset(raw_data_tp_ltpa, outcome == local_outcome & 
                               pa_domain_subgroup == local_pa_domain_subgroup & 
@@ -139,14 +140,16 @@ shinyServer(function(input, output, session){
     
     if (!is.na(outcome_disease)){
       
+      local_outcome_type <- gsub(x = outcome_types, pattern = " ", replacement = "-")
+      
       # Subset according to outcome, domain and outcome type
       acmfdata <- subset(raw_data_gsp_ltpa, outcome == outcome_disease & 
                            sex_subgroups == gender &
                            pa_domain_subgroup == local_pa_domain_subgroup & 
-                           outcome_type == outcome_types)
+                           outcome_type == local_outcome_type)
       
       # Add additional "fatal" studies that had no "both" types
-      if (outcome_types == "Fatal and non-fatal") {
+      if (local_outcome_type == "Fatal-and-non-fatal") {
         # Subset fatal types
         add_fdata <- subset(raw_data_gsp_ltpa, outcome == outcome_disease & 
                               sex_subgroups == gender &
@@ -1023,8 +1026,6 @@ shinyServer(function(input, output, session){
     if (nrow(dataset) > 0){
       
       local_cov_method <- F
-      
-      #res <- get_convergent_ma(data = dataset, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = last_knot, lout = 1000)        
       
       removeNA <- F
       

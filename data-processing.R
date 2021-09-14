@@ -56,6 +56,8 @@ raw_data[raw_data$effect_measure == "rr",]$type <- "ir"
 raw_data[raw_data$effect_measure == "hr",]$type <- "ci"
 raw_data$type <- as.character(raw_data$type)
 
+raw_data[raw_data$outcome_type == "Both",]$outcome_type <- "Fatal-and-non-fatal"
+raw_data$outcome_type <- as.character(raw_data$outcome_type)
 
 ## RENAME columns
 
