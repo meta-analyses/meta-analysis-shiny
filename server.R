@@ -633,9 +633,12 @@ shinyServer(function(input, output, session){
       }
       
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-         HTML("PIF for meeting the half the lower WHO guideline (MMETh >= 4.375 per week) <br/>",
-              "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 4.375), "<br/>",
-              "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 4.375))
+        
+        HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
+             get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 4.375), 
+             " of all cases in <u>men</u></b> and ",
+             get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 4.375),  
+             "of all cases in <u>women</u> could be prevented if all people met half the WHO recommended levels of physical activity (4.375 marginal MET hours per week).")
       }
     }
   }) %>% bindCache(input$in_outcome,
@@ -674,9 +677,10 @@ shinyServer(function(input, output, session){
       }
       
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("PIF for meeting the lower WHO guideline (MMETh >= 8.75 per week) <br/>",
-            "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 8.75), "<br/>",
-            "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 8.75))
+        HTML(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 8.75), 
+             " of all cases in <u>men</u></b> and ",
+             get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 8.75),  
+             "of all cases in <u>women</u> could be prevented if all people met the WHO recommended levels of physical activity (8.75 marginal MET hours per week).")
       }
     }
   }) %>% bindCache(input$in_outcome,
@@ -712,9 +716,10 @@ shinyServer(function(input, output, session){
       }
       
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        HTML("PIF for meeting the upper WHO guideline (MMETh >= 17.5 per week): <br/>",
-             "<b>","Male:","</b>", get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 17.5), "<br/>",
-             "<b>","Female:","</b>", get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 17.5))
+        HTML(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 17.5), 
+             " of all cases in <u>men</u></b> and ",
+             get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 17.5),  
+             " of all cases in <u>women</u> could be prevented if all people met twice the WHO recommended levels of physical activity (17.5 marginal MET hours per week).")
       }
     }
     
