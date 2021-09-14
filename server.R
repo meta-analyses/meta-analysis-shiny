@@ -655,7 +655,7 @@ shinyServer(function(input, output, session){
     HTML("")
     
     if (input$total_sub_population == "1"){
-      acmfdata <- get_overall_data()#(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+      acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
@@ -735,7 +735,7 @@ shinyServer(function(input, output, session){
   
   output$overall_datatable <- DT::renderDataTable({
     
-    overall_data <- get_overall_data()#(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+    overall_data <- get_overall_data()
     
     if(is.null(overall_data) || nrow(overall_data) <= 0){
       # Set the warning message that no lines have been selected by the user
@@ -745,9 +745,8 @@ shinyServer(function(input, output, session){
     }
     
     overall_data <- subset(overall_data, select = c(ref_number, first_author, effect_measure, 
-                                                    totalpersons, personyrs, dose, RR, cases, lci_effect, uci_effect))
+                                                    totalpersons, personyrs, cases, dose, RR, lci_effect, uci_effect))
     
-    # browser()
     # Remove gender specific suffix from ref_number
     overall_data$ref_number <- sapply(strsplit(as.character(overall_data$ref_number),"-"), `[`, 1)
     
@@ -755,6 +754,11 @@ shinyServer(function(input, output, session){
     # Round relevant columns
     overall_data$totalpersons <- round(overall_data$totalpersons)
     overall_data$personyrs <- round(overall_data$personyrs)
+    
+    overall_data <- overall_data %>% dplyr::rename("ref_id" = "ref_number", 
+                                                   "persons" = "totalpersons",
+                                                   "person_years" = "personyrs",
+                                                   "risk_estimate" = "RR")
     
     # Empty the warning message - as some lines have been selected by the user
     output$overall_warning_message <- renderUI("")
@@ -788,12 +792,17 @@ shinyServer(function(input, output, session){
     }
     
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(ref_number, first_author, effect_measure, totalpersons, personyrs, dose, RR, cases, lci_effect, uci_effect))
+    sub_population_data <- subset(sub_population_data, select = c(ref_number, first_author, effect_measure, totalpersons, personyrs, cases, dose, RR, lci_effect, uci_effect))
     
     # Remove gender specific suffix from ref_number
     sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number,"-"), `[`, 1)
     
     fname <- "male_population"
+    
+    sub_population_data <- sub_population_data %>% dplyr::rename("ref_id" = "ref_number", 
+                                                   "persons" = "totalpersons",
+                                                   "person_years" = "personyrs",
+                                                   "risk_estimate" = "RR")
     
     # Empty the warning message - as some lines have been selected by the user
     output$male_sub_warning_message <- renderUI("")
@@ -828,7 +837,7 @@ shinyServer(function(input, output, session){
     }
     
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(ref_number, first_author, effect_measure, totalpersons, personyrs, dose, RR, cases, lci_effect, uci_effect))
+    sub_population_data <- subset(sub_population_data, select = c(ref_number, first_author, effect_measure, totalpersons, personyrs, dose, cases, RR, lci_effect, uci_effect))
     
     # Round relevant columns
     sub_population_data$totalpersons <- round(sub_population_data$totalpersons)
@@ -838,6 +847,11 @@ shinyServer(function(input, output, session){
     
     # Remove gender specific suffix from ref_number
     sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number,"-"), `[`, 1)
+    
+    sub_population_data <- sub_population_data %>% dplyr::rename("ref_id" = "ref_number", 
+                                                                 "persons" = "totalpersons",
+                                                                 "person_years" = "personyrs",
+                                                                 "risk_estimate" = "RR")
     
     # Empty the warning message - as some lines have been selected by the user
     output$female_sub_warning_message <- renderUI("")
