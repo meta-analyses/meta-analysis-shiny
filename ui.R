@@ -14,7 +14,7 @@ sub_population <- c("Male Population" = 1,
                     "Female Population" = 2)
 
 
-total_sub_population <- c("Total Population" = 1,
+total_sub_population <- c("Total population" = 1,
                           "Sex-stratified" = 2)
 
 plot_options <- c("Meta-Analysis" = 1,
@@ -22,16 +22,11 @@ plot_options <- c("Meta-Analysis" = 1,
 shinyUI(fluidPage(
   titlePanel(fluidRow(
     column(4, tags$a(img(src="mrc-cam.png", style = "height:50px"), href="http://www.mrc-epid.cam.ac.uk", target="_blank", align="left")),
-    #column(2, tags$a(img(src="cam.png", style = "height:50px"), href="http://www.cam.ac.uk", target="_blank"), align = 'left'),
     column(2, offset = 6, div(tags$a(img(src="cedar.png", style = "height:50px"), href="http://www.cedar.iph.cam.ac.uk/", target="_blank")), align="right")
-    
     )
     , "Meta-Analyses Physical Activity"),
   width="100%", height="100%",
   sidebarPanel(
-    
-    # ChoiceGroup.shinyInput("choice", value = "B", options = options),
-    # textOutput("groupValue"),
     
     selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome),
     radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type),
