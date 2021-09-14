@@ -5,7 +5,7 @@ source("setup.R")
 #pa_exposure <- c("LTPA", "TPA")
 
 # outcome_type
-outcome_type <- c("Both",
+outcome_type <- c("Fatal and non-fatal",
                   "Fatal",
                   "Non-fatal")
 

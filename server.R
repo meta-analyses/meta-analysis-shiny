@@ -35,8 +35,7 @@ shinyServer(function(input, output, session){
   overall_pop_dose_res_data <- reactive({
     
     snake_case_outcome <- gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower()
-    snake_case_outcome_type <- ifelse(input$in_outcome_type == 'Both', "fatal-and-non-fatal", 
-                                      gsub(x = input$in_outcome_type, pattern = " ", replacement = "-")) %>% 
+    snake_case_outcome_type <- gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% 
       tolower()
     ma_filename <- paste0(snake_case_outcome, "-", snake_case_outcome_type)
     
@@ -49,7 +48,7 @@ shinyServer(function(input, output, session){
   male_pop_dose_res_data <- reactive({
     
     snake_case_outcome <- gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower()
-    snake_case_outcome_type <- ifelse(input$in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = input$in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+    snake_case_outcome_type <- gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
     ma_filename <- paste0("male-", snake_case_outcome, "-", snake_case_outcome_type)
     
     gender_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_sub_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
@@ -61,7 +60,7 @@ shinyServer(function(input, output, session){
   female_pop_dose_res_data <- reactive({
     
     snake_case_outcome <- gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower()
-    snake_case_outcome_type <- ifelse(input$in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = input$in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+    snake_case_outcome_type <- gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
     ma_filename <- paste0("female-", snake_case_outcome, "-", snake_case_outcome_type)
     
     gender_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_sub_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
@@ -91,7 +90,7 @@ shinyServer(function(input, output, session){
                            outcome_type == local_outcome_type)
       
       # Add additional "fatal" studies that had no "both" types
-      if (local_outcome_type == "Both") {
+      if (local_outcome_type == "Fatal and non-fatal") {
         # Subset fatal types
         add_fdata <- subset(raw_data_tp_ltpa, outcome == local_outcome & 
                               pa_domain_subgroup == local_pa_domain_subgroup & 
@@ -147,7 +146,7 @@ shinyServer(function(input, output, session){
                            outcome_type == outcome_types)
       
       # Add additional "fatal" studies that had no "both" types
-      if (outcome_types == "Both") {
+      if (outcome_types == "Fatal and non-fatal") {
         # Subset fatal types
         add_fdata <- subset(raw_data_gsp_ltpa, outcome == outcome_disease & 
                               sex_subgroups == gender &
@@ -888,7 +887,7 @@ shinyServer(function(input, output, session){
         last_knot <- last_knot[2]
         
         snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
-        snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+        snake_case_outcome_type <- gsub(x = in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
         ma_filename <- paste0(snake_case_outcome, "-", snake_case_outcome_type)
         
         plot_data <- overall_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
@@ -919,7 +918,7 @@ shinyServer(function(input, output, session){
         m_last_knot <- m_last_knot[2]
         
         snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
-        snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+        snake_case_outcome_type <- gsub(x = in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
         ma_filename <- paste0("male-", snake_case_outcome, "-", snake_case_outcome_type)
         
         m_plot_data <- gender_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
@@ -939,7 +938,7 @@ shinyServer(function(input, output, session){
         w_last_knot <- w_last_knot[2]
         
         snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
-        snake_case_outcome_type <- ifelse(in_outcome_type == 'Both', "fatal-and-non-fatal", gsub(x = in_outcome_type, pattern = " ", replacement = "-")) %>% tolower()
+        snake_case_outcome_type <- gsub(x = in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
         ma_filename <- paste0("female-", snake_case_outcome, "-", snake_case_outcome_type)
         
         w_plot_data <- gender_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
