@@ -15,7 +15,7 @@ sub_population <- c("Male Population" = 1,
 
 
 total_sub_population <- c("Total Population" = 1,
-                          "Sub-population" = 2)
+                          "Sex-stratified" = 2)
 
 plot_options <- c("Meta-Analysis" = 1,
                   "Dose range" = 2)
