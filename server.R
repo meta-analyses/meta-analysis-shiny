@@ -51,7 +51,7 @@ shinyServer(function(input, output, session){
     snake_case_outcome_type <- gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
     ma_filename <- paste0("male-", snake_case_outcome, "-", snake_case_outcome_type)
     
-    gender_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_sub_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+    gender_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
     
   }) %>% bindCache(input$in_outcome,
                   input$in_outcome_type,
@@ -63,7 +63,7 @@ shinyServer(function(input, output, session){
     snake_case_outcome_type <- gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
     ma_filename <- paste0("female-", snake_case_outcome, "-", snake_case_outcome_type)
     
-    gender_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_sub_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+    gender_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
     
   }) %>% bindCache(input$in_outcome,
                    input$in_outcome_type,
@@ -275,7 +275,6 @@ shinyServer(function(input, output, session){
     input$in_outcome_type
     input$total_sub_population
     input$in_main_quantile
-    input$in_sub_quantile
     input$plot_options
     
     isolate({
@@ -283,7 +282,6 @@ shinyServer(function(input, output, session){
       in_outcome_type <- input$in_outcome_type
       total_sub_population <- input$total_sub_population
       in_main_quantile <- input$in_main_quantile
-      in_sub_quantile <- input$in_sub_quantile
       plot_options <- input$plot_options
     })
     
@@ -302,7 +300,7 @@ shinyServer(function(input, output, session){
       
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
         
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_sub_quantile %>% as.numeric(), dose_pert = in_sub_quantile %>% as.numeric())
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         
         last_knot <- last_knot[2]
         
@@ -361,7 +359,6 @@ shinyServer(function(input, output, session){
                    input$in_outcome_type,
                    input$total_sub_population,
                    input$in_main_quantile,
-                   input$in_sub_quantile,
                    input$plot_options)
   
   
@@ -371,7 +368,6 @@ shinyServer(function(input, output, session){
     input$in_outcome_type
     input$total_sub_population
     input$in_main_quantile
-    input$in_sub_quantile
     input$plot_options
     
     isolate({
@@ -379,7 +375,6 @@ shinyServer(function(input, output, session){
       in_outcome_type <- input$in_outcome_type
       total_sub_population <- input$total_sub_population
       in_main_quantile <- input$in_main_quantile
-      in_sub_quantile <- input$in_sub_quantile
       plot_options <- input$plot_options
     })
     
@@ -417,7 +412,7 @@ shinyServer(function(input, output, session){
 
           plot_data <- female_pop_dose_res_data()
           
-          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = in_sub_quantile %>% as.numeric(), dose_pert = in_sub_quantile %>% as.numeric())
+          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
 
           last_knot <- last_knot[2]
           
@@ -449,7 +444,7 @@ shinyServer(function(input, output, session){
         
         if (!is.null(sub_pop_data) && nrow(sub_pop_data) > 0){
           
-          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+          last_knot <- get_last_knot(sub_pop_data, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
           last_knot <- last_knot[2]
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
@@ -471,7 +466,6 @@ shinyServer(function(input, output, session){
                    input$in_outcome_type,
                    input$total_sub_population,
                    input$in_main_quantile,
-                   input$in_sub_quantile,
                    input$plot_options)
   
   get_title <- function(dataset, pop_type ){
@@ -607,12 +601,25 @@ shinyServer(function(input, output, session){
   }
   
   output$lowest_guideline <- renderUI({
+    
+    input$in_outcome
+    input$in_outcome_type
+    input$total_sub_population
+    input$in_main_quantile
+    
+    isolate({
+      in_outcome <- input$in_outcome
+      in_outcome_type <- input$in_outcome_type
+      total_sub_population <- input$total_sub_population
+      in_main_quantile <- input$in_main_quantile
+    })
+    
     HTML("")
     
-    if (input$total_sub_population == "1"){
+    if (total_sub_population == "1"){
       acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
         
         HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
@@ -624,13 +631,13 @@ shinyServer(function(input, output, session){
     else{# Sub-population
       m_acmfdata <- get_male_subpopulation_data()
       if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         m_last_knot <- m_last_knot[2]
       }
       
       w_acmfdata <- get_female_subpopulation_data()
       if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         w_last_knot <- w_last_knot[2]
       }
       
@@ -646,18 +653,29 @@ shinyServer(function(input, output, session){
   }) %>% bindCache(input$in_outcome,
                    input$in_outcome_type,
                    input$total_sub_population,
-                   input$in_main_quantile,
-                   input$in_sub_quantile)
+                   input$in_main_quantile)
   
   
   output$lower_guideline <- renderUI({
     
+    input$in_outcome
+    input$in_outcome_type
+    input$total_sub_population
+    input$in_main_quantile
+    
+    isolate({
+      in_outcome <- input$in_outcome
+      in_outcome_type <- input$in_outcome_type
+      total_sub_population <- input$total_sub_population
+      in_main_quantile <- input$in_main_quantile
+    })
+    
     HTML("")
     
-    if (input$total_sub_population == "1"){
+    if (total_sub_population == "1"){
       acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
         HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
              get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75), 
@@ -669,13 +687,13 @@ shinyServer(function(input, output, session){
       
       m_acmfdata <- get_male_subpopulation_data()
       if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         m_last_knot <- m_last_knot[2]
       }
       
       w_acmfdata <- get_female_subpopulation_data()
       if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         w_last_knot <- w_last_knot[2]
       }
       
@@ -689,17 +707,29 @@ shinyServer(function(input, output, session){
   }) %>% bindCache(input$in_outcome,
                    input$in_outcome_type,
                    input$total_sub_population,
-                   input$in_main_quantile,
-                   input$in_sub_quantile)
+                   input$in_main_quantile)
   
   
   output$upper_guideline <- renderUI({
+    
+    input$in_outcome
+    input$in_outcome_type
+    input$total_sub_population
+    input$in_main_quantile
+    
+    isolate({
+      in_outcome <- input$in_outcome
+      in_outcome_type <- input$in_outcome_type
+      total_sub_population <- input$total_sub_population
+      in_main_quantile <- input$in_main_quantile
+    })
+    
     HTML("")
     
-    if (input$total_sub_population == "1"){
-      acmfdata <- get_overall_data()#PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+    if (total_sub_population == "1"){
+      acmfdata <- get_overall_data()#PA_exposure = pa_exposure, outcome_disease = in_outcome, outcome_types = in_outcome_type)
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
         HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
              get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5), 
@@ -709,13 +739,13 @@ shinyServer(function(input, output, session){
     else{# Sub-population
       m_acmfdata <- get_male_subpopulation_data()
       if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         m_last_knot <- m_last_knot[2]
       }
       
       w_acmfdata <- get_female_subpopulation_data()
       if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         w_last_knot <- w_last_knot[2]
       }
       
@@ -730,8 +760,7 @@ shinyServer(function(input, output, session){
   }) %>% bindCache(input$in_outcome,
                    input$in_outcome_type,
                    input$total_sub_population,
-                   input$in_main_quantile,
-                   input$in_sub_quantile)
+                   input$in_main_quantile)
   
   output$overall_datatable <- DT::renderDataTable({
     
@@ -881,7 +910,7 @@ shinyServer(function(input, output, session){
     input$in_outcome
     input$in_outcome_type
     input$total_sub_population
-    input$in_sub_quantile
+    input$in_main_quantile
     input$plot_options
     
     isolate({
@@ -894,18 +923,13 @@ shinyServer(function(input, output, session){
     
     dat <- data.frame()
     
-    if (input$total_sub_population == "1"){
-      overall_data <- get_overall_data()#(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+    if (total_sub_population == "1"){
+      overall_data <- get_overall_data()
       dat <- data.frame()
       
       if (!is.null(overall_data) && nrow(overall_data) > 0){
         
-        local_cov_method <- F
-        
-        if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke")
-          local_cov_method <- T
-        
-        last_knot <- get_last_knot(overall_data, personyrs_pert = input$in_main_quantile %>% as.numeric() %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric() %>% as.numeric())
+        last_knot <- get_last_knot(overall_data, personyrs_pert = in_main_quantile %>% as.numeric() %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric() %>% as.numeric())
         
         last_knot <- last_knot[2]
         
@@ -929,15 +953,9 @@ shinyServer(function(input, output, session){
       }
     }else{# Sub-population
       
-      local_cov_method <- F
-      
-      if (input$in_outcome == "Coronary heart disease" || input$in_outcome == "Cardiovascular disease" || input$in_outcome == "Stroke"
-          || input$in_outcome == "Colon cancer")
-        local_cov_method <- T
-      
       m_acmfdata <- get_male_subpopulation_data()
       if(!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         m_last_knot <- m_last_knot[2]
         
         snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
@@ -957,7 +975,7 @@ shinyServer(function(input, output, session){
       w_acmfdata <- get_female_subpopulation_data()
       td <<- w_acmfdata
       if(!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_sub_quantile %>% as.numeric(), dose_pert = input$in_sub_quantile %>% as.numeric())
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         w_last_knot <- w_last_knot[2]
         
         snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
