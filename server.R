@@ -610,12 +610,14 @@ shinyServer(function(input, output, session){
     HTML("")
     
     if (input$total_sub_population == "1"){
-      acmfdata <- get_overall_data()#(PA_exposure = pa_exposure, outcome_disease = input$in_outcome, outcome_types = input$in_outcome_type)
+      acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
-        HTML("PIF for meeting the half the lower WHO guideline (MMETh >= 4.375 per week): ", 
-             get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375), "\n")
+        
+        HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
+             get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375), 
+             " of all cases could be prevented if all people met half the WHO recommended levels of physical activity (4.375 marginal MET hours per week).")
       }
       
     }
@@ -657,8 +659,9 @@ shinyServer(function(input, output, session){
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
-        HTML("PIF for meeting the lower WHO guideline (MMETh >= 8.75 per week): ", get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), 
-                                                                                                  last_knot = last_knot , dose_value = 8.75), "\n")
+        HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
+             get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75), 
+             " of all cases could be prevented if all people met the WHO recommended levels of physical activity (8.75 marginal MET hours per week).")
       }
       
     }
@@ -698,8 +701,9 @@ shinyServer(function(input, output, session){
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
-        HTML("PIF for meeting the upper WHO guideline (MMETh >= 17.5 per week): ", get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), 
-                                                                                                  last_knot = last_knot , dose_value = 17.5), "\n")
+        HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
+             get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5), 
+             " of all cases could be prevented if all people met twice the WHO recommended levels of physical activity (17.5 marginal MET hours per week).")
       }
     }
     else{# Sub-population
