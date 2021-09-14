@@ -40,21 +40,20 @@ shinyUI(fluidPage(
     HTML("<hr>"),
     conditionalPanel(
       condition = "input.total_sub_population == 1",
-      #sliderInput(inputId = "in_main_quantile", label = "Main outcome quantiles", min = 0.75, max = 0.95, value = 0.75, step = 1, ticks = F),
       radioButtons(inputId = "in_main_quantile", label = "Last knot (quantiles)",
                    c("0.75",
                      "0.85",
                      "0.95")),
       HTML("<hr>")
     ),
-    conditionalPanel(
-      condition = "input.total_sub_population != 1",
-      radioButtons(inputId = "in_sub_quantile", label = "Sub-population quantiles",
-                   c("0.75",
-                     "0.85",
-                     "0.95")),
-      HTML("<hr>")
-    ),
+    # conditionalPanel(
+    #   condition = "input.total_sub_population != 1",
+    #   radioButtons(inputId = "in_sub_quantile", label = "Sub-population quantiles",
+    #                c("0.75",
+    #                  "0.85",
+    #                  "0.95")),
+    #   HTML("<hr>")
+    # ),
     uiOutput("lowest_guideline"),
     HTML("<hr>"),
     uiOutput("lower_guideline"),
