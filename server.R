@@ -308,7 +308,10 @@ shinyServer(function(input, output, session){
       
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
         
-        plot_data <- overall_pop_dose_res_data()
+        if (total_sub_population == "1")
+          plot_data <-   (overall_pop_dose_res_data() %>% as.data.frame())
+        else
+          plot_data <- (male_pop_dose_res_data() %>% as.data.frame())
         
         if (!is.null(plot_data) && nrow(plot_data) > 0){
 
@@ -396,11 +399,7 @@ shinyServer(function(input, output, session){
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
-          if (!is.null(plot_data) && nrow(plot_data) > 0)
-            getPlot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", in_outcome, in_outcome_type)
-          else  
-            getPlot(dataset = NULL, q = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", in_outcome, in_outcome_type)
-          
+          getPlot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", in_outcome, in_outcome_type)
           
         }else{
           
@@ -527,7 +526,7 @@ shinyServer(function(input, output, session){
   
   getPlot <- function (dataset, q, plotTitle, pop_type , outcome, outcome_type ){
     
-    if (!is.null(dataset)){
+    if (!is.null(dataset) && nrow(dataset) > 0){
       
       # Round to three decimal points
       dataset$RR <- round(dataset$RR, 3)
