@@ -967,10 +967,6 @@ shinyServer(function(input, output, session){
         
         m_plot_data <- gender_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
         
-        #res <- get_convergent_ma(data = m_acmfdata, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = m_last_knot, lout = 1000)
-        # Save results as data frame
-        #m_plot_data <- data.frame(cbind(res[[1]], res[[2]]))
-        
         colnames(m_plot_data) <- c("dose","RR", "lb", "ub")
         
       }
@@ -987,9 +983,6 @@ shinyServer(function(input, output, session){
         
         w_plot_data <- gender_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
         
-        #res <- get_convergent_ma(data = m_acmfdata, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = w_last_knot, lout = 1000)        
-        # Save results as data frame
-        #w_plot_data <- data.frame(cbind(res[[1]], res[[2]]))
         colnames(w_plot_data) <- c("dose","RR", "lb", "ub")
       }
       # MMET = c(4.375, 8.75, 17.5),  
