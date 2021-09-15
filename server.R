@@ -2,35 +2,8 @@ options(shiny.sanitize.errors = F)
 lower_guideline_value <- NA
 upper_guideline_value <- NA
 
-#overall_pop_dose_res_data <- NULL
-#gender_pop_dose_res_data <- NULL
-
 to_download <- NULL
 shinyServer(function(input, output, session){
-  
-  # input_list <- reactiveValues(in_outcome = NA,
-  #                              in_outcome_type = NA,
-  #                              total_sub_population = NA,
-  #                              plot_options = NA,
-  #                              in_main_quantile = NA,
-  #                              in_sub_quantile = NA)
-  # 
-  # ## Set  values of region
-  # observe({
-  #   
-  #   if (is.na(input_list$in_outcome))
-  #     input_list$in_outcome <- input$in_outcome
-  #   if (is.na(input_list$in_outcome_type))
-  #     input_list$in_outcome_type <- input$in_outcome_type
-  #   if (is.na(input_list$total_sub_population))
-  #     input_list$total_sub_population <- input$total_sub_population
-  #   if (is.na(input_list$plot_options))
-  #     input_list$plot_options <- input$plot_options
-  #   if (is.na(input_list$in_main_quantile))
-  #     input_list$in_main_quantile <- input$in_main_quantile
-  #   if (is.na(input_list$in_sub_quantile))
-  #     input_list$in_sub_quantile <- input$in_sub_quantile
-  # })
   
   overall_pop_dose_res_data <- reactive({
     
@@ -730,7 +703,7 @@ shinyServer(function(input, output, session){
     HTML("")
     
     if (total_sub_population == "1"){
-      acmfdata <- get_overall_data()#PA_exposure = pa_exposure, outcome_disease = in_outcome, outcome_types = in_outcome_type)
+      acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
@@ -941,12 +914,6 @@ shinyServer(function(input, output, session){
         ma_filename <- paste0(snake_case_outcome, "-", snake_case_outcome_type)
         
         plot_data <- overall_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
-        
-        
-        #res <- get_convergent_ma(data = overall_data, ptitle = "", returnval = TRUE, covMethed = TRUE, minQuantile = 0, maxQuantile = last_knot, lout = 1000)
-        
-        # Save results as data frame
-        #plot_data <- data.frame(cbind(res[[1]], res[[2]]))
         
         colnames(plot_data) <- c("dose","RR", "lb", "ub")
         #MMET = c(4.375, 8.75, 17.5),  
