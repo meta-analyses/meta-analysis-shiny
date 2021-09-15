@@ -264,7 +264,7 @@ shinyServer(function(input, output, session){
     pop_title <- "Total Population"
     
     if (total_sub_population == "1"){
-      acmfdata <- get_overall_data()#(PA_exposure = pa_exposure, outcome_disease = in_outcome, outcome_types = in_outcome_type)
+      acmfdata <- get_overall_data()
       
     }
     else{# Sub-population
@@ -356,7 +356,7 @@ shinyServer(function(input, output, session){
     
     if (total_sub_population == "1"){
       
-      acmfdata <- get_overall_data()#(PA_exposure = pa_exposure, outcome_disease = in_outcome, outcome_types = in_outcome_type)
+      acmfdata <- get_overall_data()
       
       if (!is.null(acmfdata) && nrow(acmfdata) > 0){
         
@@ -905,6 +905,16 @@ shinyServer(function(input, output, session){
       
       if (!is.null(overall_data) && nrow(overall_data) > 0){
         
+        sketch = htmltools::withTags(table(
+          class = 'display',
+          thead(
+            tr(
+              th(rowspan = 1, 'Marginal MET hours per week'),
+              th(colspan = 1, 'Relative risk and 95% confidence interval')
+            )
+          )
+        ))
+        
         last_knot <- get_last_knot(overall_data, personyrs_pert = in_main_quantile %>% as.numeric() %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric() %>% as.numeric())
         
         last_knot <- last_knot[2]
@@ -954,14 +964,28 @@ shinyServer(function(input, output, session){
       }
       # MMET = c(4.375, 8.75, 17.5),  
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
-        dat <- data.frame(MMETh = c(4.375, 8.75, 17.5), 'Male RR' = paste(get_ma_table(m_plot_data, "RR"), " (", get_ma_table(m_plot_data, "lb"),
+        dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), 'Male RR' = paste(get_ma_table(m_plot_data, "RR"), " (", get_ma_table(m_plot_data, "lb"),
                                                                           " - ", get_ma_table(m_plot_data, "ub"), ")", sep = ""),
                           'Female RR' = paste(get_ma_table(w_plot_data, "RR"), " (", get_ma_table(w_plot_data, "lb"),
                                               " - ", get_ma_table(w_plot_data, "ub"), ")", sep = ""), check.names = FALSE)
         
+        sketch = htmltools::withTags(table(
+          class = 'display',
+          thead(
+            tr(
+              th(rowspan = 2, 'Marginal MET hours per week'),
+              th(colspan = 2, 'Relative risk and 95% confidence interval')
+            ),
+            tr(
+              lapply(rep(c('Men', 'Women'), 1), th)
+            )
+          )
+        ))
+        
+        
       }
     }
-    DT::datatable(dat, options = list(paging = F, dom = 't'), rownames = FALSE) #%>%
+    DT::datatable(dat, container = sketch, options = list(paging = F, dom = 't'), rownames = FALSE) #%>%
   }) 
   # %>% bindCache(input$in_outcome,
   #                  input$in_outcome_type,
