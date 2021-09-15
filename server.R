@@ -899,6 +899,9 @@ shinyServer(function(input, output, session){
     
     dat <- data.frame()
     
+    sketch = htmltools::withTags(table(
+      class = 'display'))
+    
     if (total_sub_population == "1"){
       overall_data <- get_overall_data()
       dat <- data.frame()
