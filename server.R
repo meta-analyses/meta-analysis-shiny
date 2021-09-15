@@ -950,8 +950,8 @@ shinyServer(function(input, output, session){
         
         colnames(plot_data) <- c("dose","RR", "lb", "ub")
         #MMET = c(4.375, 8.75, 17.5),  
-        dat <- data.frame(MMETh = c(4.375, 8.75, 17.5), RR = paste(get_ma_table(plot_data, "RR"), " (", get_ma_table(plot_data, "lb"),
-                                                                   " - ", get_ma_table(plot_data, "ub"), ")", sep = ""))
+        dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), "Relative risk and 95% confidence interval" = paste(get_ma_table(plot_data, "RR"), " (", get_ma_table(plot_data, "lb"),
+                                                                   " - ", get_ma_table(plot_data, "ub"), ")", sep = ""), check.names = F)
         
       }
     }else{# Sub-population
