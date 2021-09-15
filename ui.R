@@ -1,9 +1,6 @@
 # Load required packages/libraries
 source("setup.R")
 
-# domain
-#pa_exposure <- c("LTPA", "TPA")
-
 # outcome_type
 outcome_type <- c("Fatal and non-fatal",
                   "Fatal",
@@ -38,22 +35,11 @@ shinyUI(fluidPage(
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE)
     ),
     HTML("<hr>"),
-    conditionalPanel(
-      condition = "input.total_sub_population == 1",
-      radioButtons(inputId = "in_main_quantile", label = "Last knot (quantiles)",
+   radioButtons(inputId = "in_main_quantile", label = "Last knot (quantiles)",
                    c("0.75",
                      "0.85",
                      "0.95")),
-      HTML("<hr>")
-    ),
-    # conditionalPanel(
-    #   condition = "input.total_sub_population != 1",
-    #   radioButtons(inputId = "in_sub_quantile", label = "Sub-population quantiles",
-    #                c("0.75",
-    #                  "0.85",
-    #                  "0.95")),
-    #   HTML("<hr>")
-    # ),
+    HTML("<hr>"),
     uiOutput("lowest_guideline"),
     HTML("<hr>"),
     uiOutput("lower_guideline"),
