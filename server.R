@@ -318,8 +318,8 @@ shinyServer(function(input, output, session){
           to_download$top_plot_data <<- plot_data
           
           fig_title <- in_outcome
-          if (fig_title != toupper(fig_title))
-            fig_title <- stringi::stri_trans_totitle(fig_title)
+          #if (fig_title != toupper(fig_title))
+          #  fig_title <- stringi::stri_trans_totitle(fig_title)
           
           fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of entries: ",  length(unique(acmfdata$id)) , 
                               " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
@@ -407,8 +407,8 @@ shinyServer(function(input, output, session){
           gt <- "Female Population"
           
           fig_title <- in_outcome
-          if (fig_title != toupper(fig_title))
-            fig_title <- stringi::stri_trans_totitle(fig_title)
+          #if (fig_title != toupper(fig_title))
+          #  fig_title <- stringi::stri_trans_totitle(fig_title)
           
           fig_title <- paste0(gt, " - ", fig_title)
           
@@ -462,8 +462,8 @@ shinyServer(function(input, output, session){
         gt <- "Male Population"
       
       fig_title <- input$in_outcome
-      if (fig_title != toupper(fig_title))
-        fig_title <- stringi::stri_trans_totitle(fig_title)
+      #if (fig_title != toupper(fig_title))
+      #  fig_title <- stringi::stri_trans_totitle(fig_title)
       
       fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of entries: ",  
                           length(unique(dataset$id)) , 
