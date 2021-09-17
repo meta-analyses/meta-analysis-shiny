@@ -324,13 +324,13 @@ shinyServer(function(input, output, session){
           fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of entries: ",  length(unique(acmfdata$id)) , 
                               " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
           q <- quantile(acmfdata$dose, c(0, in_main_quantile %>% as.numeric() / 2, in_main_quantile %>% as.numeric()))
-          getPlot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
+          get_DR_plot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
         }else
-          getPlot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
+          get_DR_plot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
         
       }else{
         
-        getPlot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
+        get_DR_plot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
       }
       
     }
@@ -400,7 +400,7 @@ shinyServer(function(input, output, session){
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
-          getPlot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", in_outcome, in_outcome_type)
+          get_DR_plot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", in_outcome, in_outcome_type)
           
         }else{
           
@@ -412,7 +412,7 @@ shinyServer(function(input, output, session){
           
           fig_title <- paste0(gt, " - ", fig_title)
           
-          getPlot(dataset = NULL, q = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", in_outcome, in_outcome_type)
+          get_DR_plot(dataset = NULL, q = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", in_outcome, in_outcome_type)
           
         }
         
