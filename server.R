@@ -533,7 +533,7 @@ shinyServer(function(input, output, session){
   }
   
   
-  getPlot <- function (dataset, q, plotTitle, pop_type , outcome, outcome_type ){
+  get_DR_plot <- function (dataset, q, plotTitle, pop_type , outcome, outcome_type ){
     
     if (!is.null(dataset) && nrow(dataset) > 0){
       
