@@ -286,10 +286,10 @@ shinyServer(function(input, output, session){
         
         to_download$top_plot_data <<- acmfdata
         
-        get_dose_plot(acmfdata, q, plot_title = p_title)
+        get_ind_plot(acmfdata, q, plot_title = p_title)
       }else{
         
-        get_dose_plot(NULL, 0, "")
+        get_ind_plot(NULL, 0, "")
         
       }
       
@@ -374,10 +374,10 @@ shinyServer(function(input, output, session){
         
         to_download$bottom_plot_data <<- acmfdata
         
-        get_dose_plot(acmfdata, q, plot_title = p_title)
+        get_ind_plot(acmfdata, q, plot_title = p_title)
       }else{
         
-        get_dose_plot(NULL, 0, "")
+        get_ind_plot(NULL, 0, "")
       }
       
     }
@@ -429,11 +429,11 @@ shinyServer(function(input, output, session){
           
           to_download$bottom_plot_data <<- sub_pop_data
           
-          get_dose_plot(sub_pop_data, q, plot_title = p_title)
+          get_ind_plot(sub_pop_data, q, plot_title = p_title)
         }
         
         else{
-          get_dose_plot(NULL, 0, "")
+          get_ind_plot(NULL, 0, "")
         }
       }
     }
@@ -477,7 +477,7 @@ shinyServer(function(input, output, session){
   }
   
   
-  get_dose_plot <- function (dataset, q, plot_title){
+  get_ind_plot <- function (dataset, q, plot_title){
     
     if (!is.null(dataset) && nrow(dataset) > 0){
       dataset$personyrs <- round(dataset$personyrs)
