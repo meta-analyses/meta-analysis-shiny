@@ -35,7 +35,8 @@ shinyUI(fluidPage(
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE)
     ),
     HTML("<hr>"),
-   radioButtons(inputId = "in_main_quantile", label = "Last knot (quantiles)",
+   radioButtons(inputId = "in_main_quantile", label = "Last knot (person years quantiles)",
+                inline = T, 
                    c("0.75",
                      "0.85",
                      "0.95")),

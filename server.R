@@ -470,10 +470,7 @@ shinyServer(function(input, output, session){
                           " & Person-years: ", format(round(sum(dataset$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
       
     }
-    
     fig_title
-    
-    
   }
   
   
