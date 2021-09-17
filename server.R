@@ -325,7 +325,8 @@ shinyServer(function(input, output, session){
                               " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
           q <- quantile(acmfdata$dose, c(0, in_main_quantile %>% as.numeric() / 2, in_main_quantile %>% as.numeric()))
           getPlot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
-        }
+        }else
+          getPlot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
         
       }else{
         
@@ -478,12 +479,17 @@ shinyServer(function(input, output, session){
   
   get_dose_plot <- function (dataset, q, plot_title){
     
-    if (!is.null(dataset)){
+    if (!is.null(dataset) && nrow(dataset) > 0){
       dataset$personyrs <- round(dataset$personyrs)
       group_by(dataset, id) %>% select(dose, se) %>%
         summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
       
       dataset$ref_number <- as.factor(dataset$ref_number)
+      
+      ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(uci_effect) %>% max(na.rm = T) %>% as.numeric() # filter(dose <= 35) %>% 
+      
+      ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(lci_effect) %>% min(na.rm = T) %>% as.numeric()
+      
       # Create plot
       gg <- ggplot() +
         geom_line(data = dataset, aes(dose, RR, col = ref_number, group = ref_number)) +
@@ -492,8 +498,11 @@ shinyServer(function(input, output, session){
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
         scale_y_continuous(expand = c(0, 0),
-                           breaks = seq(from = 0, to = max(dataset$uci_effect, na.rm = T), by = 0.2),
-                           limits = c(0, NA)) +
+                           breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
+        
+        annotate("text", label = paste0(round((stringr::str_remove(names(q), "%")[3] %>% as.numeric()) / 2, 2), "% (person-yrs)"), x = round(q[2],1) + 5, y = 0.15, size = 2) +
+        annotate("text", label = paste0(round(stringr::str_remove(names(q), "%")[3] %>% as.numeric(), 2), "% (person-yrs)"), x = round(q[3],1) + 5, y = 0.15, size = 2) +
+        
         coord_cartesian(xlim = c(0, 35)) +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
         theme(
@@ -536,6 +545,10 @@ shinyServer(function(input, output, session){
       dataset$ub <- round(dataset$ub, 3)
       dataset$lb <- round(dataset$lb, 3)
       
+      ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(ub) %>% max(na.rm = T) %>% as.numeric() # filter(dose <= 35) %>% 
+      
+      ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(lb) %>% min(na.rm = T) %>% as.numeric()
+      
       gg <- ggplot() + 
         geom_line(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, y = RR)) +
         geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
@@ -544,9 +557,8 @@ shinyServer(function(input, output, session){
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
         scale_y_continuous(expand = c(0, 0),
-                           breaks = seq(from = 0, to = max(dataset$ub), by = 0.2),
-                           limits = c(0, NA)) +
-        coord_cartesian(xlim = c(0, 35)) +
+                           breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
+        coord_cartesian(xlim = c(0, 35)) + #, ylim = c(ymin, ymax)) +
         xlab(paste("\n", "Marginal MET hours per week", "\n")) +
         ylab("\nRelative Risk\n") +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
@@ -593,7 +605,7 @@ shinyServer(function(input, output, session){
     
     if (total_sub_population == "1"){
       acmfdata <- get_overall_data()
-      if (!is.null(acmfdata) && nrow(acmfdata) > 0){
+      if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
         
@@ -616,7 +628,8 @@ shinyServer(function(input, output, session){
         w_last_knot <- w_last_knot[2]
       }
       
-      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
+      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0 &&
+          nrow(male_pop_dose_res_data()) > 0 && nrow(female_pop_dose_res_data() > 0)){
         
         HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
              get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 4.375), 
@@ -624,6 +637,7 @@ shinyServer(function(input, output, session){
              get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 4.375),  
              "of all cases in <u>women</u> could be prevented if all people met half the WHO recommended levels of physical activity (4.375 marginal MET hours per week).")
       }
+
     }
   }) %>% bindCache(input$in_outcome,
                    input$in_outcome_type,
@@ -649,7 +663,7 @@ shinyServer(function(input, output, session){
     
     if (total_sub_population == "1"){
       acmfdata <- get_overall_data()
-      if (!is.null(acmfdata) && nrow(acmfdata) > 0){
+      if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
         HTML(get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75), 
@@ -671,7 +685,8 @@ shinyServer(function(input, output, session){
         w_last_knot <- w_last_knot[2]
       }
       
-      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
+      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0 &&
+          nrow(male_pop_dose_res_data()) > 0 && nrow(female_pop_dose_res_data() > 0)){
         HTML(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 8.75), 
              " of all cases in <u>men</u></b> and ",
              get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 8.75),  
@@ -702,7 +717,7 @@ shinyServer(function(input, output, session){
     
     if (total_sub_population == "1"){
       acmfdata <- get_overall_data()
-      if (!is.null(acmfdata) && nrow(acmfdata) > 0){
+      if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         last_knot <- last_knot[2]
         HTML(get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5), 
@@ -722,7 +737,8 @@ shinyServer(function(input, output, session){
         w_last_knot <- w_last_knot[2]
       }
       
-      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
+      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0  &&
+          nrow(male_pop_dose_res_data()) > 0 && nrow(female_pop_dose_res_data() > 0)){
         HTML(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 17.5), 
              " of all cases in <u>men</u></b> and ",
              get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 17.5),  
@@ -925,10 +941,11 @@ shinyServer(function(input, output, session){
         
         plot_data <- overall_pop_tbles %>% filter(filename == ma_filename & quantile == in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
         
-        colnames(plot_data) <- c("dose","RR", "lb", "ub")
-        #MMET = c(4.375, 8.75, 17.5),  
-        dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), "Relative risk and 95% confidence interval" = paste(get_ma_table(plot_data, "RR"), " (", get_ma_table(plot_data, "lb"),
-                                                                   " - ", get_ma_table(plot_data, "ub"), ")", sep = ""), check.names = F)
+        if (nrow(plot_data) > 0){
+          colnames(plot_data) <- c("dose","RR", "lb", "ub")
+          dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), "Relative risk and 95% confidence interval" = paste(get_ma_table(plot_data, "RR"), " (", get_ma_table(plot_data, "lb"),
+                                                                     " - ", get_ma_table(plot_data, "ub"), ")", sep = ""), check.names = F)
+        }
         
       }
     }else{# Sub-population
@@ -963,7 +980,7 @@ shinyServer(function(input, output, session){
         colnames(w_plot_data) <- c("dose","RR", "lb", "ub")
       }
       # MMET = c(4.375, 8.75, 17.5),  
-      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0){
+      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0 && nrow(m_plot_data) > 0 && nrow(w_plot_data) > 0){
         dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), 'Male RR' = paste(get_ma_table(m_plot_data, "RR"), " (", get_ma_table(m_plot_data, "lb"),
                                                                           " - ", get_ma_table(m_plot_data, "ub"), ")", sep = ""),
                           'Female RR' = paste(get_ma_table(w_plot_data, "RR"), " (", get_ma_table(w_plot_data, "lb"),
