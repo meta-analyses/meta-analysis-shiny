@@ -542,15 +542,20 @@ shinyServer(function(input, output, session){
       dataset$ub <- round(dataset$ub, 3)
       dataset$lb <- round(dataset$lb, 3)
       
+      dataset <- dataset %>% filter(dose <= 35)
+      
       ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(ub) %>% max(na.rm = T) %>% as.numeric() # filter(dose <= 35) %>% 
       
       ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(lb) %>% min(na.rm = T) %>% as.numeric()
       
+      # geom_label(aes(label = Dose),
+      #data = DF %>% filter(Time == max(Time)),
+      #nudge_x = 0.35,
+      #size = 4)
+      
       gg <- ggplot() + 
-        geom_line(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, y = RR)) +
-        geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
-        geom_ribbon(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
-        geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10) +
+        geom_line(data = subset(dataset, dose < as.numeric(q[3]) && dose <= 35), aes(x = dose, y = RR)) +
+        geom_ribbon(data = subset(dataset, dose < as.numeric(q[3]) && dose <= 35), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
         scale_y_continuous(expand = c(0, 0),
@@ -567,6 +572,13 @@ shinyServer(function(input, output, session){
           legend.direction = "horizontal",
           legend.position = c(0.1, 1.05)) + 
         labs(title = paste(plotTitle)) #+ labs(fill = "") 
+      
+      if (max(dataset$dose) >= as.numeric(q[3])){
+        gg <- gg + 
+          geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
+          geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10)
+      }
+      
       
     }else{
       gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
