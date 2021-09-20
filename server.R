@@ -564,6 +564,7 @@ shinyServer(function(input, output, session){
         xlab(paste("\n", "Marginal MET hours per week", "\n")) +
         ylab("\nRelative Risk\n") +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
+        #geom_label(aes(label = "test"), data = q %>% as.data.frame(), nudge_x = 0.35, size = 4) +
         
         theme(
           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
@@ -591,7 +592,20 @@ shinyServer(function(input, output, session){
         labs (title = "Sorry no data is available")
     }
     
-    p <- ggplotly(gg)
+    qdf <- q %>% as.data.frame()
+    names(qdf) <- 'val'
+    
+    p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
+                                          y = ymin,
+                                          text = paste0("Person Years (", names(q), ")"),
+                                          xref = "x",
+                                          yref = "y",
+                                          showarrow = TRUE,
+                                          arrowhead = 4,
+                                          arrowsize = .5,
+                                          ax = 20,
+                                          ay = -40,
+                                          font=list(size = 7))
     
     p
   }
