@@ -483,6 +483,8 @@ shinyServer(function(input, output, session){
       
       dataset$ref_number <- as.factor(dataset$ref_number)
       
+      dataset <- dataset %>% filter(dose <= 35)
+      
       ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(uci_effect) %>% max(na.rm = T) %>% as.numeric() # filter(dose <= 35) %>% 
       
       ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(lci_effect) %>% min(na.rm = T) %>% as.numeric()
@@ -497,8 +499,8 @@ shinyServer(function(input, output, session){
         scale_y_continuous(expand = c(0, 0),
                            breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
         
-        annotate("text", label = paste0(round((stringr::str_remove(names(q), "%")[3] %>% as.numeric()) / 2, 2), "% (person-yrs)"), x = round(q[2],1) + 5, y = 0.15, size = 2) +
-        annotate("text", label = paste0(round(stringr::str_remove(names(q), "%")[3] %>% as.numeric(), 2), "% (person-yrs)"), x = round(q[3],1) + 5, y = 0.15, size = 2) +
+        #annotate("text", label = paste0(round((stringr::str_remove(names(q), "%")[3] %>% as.numeric()) / 2, 2), "% (person-yrs)"), x = round(q[2],1) + 5, y = 0.15, size = 2) +
+        #annotate("text", label = paste0(round(stringr::str_remove(names(q), "%")[3] %>% as.numeric(), 2), "% (person-yrs)"), x = round(q[3],1) + 5, y = 0.15, size = 2) +
         
         coord_cartesian(xlim = c(0, 35)) +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
@@ -511,6 +513,23 @@ shinyServer(function(input, output, session){
         xlab("\nMarginal MET hours per week\n") +
         ylab("\nRelative Risk\n") +
         labs(title = paste(plot_title))
+      
+      
+      qdf <- q %>% as.data.frame()
+      names(qdf) <- 'val'
+      
+      p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
+                                            y = ymin,
+                                            text = paste0("Person Years (", names(q), ")"),
+                                            xref = "x",
+                                            yref = "y",
+                                            showarrow = TRUE,
+                                            arrowhead = 4,
+                                            arrowsize = .5,
+                                            ax = 20,
+                                            ay = -40,
+                                            font=list(size = 7))
+      
         
 
     }else{
@@ -522,9 +541,11 @@ shinyServer(function(input, output, session){
           legend.direction = "horizontal",
           legend.position = c(0.1, 1.05)) +
         labs (title = "Sorry no data is available")
+      
+      p <- ggplotly(gg)
     }
     
-    p <- ggplotly(gg)
+    
     p
     
   }
@@ -580,6 +601,22 @@ shinyServer(function(input, output, session){
           geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10)
       }
       
+      qdf <- q %>% as.data.frame()
+      names(qdf) <- 'val'
+      
+      
+      p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
+                                            y = ymin,
+                                            text = paste0("Person Years (", names(q), ")"),
+                                            xref = "x",
+                                            yref = "y",
+                                            showarrow = TRUE,
+                                            arrowhead = 4,
+                                            arrowsize = .5,
+                                            ax = 20,
+                                            ay = -40,
+                                            font=list(size = 7))
+      
       
     }else{
       gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
@@ -590,22 +627,9 @@ shinyServer(function(input, output, session){
           legend.direction = "horizontal",
           legend.position = c(0.1, 1.05)) +
         labs (title = "Sorry no data is available")
+      
+      p <- ggplotly(gg)
     }
-    
-    qdf <- q %>% as.data.frame()
-    names(qdf) <- 'val'
-    
-    p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
-                                          y = ymin,
-                                          text = paste0("Person Years (", names(q), ")"),
-                                          xref = "x",
-                                          yref = "y",
-                                          showarrow = TRUE,
-                                          arrowhead = 4,
-                                          arrowsize = .5,
-                                          ax = 20,
-                                          ay = -40,
-                                          font=list(size = 7))
     
     p
   }
