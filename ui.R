@@ -16,6 +16,13 @@ total_sub_population <- c("Total population" = 1,
 
 plot_options <- c("Meta-Analysis" = 1,
                   "Dose range" = 2)
+
+broad_outcomes <- c("All-cause mortality" = 1, 
+                    "Cardiovascular diseases" = 2, 
+                    "Cancers" = 3,
+                    "Neurological disorders" = 4,
+                    "Others" = 5)
+
 shinyUI(fluidPage(
   titlePanel(fluidRow(
     column(4, tags$a(img(src="mrc-cam.png", style = "height:50px"), href="http://www.mrc-epid.cam.ac.uk", target="_blank", align="left")),
@@ -24,7 +31,7 @@ shinyUI(fluidPage(
     , "Meta-Analyses Physical Activity"),
   width="100%", height="100%",
   sidebarPanel(
-    
+    radioButtons(inputId = "in_outcome_cat", label = "Outcome category:", choices =  broad_outcomes, inline = TRUE),
     selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome),
     radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
