@@ -1179,4 +1179,67 @@ shinyServer(function(input, output, session){
     }
   )
   
+  # Only requred to run if the region changes (as that affects purpose) or the purpose changes (as that affects geographies)
+  observe({
+    
+    #isolate({
+    update_outcomes(input_outcome_cat())
+    #})
+  })
+  
+  input_outcome_cat <- reactive({
+    if(is.null(input$in_outcome_cat)) {
+      "All-cause mortality"
+    } else {
+      input$in_outcome_cat
+    }
+  })
+  
+  update_outcomes <- function(outcome){
+    
+    # Identify locally available purposes and update list accordingly
+    # if(!is.null(outcome)){
+      
+      # c("All-cause mortality" = 1, 
+      #   "Cardiovascular diseases" = 2, 
+      #   "Cancers" = 3,
+      #   "Neurological disorders" = 4,
+      #   "Others" = 5)
+      
+      local_outcome_choices <- selected_outcome <- "All-cause mortality"
+      
+      if (outcome == "2"){
+        
+        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause cvd",
+                                                                    "Coronary heart disease",
+                                                                    "Stroke")))$outcome
+        
+      }else if (outcome == "3"){
+        
+        local_outcome_choices <- (uoutcome %>% filter(str_detect(outcome, "cancer")))$outcome
+        
+      }else if (outcome == "4"){
+        
+        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause dementia", 
+                                                                    "Alzheimer's disease", 
+                                                                    "Depression", 
+                                                                    "Depressive symptoms", 
+                                                                    "Major depression", 
+                                                                    "Parkinson's disease", 
+                                                                    "Vascular dementia")))$outcome
+        
+      }else if (outcome == "5"){
+        
+        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("Myeloid leukemia",
+                                                                    "Myeloma"
+                                                                    )))$outcome
+      }
+      
+      updateSelectInput(session, "in_outcome", 
+                        choices = local_outcome_choices, 
+                        selected = local_outcome_choices[1])
+      
+    # }
+  }
+  
 })
