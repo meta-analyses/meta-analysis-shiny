@@ -1212,6 +1212,7 @@ shinyServer(function(input, output, session){
         
         local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause cvd",
                                                                     "Coronary heart disease",
+                                                                    "Heart failure",
                                                                     "Stroke")))$outcome
         
       }else if (outcome == "3"){
