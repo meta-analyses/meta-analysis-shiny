@@ -278,7 +278,7 @@ shinyServer(function(input, output, session){
         
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         
-        last_knot <- last_knot[2]
+        last_knot <- round(last_knot[2], 2)
         
         q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
         
@@ -321,7 +321,7 @@ shinyServer(function(input, output, session){
           
           last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
           
-          last_knot <- last_knot[2]
+          last_knot <- round(last_knot[2], 2)
           
           q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
           
@@ -372,7 +372,7 @@ shinyServer(function(input, output, session){
         
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
         
-        last_knot <- last_knot[2]
+        last_knot <- round(last_knot[2], 2)
         
         q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
         
@@ -398,7 +398,7 @@ shinyServer(function(input, output, session){
           
           last_knot <- get_last_knot(sub_pop_data, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
 
-          last_knot <- last_knot[2]
+          last_knot <- round(last_knot[2], 2)
           
           to_download$bottom_plot_data <<- plot_data
           
@@ -423,7 +423,7 @@ shinyServer(function(input, output, session){
         if (!is.null(sub_pop_data) && nrow(sub_pop_data) > 0){
           
           last_knot <- get_last_knot(sub_pop_data, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-          last_knot <- last_knot[2]
+          last_knot <- round(last_knot[2], 2)
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
@@ -605,7 +605,6 @@ shinyServer(function(input, output, session){
       qdf <- q %>% as.data.frame()
       names(qdf) <- 'val'
       
-      
       p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
                                             y = ymin,
                                             text = paste0("Person Years (", names(q), ")"),
@@ -654,7 +653,7 @@ shinyServer(function(input, output, session){
       acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        last_knot <- last_knot[2]
+        last_knot <- round(last_knot[2], 2)
         
         HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
              get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375), 
@@ -666,13 +665,13 @@ shinyServer(function(input, output, session){
       m_acmfdata <- get_male_subpopulation_data()
       if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
         m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        m_last_knot <- m_last_knot[2]
+        m_last_knot <- round(m_last_knot[2], 2)
       }
       
       w_acmfdata <- get_female_subpopulation_data()
       if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
         w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        w_last_knot <- w_last_knot[2]
+        w_last_knot <- round(w_last_knot[2], 2)
       }
       
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0 &&
@@ -712,7 +711,7 @@ shinyServer(function(input, output, session){
       acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        last_knot <- last_knot[2]
+        last_knot <- round(last_knot[2], 2)
         HTML(get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75), 
              " of all cases could be prevented if all people met the WHO recommended levels of physical activity (8.75 marginal MET hours per week).")
       }
@@ -723,13 +722,13 @@ shinyServer(function(input, output, session){
       m_acmfdata <- get_male_subpopulation_data()
       if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
         m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        m_last_knot <- m_last_knot[2]
+        m_last_knot <- round(m_last_knot[2], 2)
       }
       
       w_acmfdata <- get_female_subpopulation_data()
       if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
         w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        w_last_knot <- w_last_knot[2]
+        w_last_knot <- round(w_last_knot[2], 2)
       }
       
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0 &&
@@ -766,7 +765,7 @@ shinyServer(function(input, output, session){
       acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
         last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        last_knot <- last_knot[2]
+        last_knot <- round(last_knot[2], 2)
         HTML(get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5), 
              " of all cases could be prevented if all people met twice the WHO recommended levels of physical activity (17.5 marginal MET hours per week).")
       }
@@ -775,13 +774,13 @@ shinyServer(function(input, output, session){
       m_acmfdata <- get_male_subpopulation_data()
       if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
         m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        m_last_knot <- m_last_knot[2]
+        m_last_knot <- round(m_last_knot[2], 2)
       }
       
       w_acmfdata <- get_female_subpopulation_data()
       if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
         w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        w_last_knot <- w_last_knot[2]
+        w_last_knot <- round(w_last_knot[2], 2)
       }
       
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0  &&
@@ -980,7 +979,7 @@ shinyServer(function(input, output, session){
         
         last_knot <- get_last_knot(overall_data, personyrs_pert = in_main_quantile %>% as.numeric() %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric() %>% as.numeric())
         
-        last_knot <- last_knot[2]
+        last_knot <- round(last_knot[2], 2)
         
         snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
         snake_case_outcome_type <- gsub(x = in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
@@ -1000,7 +999,7 @@ shinyServer(function(input, output, session){
       m_acmfdata <- get_male_subpopulation_data()
       if(!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
         m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        m_last_knot <- m_last_knot[2]
+        m_last_knot <- round(m_last_knot[2], 2)
         
         snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
         snake_case_outcome_type <- gsub(x = in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
@@ -1016,7 +1015,7 @@ shinyServer(function(input, output, session){
       td <<- w_acmfdata
       if(!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
         w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        w_last_knot <- w_last_knot[2]
+        w_last_knot <- round(w_last_knot[2], 2)
         
         snake_case_outcome <- gsub(x = in_outcome, pattern = " ", replacement = "-") %>% tolower()
         snake_case_outcome_type <- gsub(x = in_outcome_type, pattern = " ", replacement = "-") %>% tolower()
