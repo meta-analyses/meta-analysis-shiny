@@ -301,7 +301,7 @@ shinyServer(function(input, output, session){
       outcome_type <- ""
       
       if (in_outcome_type != "all"){
-        outcome_type <- paste(stringi::stri_trans_totitle(in_outcome_type), "- ")
+        outcome_type <- paste(in_outcome_type, "- ")
         
       }
       
@@ -318,8 +318,6 @@ shinyServer(function(input, output, session){
           to_download$top_plot_data <<- plot_data
           
           fig_title <- in_outcome
-          #if (fig_title != toupper(fig_title))
-          #  fig_title <- stringi::stri_trans_totitle(fig_title)
           
           last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
           
@@ -413,8 +411,6 @@ shinyServer(function(input, output, session){
           gt <- "Female Population"
           
           fig_title <- in_outcome
-          #if (fig_title != toupper(fig_title))
-          #  fig_title <- stringi::stri_trans_totitle(fig_title)
           
           fig_title <- paste0(gt, " - ", fig_title)
           
@@ -457,7 +453,7 @@ shinyServer(function(input, output, session){
       outcome_type <- ""
       
       if (input$in_outcome_type != "all"){
-        outcome_type <- paste(stringi::stri_trans_totitle(input$in_outcome_type), "- ")
+        outcome_type <- paste(input$in_outcome_type, "- ")
         
       }
       
@@ -468,8 +464,6 @@ shinyServer(function(input, output, session){
         gt <- "Male Population"
       
       fig_title <- input$in_outcome
-      #if (fig_title != toupper(fig_title))
-      #  fig_title <- stringi::stri_trans_totitle(fig_title)
       
       fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of entries: ",  
                           length(unique(dataset$id)) , 
