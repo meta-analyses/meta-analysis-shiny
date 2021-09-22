@@ -321,9 +321,15 @@ shinyServer(function(input, output, session){
           #if (fig_title != toupper(fig_title))
           #  fig_title <- stringi::stri_trans_totitle(fig_title)
           
+          last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
+          
+          last_knot <- last_knot[2]
+          
+          q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
+          
           fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of entries: ",  length(unique(acmfdata$id)) , 
                               " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
-          q <- quantile(acmfdata$dose, c(0, in_main_quantile %>% as.numeric() / 2, in_main_quantile %>% as.numeric()))
+          
           get_DR_plot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
         }else
           get_DR_plot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
@@ -477,6 +483,7 @@ shinyServer(function(input, output, session){
   get_ind_plot <- function (dataset, q, plot_title){
     
     if (!is.null(dataset) && nrow(dataset) > 0){
+      
       dataset$personyrs <- round(dataset$personyrs)
       group_by(dataset, id) %>% select(dose, se) %>%
         summarise(min = min(dose), max = max(dose), ref = dose[is.na(se)])
@@ -485,9 +492,9 @@ shinyServer(function(input, output, session){
       
       dataset <- dataset %>% filter(dose <= 35)
       
-      ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(uci_effect) %>% max(na.rm = T) %>% as.numeric() # filter(dose <= 35) %>% 
+      ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(dose) %>% max(na.rm = T) %>% as.numeric()
       
-      ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(lci_effect) %>% min(na.rm = T) %>% as.numeric()
+      ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(dose) %>% min(na.rm = T) %>% as.numeric()
       
       # Create plot
       gg <- ggplot() +
@@ -502,7 +509,7 @@ shinyServer(function(input, output, session){
         #annotate("text", label = paste0(round((stringr::str_remove(names(q), "%")[3] %>% as.numeric()) / 2, 2), "% (person-yrs)"), x = round(q[2],1) + 5, y = 0.15, size = 2) +
         #annotate("text", label = paste0(round(stringr::str_remove(names(q), "%")[3] %>% as.numeric(), 2), "% (person-yrs)"), x = round(q[3],1) + 5, y = 0.15, size = 2) +
         
-        coord_cartesian(xlim = c(0, 35)) +
+        coord_cartesian(xlim = c(0, 35)) + #, ylim = c(ymin, ymax)) +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
         theme(
           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
@@ -515,22 +522,23 @@ shinyServer(function(input, output, session){
         labs(title = paste(plot_title))
       
       
-      qdf <- q %>% as.data.frame()
-      names(qdf) <- 'val'
+      # qdf <- q %>% as.data.frame()
+      # names(qdf) <- 'val'
+      # 
+      # p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
+      #                                       y = 0.8,
+      #                                       text = paste0("Person Years (", names(q), ")"),
+      #                                       xref = "x",
+      #                                       yref = "y",
+      #                                       showarrow = TRUE,
+      #                                       arrowhead = 4,
+      #                                       arrowsize = .5,
+      #                                       ax = 20,
+      #                                       ay = -40,
+      #                                       font=list(size = 7))
       
-      p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
-                                            y = ymin,
-                                            text = paste0("Person Years (", names(q), ")"),
-                                            xref = "x",
-                                            yref = "y",
-                                            showarrow = TRUE,
-                                            arrowhead = 4,
-                                            arrowsize = .5,
-                                            ax = 20,
-                                            ay = -40,
-                                            font=list(size = 7))
+      p <- ggplotly(gg)
       
-        
 
     }else{
       gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
@@ -544,7 +552,6 @@ shinyServer(function(input, output, session){
       
       p <- ggplotly(gg)
     }
-    
     
     p
     
@@ -616,7 +623,6 @@ shinyServer(function(input, output, session){
                                             ax = 20,
                                             ay = -40,
                                             font=list(size = 7))
-      
       
     }else{
       gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
