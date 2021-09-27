@@ -60,12 +60,6 @@ shinyServer(function(input, output, session){
                    input$in_main_quantile)
   
   
-  # To set initialize to_download
-  observe({
-    to_download$top_plot_data <<- NULL
-    to_download$bottom_plot_data <<- NULL
-  })
-    
   get_overall_data <- reactive({
     
     if (!is.na(input$in_outcome)){
@@ -1177,10 +1171,11 @@ shinyServer(function(input, output, session){
   
   output$download_top_data <- downloadHandler(
     filename = function() {
-      paste(input$in_outcome, "-", input$in_outcome_type, ".csv", sep="")
+      paste(ifelse(input$total_sub_population == "1", "total-population-", "male-population-"), 
+            gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower(), "-", 
+            gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% tolower(), "-q-", input$in_main_quantile,  ".csv", sep="")
     },
     content = function(file) {
-      # cat(summary(to_download$top_plot_data), "\n")
       write.csv(to_download$top_plot_data, file)
     }
   )
@@ -1188,7 +1183,9 @@ shinyServer(function(input, output, session){
   
   output$download_bottom_data <- downloadHandler(
     filename = function() {
-      paste(input$in_outcome, "-", input$in_outcome_type, ".csv", sep="")
+      paste(ifelse(input$total_sub_population == "1", "total-population-", "female-population-"), 
+            gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower(), "-", 
+            gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% tolower(), "-q-", input$in_main_quantile,  ".csv", sep="")
     },
     content = function(file) {
       write.csv(to_download$bottom_plot_data, file)
