@@ -63,9 +63,9 @@ shinyUI(fluidPage(
     tabsetPanel(
       tabPanel("Analysis",
                plotlyOutput("top_plot"),
-               downloadLink("download_top_data", "Download Data"),
+               downloadLink("download_top_data", "Download data"),
                plotlyOutput("bottom_plot"),
-               downloadLink("download_bottom_data", "Download Data")
+               downloadLink("download_bottom_data", "Download data")
       ),
       tabPanel("Total Population Data",
                uiOutput("overall_warning_message"),
