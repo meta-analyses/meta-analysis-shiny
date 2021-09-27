@@ -27,8 +27,8 @@ shinyUI(fluidPage(
   titlePanel(fluidRow(
     column(4, tags$a(img(src="mrc-cam.png", style = "height:50px"), href="http://www.mrc-epid.cam.ac.uk", target="_blank", align="left")),
     column(2, offset = 6, div(tags$a(img(src="cedar.png", style = "height:50px"), href="http://www.cedar.iph.cam.ac.uk/", target="_blank")), align="right")
-    )
-    , "Meta-Analyses Physical Activity"),
+  )
+  , "Meta-Analyses Physical Activity"),
   width="100%", height="100%",
   sidebarPanel(
     radioButtons(inputId = "in_outcome_cat", label = "Outcome category:", choices =  broad_outcomes, inline = TRUE),
@@ -42,11 +42,11 @@ shinyUI(fluidPage(
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE)
     ),
     HTML("<hr>"),
-   radioButtons(inputId = "in_main_quantile", label = "Last knot (person years quantiles)",
-                inline = T, 
-                   c("0.75",
-                     "0.85",
-                     "0.95")),
+    radioButtons(inputId = "in_main_quantile", label = "Last knot (person years quantiles)",
+                 inline = T, 
+                 c("0.75",
+                   "0.85",
+                   "0.95")),
     HTML("<hr>"),
     uiOutput("lowest_guideline"),
     HTML("<hr>"),
@@ -59,7 +59,7 @@ shinyUI(fluidPage(
   ),
   
   mainPanel(
-
+    
     tabsetPanel(
       tabPanel("Analysis",
                plotlyOutput("top_plot"),
@@ -79,8 +79,7 @@ shinyUI(fluidPage(
                uiOutput("female_sub_warning_message"),
                DT::dataTableOutput("female_population_datatable")
       ),
-
-      id = "conditionedPanels"
+      id = "main_panel"
     )
   )
 ))

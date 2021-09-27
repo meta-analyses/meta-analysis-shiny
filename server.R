@@ -5,6 +5,24 @@ upper_guideline_value <- NA
 to_download <- NULL
 shinyServer(function(input, output, session){
   
+  observe( {
+    input$total_sub_population
+    if(input$total_sub_population == "1"){
+      hideTab(inputId = "main_panel", target = "Male Population Data")
+      hideTab(inputId = "main_panel", target = "Female Population Data")
+      showTab(inputId = "main_panel", target = "Total Population Data")
+    }else if(input$total_sub_population != "1"){
+      showTab(inputId = "main_panel", target = "Male Population Data")
+      showTab(inputId = "main_panel", target = "Female Population Data")
+      hideTab(inputId = "main_panel", target = "Total Population Data")
+      
+    }
+  })
+  
+  observeEvent(input$total_sub_population, {
+    hideTab(inputId = "tabs", target = "Total Population Data")
+  })
+  
   overall_pop_dose_res_data <- reactive({
     
     snake_case_outcome <- gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower()
