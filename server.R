@@ -18,10 +18,6 @@ shinyServer(function(input, output, session){
     }
   })
   
-  observeEvent(input$total_sub_population, {
-    hideTab(inputId = "tabs", target = "Total Population Data")
-  })
-  
   overall_pop_dose_res_data <- reactive({
     
     snake_case_outcome <- gsub(x = input$in_outcome, pattern = " ", replacement = "-") %>% tolower()
