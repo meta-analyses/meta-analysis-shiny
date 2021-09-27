@@ -32,7 +32,7 @@ shinyUI(fluidPage(
   width="100%", height="100%",
   sidebarPanel(
     radioButtons(inputId = "in_outcome_cat", label = "Outcome category:", choices =  broad_outcomes, inline = TRUE),
-    selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome),
+    selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome, selected = uoutcome$outcome[[which(uoutcome$outcome == "All-cause mortality")]]),
     radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
     radioButtons("total_sub_population", "Population: ", total_sub_population, inline = TRUE),

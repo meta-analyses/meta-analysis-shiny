@@ -15,7 +15,6 @@ shinyServer(function(input, output, session){
       showTab(inputId = "main_panel", target = "Male Population Data")
       showTab(inputId = "main_panel", target = "Female Population Data")
       hideTab(inputId = "main_panel", target = "Total Population Data")
-      
     }
   })
   
