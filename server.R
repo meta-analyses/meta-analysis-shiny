@@ -332,7 +332,7 @@ shinyServer(function(input, output, session){
           
           q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
           
-          fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\n Number of entries: ",  length(unique(acmfdata$id)) , 
+          fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\nNumber of entries: ",  length(unique(acmfdata$id)) , 
                               " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
           
           get_DR_plot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
@@ -472,7 +472,7 @@ shinyServer(function(input, output, session){
       
       fig_title <- input$in_outcome
       
-      fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\n Number of entries: ",  
+      fig_title <- paste0(gt, " - ", outcome_type, fig_title, "\nNumber of entries: ",  
                           length(unique(dataset$id)) , 
                           " & Person-years: ", format(round(sum(dataset$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
       
