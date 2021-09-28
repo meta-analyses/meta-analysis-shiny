@@ -20,8 +20,9 @@ plot_options <- c("Meta-Analysis" = 1,
 broad_outcomes <- c("All-cause mortality" = 1, 
                     "Cardiovascular diseases" = 2, 
                     "Cancers" = 3,
-                    "Neurological disorders" = 4,
-                    "Others" = 5)
+                    "Depression" = 4,
+                    "Neurological disorders" = 5,
+                    "Others" = 6)
 
 shinyUI(fluidPage(
   titlePanel(fluidRow(
@@ -31,8 +32,10 @@ shinyUI(fluidPage(
   , "Meta-Analyses Physical Activity"),
   width="100%", height="100%",
   sidebarPanel(
+    div(
     radioButtons(inputId = "in_outcome_cat", label = "Outcome category:", choices =  broad_outcomes, inline = TRUE),
-    selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome, selected = uoutcome$outcome[[which(uoutcome$outcome == "All-cause mortality")]]),
+    selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome,
+                selected = uoutcome$outcome[[which(uoutcome$outcome == "All-cause mortality")]]),
     radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type),
     HTML("<hr>"),
     radioButtons("total_sub_population", "Population: ", total_sub_population, inline = TRUE),
@@ -55,6 +58,7 @@ shinyUI(fluidPage(
     uiOutput("upper_guideline"),
     HTML("<hr>"),
     DT::dataTableOutput("dose_range")
+    )
     
   ),
   

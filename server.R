@@ -1230,15 +1230,19 @@ shinyServer(function(input, output, session){
         
       }else if (outcome == "4"){
         
+        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("Depression", 
+                                                                     "Depressive symptoms", 
+                                                                     "Major depression"
+                                                                     )))$outcome
+        
+      }else if (outcome == "5"){
+        
         local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause dementia", 
-                                                                    "Alzheimer's disease", 
-                                                                    "Depression", 
-                                                                    "Depressive symptoms", 
-                                                                    "Major depression", 
+                                                                    "Alzheimer's disease",
                                                                     "Parkinson's disease", 
                                                                     "Vascular dementia")))$outcome
         
-      }else if (outcome == "5"){
+      }else if (outcome == "6"){
         
         local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("Myeloid leukemia",
                                                                     "Myeloma"
