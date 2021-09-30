@@ -518,8 +518,8 @@ shinyServer(function(input, output, session){
           plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
           legend.direction = "horizontal",
           legend.position = "none") +
-        xlab("\nMarginal MET hours per week\n") +
-        ylab("\nRelative Risk\n") +
+        xlab("Marginal MET hours per week") +
+        ylab("Relative Risk") +
         labs(title = paste(plot_title))
       
       
@@ -590,8 +590,8 @@ shinyServer(function(input, output, session){
         scale_y_continuous(expand = c(0, 0),
                            breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
         coord_cartesian(xlim = c(0, 35)) + #, ylim = c(ymin, ymax)) +
-        xlab(paste("\n", "Marginal MET hours per week", "\n")) +
-        ylab("\nRelative Risk\n") +
+        xlab(paste("Marginal MET hours per week")) +
+        ylab("Relative Risk") +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
         #geom_label(aes(label = "test"), data = q %>% as.data.frame(), nudge_x = 0.35, size = 4) +
         
