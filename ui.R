@@ -21,8 +21,7 @@ broad_outcomes <- c("All-cause mortality" = 1,
                     "Cardiovascular diseases" = 2, 
                     "Cancers" = 3,
                     "Depression" = 4,
-                    "Neurological disorders" = 5,
-                    "Others" = 6)
+                    "Neurological disorders" = 5)
 
 shinyUI(fluidPage(
   titlePanel(fluidRow(

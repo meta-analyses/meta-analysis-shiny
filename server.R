@@ -1226,7 +1226,7 @@ shinyServer(function(input, output, session){
         
       }else if (outcome == "3"){
         
-        local_outcome_choices <- (uoutcome %>% filter(str_detect(outcome, "cancer")))$outcome
+        local_outcome_choices <- (uoutcome %>% filter(str_detect(outcome, "cancer") | outcome %in% c("Myeloid leukemia", "Myeloma")))$outcome
         
       }else if (outcome == "4"){
         
@@ -1242,11 +1242,6 @@ shinyServer(function(input, output, session){
                                                                     "Parkinson's disease", 
                                                                     "Vascular dementia")))$outcome
         
-      }else if (outcome == "6"){
-        
-        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("Myeloid leukemia",
-                                                                    "Myeloma"
-                                                                    )))$outcome
       }
       
       updateSelectInput(session, "in_outcome", 
