@@ -35,20 +35,19 @@ shinyUI(fluidPage(
     radioButtons(inputId = "in_outcome_cat", label = "Outcome category:", choices =  broad_outcomes, inline = TRUE),
     selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome,
                 selected = uoutcome$outcome[[which(uoutcome$outcome == "All-cause mortality")]]),
-    radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type),
-    HTML("<hr>"),
-    radioButtons("total_sub_population", "Population: ", total_sub_population, inline = TRUE),
+    fluidRow(
+      column(4, radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type)),
+      column(4, radioButtons("total_sub_population", "Population: ", total_sub_population)),
+      column(4, radioButtons(inputId = "in_main_quantile", label = "Last knot (person years quantiles)",
+                 c("0.75",
+                   "0.85",
+                   "0.95")))
+      ),
     conditionalPanel(
       condition = "input.total_sub_population != 1",
       HTML("<hr>"),
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE)
     ),
-    HTML("<hr>"),
-    radioButtons(inputId = "in_main_quantile", label = "Last knot (person years quantiles)",
-                 inline = T, 
-                 c("0.75",
-                   "0.85",
-                   "0.95")),
     HTML("<hr>"),
     uiOutput("lowest_guideline"),
     HTML("<hr>"),
