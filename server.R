@@ -270,6 +270,8 @@ shinyServer(function(input, output, session){
     
     pop_title <- "Total Population"
     
+    to_download$top_plot_data <<- NULL
+    
     if (total_sub_population == "1"){
       acmfdata <- get_overall_data()
       
@@ -368,6 +370,8 @@ shinyServer(function(input, output, session){
       in_main_quantile <- input$in_main_quantile
       plot_options <- input$plot_options
     })
+    
+    to_download$bottom_plot_data <<- NULL
     
     if (total_sub_population == "1"){
       
