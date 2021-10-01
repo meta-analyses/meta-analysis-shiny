@@ -2,8 +2,8 @@ pkgs <- c(
   "DT",
   "ggplot2",
   "plotly",
-  "shiny"#,
-  #"shiny.fluent"
+  "shiny",
+  "tippy"#,
 )
 # Which packages do we require?
 # lapply(pkgs, library, character.only = T)

@@ -38,10 +38,12 @@ shinyUI(fluidPage(
     fluidRow(
       column(4, radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type)),
       column(4, radioButtons("total_sub_population", "Population: ", total_sub_population)),
-      column(4, radioButtons(inputId = "in_main_quantile", label = "Last knot (person years quantiles)",
+      column(4, with_tippy(radioButtons(inputId = "in_main_quantile", label = "Last knot (person years quantiles)",
                  c("0.75",
                    "0.85",
-                   "0.95")))
+                   "0.95")),
+             "Knots are where we allow shape changes. With person years (%), it is at three locations (0, last_knot / 2 and last_knot)", 
+             placement = "top"))
       ),
     conditionalPanel(
       condition = "input.total_sub_population != 1",
