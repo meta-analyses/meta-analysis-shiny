@@ -717,10 +717,10 @@ shinyServer(function(input, output, session){
           )
         ))
         
-        dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), 'Male PIF' = c(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375),
+        dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), 'Men' = c(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375),
                                                                                           get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75),
                                                                                           get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5)),
-                          'Female PIF' = c(get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375),
+                          'Women' = c(get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375),
                                          get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75),
                                          get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5)), check.names = FALSE)
       }
@@ -982,14 +982,9 @@ shinyServer(function(input, output, session){
         
       }
     }
-    DT::datatable(dat, container = sketch, options = list(paging = F, dom = 't'), rownames = FALSE) #%>%
+    DT::datatable(dat, container = sketch, options = list(paging = F, dom = 't'), rownames = FALSE)
   }) 
-  # %>% bindCache(input$in_outcome,
-  #                  input$in_outcome_type,
-  #                  input$total_sub_population,
-  #                  input$in_sub_quantile,
-  #                  input$plot_options)
-  
+
   get_ma_table <- function(plot_data, colname = "RR"){
     
     c(round(plot_data[[colname]][which.min(abs(plot_data$dose - 4.375))], 2),
