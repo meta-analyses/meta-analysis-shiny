@@ -25,11 +25,11 @@ shinyServer(function(input, output, session){
       tolower()
     ma_filename <- paste0(snake_case_outcome, "-", snake_case_outcome_type)
     
-   overall_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
+    overall_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
     
   }) %>% bindCache(input$in_outcome,
-                         input$in_outcome_type,
-                         input$in_main_quantile)
+                   input$in_outcome_type,
+                   input$in_main_quantile)
   
   male_pop_dose_res_data <- reactive({
     
@@ -40,8 +40,8 @@ shinyServer(function(input, output, session){
     gender_pop_tbles %>% filter(filename == ma_filename & quantile == input$in_main_quantile %>% as.numeric()) %>% dplyr::select(-c(filename, quantile))
     
   }) %>% bindCache(input$in_outcome,
-                  input$in_outcome_type,
-                  input$in_main_quantile)
+                   input$in_outcome_type,
+                   input$in_main_quantile)
   
   female_pop_dose_res_data <- reactive({
     
@@ -104,7 +104,7 @@ shinyServer(function(input, output, session){
       data.frame()
     
   }) %>% bindCache(input$in_outcome,
-                input$in_outcome_type)
+                   input$in_outcome_type)
   
   get_male_subpopulation_data <- reactive(get_subpopulation_data(outcome_disease = input$in_outcome,
                                                                  outcome_types = input$in_outcome_type,
@@ -112,9 +112,9 @@ shinyServer(function(input, output, session){
                                                                                             input$in_outcome_type)
   
   get_female_subpopulation_data <- reactive(get_subpopulation_data(outcome_disease = input$in_outcome,
-                                                                 outcome_types = input$in_outcome_type,
-                                                                 gender = 2)) %>% bindCache(input$in_outcome,
-                                                                                            input$in_outcome_type)
+                                                                   outcome_types = input$in_outcome_type,
+                                                                   gender = 2)) %>% bindCache(input$in_outcome,
+                                                                                              input$in_outcome_type)
   
   get_subpopulation_data <- function(outcome_disease, outcome_types, gender){
     
@@ -323,7 +323,7 @@ shinyServer(function(input, output, session){
           plot_data <- (male_pop_dose_res_data() %>% as.data.frame())
         
         if (!is.null(plot_data) && nrow(plot_data) > 0){
-
+          
           to_download$top_plot_data <<- plot_data
           
           fig_title <- in_outcome
@@ -404,11 +404,11 @@ shinyServer(function(input, output, session){
       if (plot_options == "1"){
         
         if (!is.null(sub_pop_data) && nrow(sub_pop_data) > 0){
-
+          
           plot_data <- female_pop_dose_res_data()
           
           last_knot <- get_last_knot(sub_pop_data, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-
+          
           last_knot <- round(last_knot[2], 2)
           
           to_download$bottom_plot_data <<- plot_data
@@ -544,7 +544,7 @@ shinyServer(function(input, output, session){
       
       p <- ggplotly(gg)
       
-
+      
     }else{
       gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
         theme(
@@ -721,8 +721,8 @@ shinyServer(function(input, output, session){
                                                                                           get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75),
                                                                                           get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5)),
                           'Women' = c(get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375),
-                                         get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75),
-                                         get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5)), check.names = FALSE)
+                                      get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75),
+                                      get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5)), check.names = FALSE)
       }
       
     }
@@ -731,7 +731,7 @@ shinyServer(function(input, output, session){
       style="caption-side: top; text-align: left; margin: 8px 0;",
       "% prevented cases at three WHO recommended levels (half, full and double) of physical activity"
     ), options = list(paging = F, dom = 't'), rownames = FALSE)
-      
+    
   }) 
   
   output$overall_datatable <- DT::renderDataTable({
@@ -801,9 +801,9 @@ shinyServer(function(input, output, session){
     fname <- "male_population"
     
     sub_population_data <- sub_population_data %>% dplyr::rename("ref_id" = "ref_number", 
-                                                   "persons" = "totalpersons",
-                                                   "person_years" = "personyrs",
-                                                   "risk_estimate" = "RR")
+                                                                 "persons" = "totalpersons",
+                                                                 "person_years" = "personyrs",
+                                                                 "risk_estimate" = "RR")
     
     # Empty the warning message - as some lines have been selected by the user
     output$male_sub_warning_message <- renderUI("")
@@ -927,7 +927,7 @@ shinyServer(function(input, output, session){
         if (nrow(plot_data) > 0){
           colnames(plot_data) <- c("dose","RR", "lb", "ub")
           dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), "Relative risk and 95% confidence interval" = paste(get_ma_table(plot_data, "RR"), " (", get_ma_table(plot_data, "lb"),
-                                                                     " - ", get_ma_table(plot_data, "ub"), ")", sep = ""), check.names = F)
+                                                                                                                                      " - ", get_ma_table(plot_data, "ub"), ")", sep = ""), check.names = F)
         }
         
       }
@@ -965,7 +965,7 @@ shinyServer(function(input, output, session){
       # MMET = c(4.375, 8.75, 17.5),  
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0 && nrow(m_plot_data) > 0 && nrow(w_plot_data) > 0){
         dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), 'Male RR' = paste(get_ma_table(m_plot_data, "RR"), " (", get_ma_table(m_plot_data, "lb"),
-                                                                          " - ", get_ma_table(m_plot_data, "ub"), ")", sep = ""),
+                                                                                                  " - ", get_ma_table(m_plot_data, "ub"), ")", sep = ""),
                           'Female RR' = paste(get_ma_table(w_plot_data, "RR"), " (", get_ma_table(w_plot_data, "lb"),
                                               " - ", get_ma_table(w_plot_data, "ub"), ")", sep = ""), check.names = FALSE)
         
@@ -987,7 +987,7 @@ shinyServer(function(input, output, session){
     }
     DT::datatable(dat, container = sketch, options = list(paging = F, dom = 't'), rownames = FALSE)
   }) 
-
+  
   get_ma_table <- function(plot_data, colname = "RR"){
     
     c(round(plot_data[[colname]][which.min(abs(plot_data$dose - 4.375))], 2),
@@ -1131,49 +1131,39 @@ shinyServer(function(input, output, session){
   
   update_outcomes <- function(outcome){
     
-    # Identify locally available purposes and update list accordingly
-    # if(!is.null(outcome)){
+    local_outcome_choices <- selected_outcome <- "All-cause mortality"
+    
+    if (outcome == "2"){
       
-      # c("All-cause mortality" = 1, 
-      #   "Cardiovascular diseases" = 2, 
-      #   "Cancers" = 3,
-      #   "Neurological disorders" = 4,
-      #   "Others" = 5)
+      local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause CVD",
+                                                                   "Coronary heart disease",
+                                                                   "Heart failure",
+                                                                   "Stroke")))$outcome
       
-      local_outcome_choices <- selected_outcome <- "All-cause mortality"
+    }else if (outcome == "3"){
       
-      if (outcome == "2"){
-        
-        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause CVD",
-                                                                    "Coronary heart disease",
-                                                                    "Heart failure",
-                                                                    "Stroke")))$outcome
-        
-      }else if (outcome == "3"){
-        
-        local_outcome_choices <- (uoutcome %>% filter(str_detect(outcome, "cancer") | outcome %in% c("Myeloid leukemia", "Myeloma")))$outcome
-        
-      }else if (outcome == "4"){
-        
-        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("Depression", 
-                                                                     "Depressive symptoms", 
-                                                                     "Major depression"
-                                                                     )))$outcome
-        
-      }else if (outcome == "5"){
-        
-        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause dementia", 
-                                                                    "Alzheimer's disease",
-                                                                    "Parkinson's disease", 
-                                                                    "Vascular dementia")))$outcome
-        
-      }
+      local_outcome_choices <- (uoutcome %>% filter(str_detect(outcome, "cancer") | outcome %in% c("Myeloid leukemia", "Myeloma")))$outcome
       
-      updateSelectInput(session, "in_outcome", 
-                        choices = local_outcome_choices, 
-                        selected = local_outcome_choices[1])
+    }else if (outcome == "4"){
       
-    # }
+      local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("Depression", 
+                                                                   "Depressive symptoms", 
+                                                                   "Major depression"
+      )))$outcome
+      
+    }else if (outcome == "5"){
+      
+      local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause dementia", 
+                                                                   "Alzheimer's disease",
+                                                                   "Parkinson's disease", 
+                                                                   "Vascular dementia")))$outcome
+      
+    }
+    
+    updateSelectInput(session, "in_outcome", 
+                      choices = local_outcome_choices, 
+                      selected = local_outcome_choices[1])
+    
   }
   
 })
