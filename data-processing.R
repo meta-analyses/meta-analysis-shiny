@@ -108,17 +108,13 @@ for (i in unique(raw_data$ref_number)){
             raw_data[!is.na(raw_data$n_baseline) & raw_data$ref_number == i & (!is.na(raw_data$totalpersons)) & (is.na(raw_data$personyrs)) & !(is.na(raw_data$cases)),]$tot_personyrs)
 }
 
-# Replace 'Heart failure' with 'heart failure'
-#raw_data[raw_data$outcome == 'Heart failure',]$outcome <- 'heart failure'
-
- 
 raw_data$outcome <- stringi::stri_trans_totitle(raw_data$outcome, opts_brkiter = stringi::stri_opts_brkiter(type = "sentence"))
+
+raw_data[raw_data$outcome == 'All-cause cvd',]$outcome <- 'All-cause CVD'
 
 # Identify unique outcomes
 uoutcome <- data.frame(outcome = as.character(unique(raw_data$outcome)))
 uoutcome$outcome <- as.character(uoutcome$outcome)
-
-uoutcome$outcome <- stringi::stri_trans_totitle(uoutcome$outcome, opts_brkiter = stringi::stri_opts_brkiter(type = "sentence"))
 
 # Sort
 uoutcome$outcome <- sort(uoutcome$outcome)

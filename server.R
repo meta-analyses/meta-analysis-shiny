@@ -1144,7 +1144,7 @@ shinyServer(function(input, output, session){
       
       if (outcome == "2"){
         
-        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause cvd",
+        local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("All-cause CVD",
                                                                     "Coronary heart disease",
                                                                     "Heart failure",
                                                                     "Stroke")))$outcome
