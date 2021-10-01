@@ -49,11 +49,7 @@ shinyUI(fluidPage(
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE)
     ),
     HTML("<hr>"),
-    uiOutput("lowest_guideline"),
-    HTML("<hr>"),
-    uiOutput("lower_guideline"),
-    HTML("<hr>"),
-    uiOutput("upper_guideline"),
+    DT::dataTableOutput("PIF"),
     HTML("<hr>"),
     DT::dataTableOutput("dose_range")
     )

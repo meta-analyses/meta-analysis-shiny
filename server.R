@@ -644,169 +644,92 @@ shinyServer(function(input, output, session){
     p
   }
   
-  output$lowest_guideline <- renderUI({
+  output$PIF <- DT::renderDataTable({
     
-    input$in_outcome
-    input$in_outcome_type
     input$total_sub_population
     input$in_main_quantile
     
-    isolate({
-      in_outcome <- input$in_outcome
-      in_outcome_type <- input$in_outcome_type
-      total_sub_population <- input$total_sub_population
-      in_main_quantile <- input$in_main_quantile
-    })
+    dat <- data.frame()
     
-    HTML("")
+    sketch = htmltools::withTags(table(
+      class = 'display'))
     
-    if (total_sub_population == "1"){
+    if (req(input$total_sub_population) == "1"){
       acmfdata <- get_overall_data()
       if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
+        
+        # sketch = htmltools::withTags(table(
+        #   class = 'display',
+        #   thead(
+        #     tr(
+        #       th(rowspan = 1, 'Marginal MET hours per week'),
+        #       th(colspan = 1, 'Relative risk and 95% confidence interval')
+        #     )
+        #   )
+        # ))
+        
+        sketch = htmltools::withTags(table(
+          class = 'display',
+          thead(
+            tr(
+              th(rowspan = 1, 'Marginal MET hours per week'),
+              th(colspan = 1, 'Potential Impact Fraction (PIF) and 95% confidence interval')
+            )
+          )
+        ))
+        
+        last_knot <- get_last_knot(acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
         last_knot <- round(last_knot[2], 2)
         
-        HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
-             get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375), 
-             " of all cases could be prevented if all people met half the WHO recommended levels of physical activity (4.375 marginal MET hours per week).")
+        dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), 'PIF' = c(get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375),
+                                                                                          get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75),
+                                                                                          get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5)), check.names = FALSE)
+        
       }
+    }else if(req(input$total_sub_population) == "2"){
       
-    }
-    else{# Sub-population
       m_acmfdata <- get_male_subpopulation_data()
       if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
+        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
         m_last_knot <- round(m_last_knot[2], 2)
       }
       
       w_acmfdata <- get_female_subpopulation_data()
       if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
+        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = input$in_main_quantile %>% as.numeric(), dose_pert = input$in_main_quantile %>% as.numeric())
         w_last_knot <- round(w_last_knot[2], 2)
       }
       
       if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0 &&
           nrow(male_pop_dose_res_data()) > 0 && nrow(female_pop_dose_res_data() > 0)){
         
-        HTML("<b>Potential Impact Fraction (PIF)</b> <br/>",
-             get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 4.375), 
-             " of all cases in <u>men</u></b> and ",
-             get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 4.375),  
-             "of all cases in <u>women</u> could be prevented if all people met half the WHO recommended levels of physical activity (4.375 marginal MET hours per week).")
-      }
-
-    }
-  }) %>% bindCache(input$in_outcome,
-                   input$in_outcome_type,
-                   input$total_sub_population,
-                   input$in_main_quantile)
-  
-  
-  output$lower_guideline <- renderUI({
-    
-    input$in_outcome
-    input$in_outcome_type
-    input$total_sub_population
-    input$in_main_quantile
-    
-    isolate({
-      in_outcome <- input$in_outcome
-      in_outcome_type <- input$in_outcome_type
-      total_sub_population <- input$total_sub_population
-      in_main_quantile <- input$in_main_quantile
-    })
-    
-    HTML("")
-    
-    if (total_sub_population == "1"){
-      acmfdata <- get_overall_data()
-      if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        last_knot <- round(last_knot[2], 2)
-        HTML(get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75), 
-             " of all cases could be prevented if all people met the WHO recommended levels of physical activity (8.75 marginal MET hours per week).")
+        
+        sketch = htmltools::withTags(table(
+          class = 'display',
+          thead(
+            tr(
+              th(rowspan = 2, 'Marginal MET hours per week'),
+              th(colspan = 2, 'Potential Impact Fraction (PIF) and 95% confidence interval')
+            ),
+            tr(
+              lapply(rep(c('Men', 'Women'), 1), th)
+            )
+          )
+        ))
+        
+        dat <- data.frame("Marginal MET hours per week" = c(4.375, 8.75, 17.5), 'Male PIF' = c(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375),
+                                                                                          get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75),
+                                                                                          get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5)),
+                          'Female PIF' = c(get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 4.375),
+                                         get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 8.75),
+                                         get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5)), check.names = FALSE)
       }
       
     }
-    else{# Sub-population
-      
-      m_acmfdata <- get_male_subpopulation_data()
-      if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        m_last_knot <- round(m_last_knot[2], 2)
-      }
-      
-      w_acmfdata <- get_female_subpopulation_data()
-      if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        w_last_knot <- round(w_last_knot[2], 2)
-      }
-      
-      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0 &&
-          nrow(male_pop_dose_res_data()) > 0 && nrow(female_pop_dose_res_data() > 0)){
-        HTML(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 8.75), 
-             " of all cases in <u>men</u></b> and ",
-             get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 8.75),  
-             "of all cases in <u>women</u> could be prevented if all people met the WHO recommended levels of physical activity (8.75 marginal MET hours per week).")
-      }
-    }
-  }) %>% bindCache(input$in_outcome,
-                   input$in_outcome_type,
-                   input$total_sub_population,
-                   input$in_main_quantile)
-  
-  
-  output$upper_guideline <- renderUI({
     
-    input$in_outcome
-    input$in_outcome_type
-    input$total_sub_population
-    input$in_main_quantile
-    
-    isolate({
-      in_outcome <- input$in_outcome
-      in_outcome_type <- input$in_outcome_type
-      total_sub_population <- input$total_sub_population
-      in_main_quantile <- input$in_main_quantile
-    })
-    
-    HTML("")
-    
-    if (total_sub_population == "1"){
-      acmfdata <- get_overall_data()
-      if (!is.null(acmfdata) && nrow(acmfdata) > 0 && nrow(overall_pop_dose_res_data()) > 0){
-        last_knot <- get_last_knot(acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        last_knot <- round(last_knot[2], 2)
-        HTML(get_pif_values(dataset = acmfdata, plot_data = overall_pop_dose_res_data(), last_knot = last_knot , dose_value = 17.5), 
-             " of all cases could be prevented if all people met twice the WHO recommended levels of physical activity (17.5 marginal MET hours per week).")
-      }
-    }
-    else{# Sub-population
-      m_acmfdata <- get_male_subpopulation_data()
-      if (!is.null(m_acmfdata) && nrow(m_acmfdata) > 0){
-        m_last_knot <- get_last_knot(m_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        m_last_knot <- round(m_last_knot[2], 2)
-      }
+    DT::datatable(dat, container = sketch, options = list(paging = F, dom = 't'), rownames = FALSE)
       
-      w_acmfdata <- get_female_subpopulation_data()
-      if (!is.null(w_acmfdata) && nrow(w_acmfdata) > 0){
-        w_last_knot <- get_last_knot(w_acmfdata, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
-        w_last_knot <- round(w_last_knot[2], 2)
-      }
-      
-      if (!is.null(m_acmfdata) && !is.null(w_acmfdata) && nrow(m_acmfdata) > 0 && nrow(w_acmfdata) > 0  &&
-          nrow(male_pop_dose_res_data()) > 0 && nrow(female_pop_dose_res_data() > 0)){
-        HTML(get_pif_values(dataset = m_acmfdata, plot_data = male_pop_dose_res_data(), last_knot = m_last_knot , dose_value = 17.5), 
-             " of all cases in <u>men</u></b> and ",
-             get_pif_values(dataset = w_acmfdata, plot_data = female_pop_dose_res_data(), last_knot = w_last_knot , dose_value = 17.5),  
-             " of all cases in <u>women</u> could be prevented if all people met twice the WHO recommended levels of physical activity (17.5 marginal MET hours per week).")
-      }
-    }
-    
-  }) %>% bindCache(input$in_outcome,
-                   input$in_outcome_type,
-                   input$total_sub_population,
-                   input$in_main_quantile)
+  }) 
   
   output$overall_datatable <- DT::renderDataTable({
     
@@ -1162,7 +1085,7 @@ shinyServer(function(input, output, session){
       
       pert_ls_upper <- ((sum_tp - sum_ls_upper_tp) / sum_tp) * 100
       
-      lower_guideline_value <- paste0(round(pert_ls, 1) , "% (95% CI: ", round(pert_ls_lower, 1), " - ",  round(pert_ls_upper, 1), ")" )
+      lower_guideline_value <- paste0(round(pert_ls, 1) , "% (", round(pert_ls_lower, 1), " - ",  round(pert_ls_upper, 1), ")" )
       
     }
     
