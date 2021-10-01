@@ -727,7 +727,10 @@ shinyServer(function(input, output, session){
       
     }
     
-    DT::datatable(dat, container = sketch, options = list(paging = F, dom = 't'), rownames = FALSE)
+    DT::datatable(dat, container = sketch, caption = tags$caption(
+      style="caption-side: top; text-align: left; margin: 8px 0;",
+      "% prevented cases at three WHO recommended levels (half, full and double) of physical activity"
+    ), options = list(paging = F, dom = 't'), rownames = FALSE)
       
   }) 
   
