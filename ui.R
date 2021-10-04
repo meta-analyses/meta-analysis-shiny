@@ -36,7 +36,7 @@ shinyUI(fluidPage(
     selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome,
                 selected = uoutcome$outcome[[which(uoutcome$outcome == "All-cause mortality")]]),
     fluidRow(
-      column(4, radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type)),
+      column(4, radioButtons(inputId = "in_outcome_type", label = "Outcome type:", choices =  outcome_type, selected = outcome_type[2])),
       column(4, radioButtons("total_sub_population", "Population: ", total_sub_population)),
       column(4, with_tippy(radioButtons(inputId = "in_main_quantile", label = "Last knot (person years quantiles)",
                  c("0.75",
