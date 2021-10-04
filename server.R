@@ -72,18 +72,11 @@ shinyServer(function(input, output, session){
       
       # Add additional "fatal" studies that had no "both" types
       if (local_outcome_type == "Fatal-and-non-fatal") {
+        
         # Subset fatal types
         add_fdata <- subset(raw_data_tp_ltpa, outcome == local_outcome & 
                               pa_domain_subgroup == local_pa_domain_subgroup & 
                               outcome_type == "Fatal")
-        # ONLY add those studies that have no "both" studies
-        add_fdata <- subset(add_fdata, !id %in% acmfdata$id)
-        # Add additional rows
-        if (nrow(add_fdata) > 0) {
-          # if (nrow(acmfdata) == 0)
-          #  next()
-          acmfdata <- rbind(acmfdata, add_fdata)
-        }
         
         # Subset Non-fatal types
         add_nfdata <- subset(raw_data_tp_ltpa, outcome == local_outcome & 
@@ -91,7 +84,22 @@ shinyServer(function(input, output, session){
                                outcome_type == "Non-fatal")
         
         # ONLY add those studies that have no "both" studies
+        add_fdata <- subset(add_fdata, !id %in% acmfdata$id)
+        # ONLY add those studies that have no "both" studies
         add_nfdata <- subset(add_nfdata, !id %in% acmfdata$id)
+        
+        # Add logic to return an empty data frame when Fatal-and-non-fatal and Non-fatal are both empty. Solves #25 issue
+        if (nrow(acmfdata) == 0 && nrow(add_nfdata) == 0){
+          return(data.frame())
+        }
+        
+        # Add additional rows
+        if (nrow(add_fdata) > 0) {
+          # if (nrow(acmfdata) == 0)
+          #  next()
+          acmfdata <- rbind(acmfdata, add_fdata)
+        }
+        
         # Add additional rows
         if (nrow(add_nfdata) > 0) {
           acmfdata <- rbind(acmfdata, add_nfdata)
