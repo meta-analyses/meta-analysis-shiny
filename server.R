@@ -533,7 +533,6 @@ shinyServer(function(input, output, session){
       gg <- ggplot(data = dataset) +
         geom_line(aes(dose, RR, col = ref_number, group = ref_number)) +
         geom_point(aes(dose, RR, col = ref_number, label = first_author, group = personyrs), size = 4 * (dataset$personyrs - min(dataset$personyrs)) / diff(range(dataset$personyrs))) +
-        geom_density(aes(dose * totalpersons/ sum(totalpersons, na.rm = T), y = ..scaled.., fill = "red"), size = 0.2, alpha = 0.4 ) +
         geom_vline(xintercept = q, linetype = "dotted", alpha = 0.6) +
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
@@ -1277,11 +1276,10 @@ shinyServer(function(input, output, session){
       total_sub_population <- input$total_sub_population
     })
     
+    plot_data <- data.frame()
+    
     if (total_sub_population == "1"){
       plot_data <- get_overall_data()
-      
-      plot_data$population <- "Total (men and women)"
-      
     }
     else{# Sub-population
       plot_m_data <- get_male_subpopulation_data()
@@ -1304,9 +1302,11 @@ shinyServer(function(input, output, session){
         
       }
       
-    }else{
+    }else if (total_sub_population == "1"){
       
       if (!is.null(plot_data) && nrow(plot_data) > 0){
+        
+        plot_data$population <- "Total (men and women)"
         
         get_dose_distr(plot_data)
       }else{
@@ -1319,9 +1319,7 @@ shinyServer(function(input, output, session){
     
   }) %>% bindCache(input$in_outcome,
                    input$in_outcome_type,
-                   input$total_sub_population,
-                   input$in_main_quantile,
-                   input$plot_options)
+                   input$total_sub_population)
   
   
   get_dose_distr <- function(dataset){
