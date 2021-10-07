@@ -31,7 +31,6 @@ shinyUI(fluidPage(
   , "Meta-Analyses Physical Activity"),
   width="100%", height="100%",
   sidebarPanel(
-    div(
     radioButtons(inputId = "in_outcome_cat", label = "Outcome category:", choices =  broad_outcomes, inline = TRUE),
     selectInput(inputId = "in_outcome", label = "Outcome:", choices =  uoutcome$outcome,
                 selected = uoutcome$outcome[[which(uoutcome$outcome == "All-cause mortality")]]),
@@ -53,9 +52,11 @@ shinyUI(fluidPage(
     HTML("<hr>"),
     DT::dataTableOutput("PIF"),
     HTML("<hr>"),
-    DT::dataTableOutput("dose_range")
-    )
-    
+    DT::dataTableOutput("dose_range"),
+    shinyBS::bsCollapsePanel("Dose distribution", "This shows distribution of Marginal MET hours per week, normalized by total persons in each category",
+                             uiOutput("generic_warning_message"), 
+                             DT::dataTableOutput("dose_distr"),
+                             plotlyOutput("dose_distr_plot"))
   ),
   
   mainPanel(
