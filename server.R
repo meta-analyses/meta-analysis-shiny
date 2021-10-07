@@ -492,6 +492,26 @@ shinyServer(function(input, output, session){
     fig_title
   }
   
+  get_short_title  <- function(dataset, pop_type ){
+    fig_title <- ""
+    
+    if (nrow(dataset) > 0){
+      outcome_type <- ""
+      
+      if (input$in_outcome_type != "all"){
+        outcome_type <- paste(input$in_outcome_type, "- ")
+        
+      }
+      
+      fig_title <- input$in_outcome
+      
+      fig_title <- paste0(input$in_outcome, " (", tolower(input$in_outcome_type), ")")#,  
+                          #" & Total-persons: ", format(round(sum(dataset$totalpersons, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
+      
+    }
+    fig_title
+  }
+  
   
   get_ind_plot <- function (dataset, q, plot_title){
     
@@ -1235,12 +1255,14 @@ shinyServer(function(input, output, session){
     
     # Empty the warning message - as some lines have been selected by the user
     output$generic_warning_message <- renderUI("")
-    DT::datatable(overall_data,
-                  extensions = 'Buttons',
-                  escape = FALSE,
-                  rownames = FALSE,
-                  options = list(dom = 't',
-                                 scrollX = TRUE))
+    DT::datatable(overall_data, caption = tags$caption(
+      style="caption-side: top; text-align: left; margin: 8px 0;",
+      "Distribution of Marginal MET hours per week for ", get_short_title(overall_data)),
+      extensions = 'Buttons',
+      escape = FALSE,
+      rownames = FALSE,
+      options = list(dom = 't',
+                     scrollX = TRUE))
   })
   
   output$dose_distr_plot <- renderPlotly({
