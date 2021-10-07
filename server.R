@@ -510,9 +510,10 @@ shinyServer(function(input, output, session){
       ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(dose) %>% min(na.rm = T) %>% as.numeric()
       
       # Create plot
-      gg <- ggplot() +
-        geom_line(data = dataset, aes(dose, RR, col = ref_number, group = ref_number)) +
-        geom_point(data = dataset, aes(dose, RR, col = ref_number, label = first_author, group = personyrs), size = 4 * (dataset$personyrs - min(dataset$personyrs)) / diff(range(dataset$personyrs))) +
+      gg <- ggplot(data = dataset) +
+        geom_line(aes(dose, RR, col = ref_number, group = ref_number)) +
+        geom_point(aes(dose, RR, col = ref_number, label = first_author, group = personyrs), size = 4 * (dataset$personyrs - min(dataset$personyrs)) / diff(range(dataset$personyrs))) +
+        geom_density(aes(dose * totalpersons/ sum(totalpersons, na.rm = T), y = ..scaled.., fill = "red"), size = 0.2, alpha = 0.4 ) +
         geom_vline(xintercept = q, linetype = "dotted", alpha = 0.6) +
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
@@ -1173,5 +1174,163 @@ shinyServer(function(input, output, session){
                       selected = local_outcome_choices[1])
     
   }
+  
+  output$dose_distr <- DT::renderDataTable({
+    
+    if (input$total_sub_population == "1"){
+      overall_data <- get_overall_data()
+      
+    }
+    else{# Sub-population
+      overall_data <- get_male_subpopulation_data()
+    }
+    
+    if(is.null(overall_data) || nrow(overall_data) <= 0){
+      # Set the warning message that no lines have been selected by the user
+      output$generic_warning_message <- renderUI(HTML("<strong>No data available </strong>"))
+      # Return an empty data.frame
+      return(data.frame(File=character()))
+    }
+    
+    overall_data <- subset(overall_data, select = c(dose, totalpersons)) %>% 
+      mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T)) %>% 
+      dplyr::select(-c(dose, totalpersons)) %>% filter(!is.na(weighted_dose))
+    
+    overall_data <- as.data.frame(do.call(cbind, lapply(overall_data, summary)))
+    td <- overall_data
+    overall_data <- as.data.frame(lapply(overall_data, function(x) round(as.numeric(as.character(x)), 3)))
+    rownames(overall_data) <- rownames(td)
+    
+    temp_rnames <- rownames(overall_data)
+    
+    rownames(overall_data) <- temp_rnames
+    
+    overall_data <- overall_data %>% rownames_to_column("summary") %>% pivot_wider(names_from = summary, values_from = weighted_dose)
+    
+    if (input$total_sub_population == "2"){
+      female_overall_data <- get_female_subpopulation_data()
+    
+      female_overall_data <- subset(female_overall_data, select = c(dose, totalpersons)) %>% 
+        mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T)) %>% 
+        dplyr::select(-c(dose, totalpersons)) %>% filter(!is.na(weighted_dose))
+      
+      female_overall_data <- as.data.frame(do.call(cbind, lapply(female_overall_data, summary)))
+      td <- female_overall_data
+      female_overall_data <- as.data.frame(lapply(female_overall_data, function(x) round(as.numeric(as.character(x)), 3)))
+      rownames(female_overall_data) <- rownames(td)
+      
+      temp_rnames <- rownames(female_overall_data)
+      
+      rownames(female_overall_data) <- temp_rnames
+      
+      female_overall_data <- female_overall_data %>% rownames_to_column("summary") %>% pivot_wider(names_from = summary, values_from = weighted_dose)
+      
+      overall_data <- rbind(overall_data, female_overall_data)
+      
+      overall_data <- cbind(data.frame("Population" = c("Men", "Women")), overall_data, row.names = NULL)
+    
+    }
+    
+    fname <- "total_population_dose_distr"
+    
+    # Empty the warning message - as some lines have been selected by the user
+    output$generic_warning_message <- renderUI("")
+    DT::datatable(overall_data,
+                  extensions = 'Buttons',
+                  escape = FALSE,
+                  rownames = FALSE,
+                  options = list(dom = 't',
+                                 scrollX = TRUE))
+  })
+  
+  output$dose_distr_plot <- renderPlotly({
+    
+    input$in_outcome
+    input$in_outcome_type
+    input$total_sub_population
+    
+    isolate({
+      in_outcome <- input$in_outcome
+      in_outcome_type <- input$in_outcome_type
+      total_sub_population <- input$total_sub_population
+    })
+    
+    if (total_sub_population == "1"){
+      plot_data <- get_overall_data()
+      
+      plot_data$population <- "Total (men and women)"
+      
+    }
+    else{# Sub-population
+      plot_m_data <- get_male_subpopulation_data()
+      plot_w_data <- get_female_subpopulation_data()
+    }
+    
+    if (total_sub_population == "2"){
+      
+      if (!is.null(plot_m_data) && nrow(plot_m_data) > 0 &&
+          !is.null(plot_w_data) && nrow(plot_w_data) > 0){
+        
+        plot_m_data$population <- "Men"
+        
+        plot_w_data$population <- "Women"
+        
+        get_dose_distr(rbind(plot_m_data, plot_w_data))
+      }else{
+        
+        get_dose_distr(NULL)
+        
+      }
+      
+    }else{
+      
+      if (!is.null(plot_data) && nrow(plot_data) > 0){
+        
+        get_dose_distr(plot_data)
+      }else{
+        
+        get_dose_distr(NULL)
+        
+      }
+      
+    }
+    
+  }) %>% bindCache(input$in_outcome,
+                   input$in_outcome_type,
+                   input$total_sub_population,
+                   input$in_main_quantile,
+                   input$plot_options)
+  
+  
+  get_dose_distr <- function(dataset){
+    
+    if (!is.null(dataset) && nrow(dataset) > 0){
+      dataset$wdose <- dataset$dose * dataset$totalpersons/ sum(dataset$totalpersons, na.rm = T)
+      dataset <- dataset %>% filter(!is.na(wdose))
+      gg <- ggplot(data = dataset) +
+        geom_density(aes(wdose, y = ..scaled.., fill = population), size = 0.2, alpha = 0.4) +
+        theme(legend.position = "bottom") +
+        xlab("Marginal MET hours per week") +
+        ylab("Density")
+      
+      # plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+      # plot.title = element_text(size = 12, colour = "black", vjust = 7),
+      # plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
+      
+    }else{
+      gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
+        theme(
+          plot.margin = unit(c(2, 1, 1, 1), "cm"), 
+          plot.title = element_text(size = 12, colour = "red", vjust = 7),
+          plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="red"),
+          legend.direction = "horizontal",
+          legend.position = c(0.1, 1.05)) +
+        labs (title = "Sorry no data is available")
+    }
+    
+    ggplotly(gg) %>%
+      layout(legend = list(orientation = "h", x = 0.4))
+  }
+  
   
 })
