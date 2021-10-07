@@ -3,6 +3,7 @@ pkgs <- c(
   "ggplot2",
   "plotly",
   "shiny",
+  "shinyBS",
   "tippy"#,
 )
 # Which packages do we require?
