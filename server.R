@@ -1291,9 +1291,13 @@ shinyServer(function(input, output, session){
       if (!is.null(plot_m_data) && nrow(plot_m_data) > 0 &&
           !is.null(plot_w_data) && nrow(plot_w_data) > 0){
         
-        plot_m_data$population <- "Men"
+        plot_m_data <- plot_m_data %>% 
+          mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T), 
+                 population  = "Men") %>% filter(!is.na(weighted_dose))
         
-        plot_w_data$population <- "Women"
+        plot_w_data <- plot_w_data %>% 
+          mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T), 
+                 population  = "Women") %>% filter(!is.na(weighted_dose))
         
         get_dose_distr(rbind(plot_m_data, plot_w_data))
       }else{
@@ -1306,7 +1310,9 @@ shinyServer(function(input, output, session){
       
       if (!is.null(plot_data) && nrow(plot_data) > 0){
         
-        plot_data$population <- "Total (men and women)"
+        plot_data <- plot_data %>% 
+          mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T), 
+                 population  = "Total (men and women)") %>% filter(!is.na(weighted_dose))
         
         get_dose_distr(plot_data)
       }else{
@@ -1325,10 +1331,9 @@ shinyServer(function(input, output, session){
   get_dose_distr <- function(dataset){
     
     if (!is.null(dataset) && nrow(dataset) > 0){
-      dataset$wdose <- dataset$dose * dataset$totalpersons/ sum(dataset$totalpersons, na.rm = T)
-      dataset <- dataset %>% filter(!is.na(wdose))
+      
       gg <- ggplot(data = dataset) +
-        geom_density(aes(wdose, y = ..scaled.., fill = population), size = 0.2, alpha = 0.4) +
+        geom_density(aes(weighted_dose, y = ..scaled.., fill = population), size = 0.2, alpha = 0.4) +
         theme(legend.position = "bottom") +
         xlab("Marginal MET hours per week") +
         ylab("Density")
