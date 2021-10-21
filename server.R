@@ -502,20 +502,8 @@ shinyServer(function(input, output, session){
   
   get_short_title  <- function(dataset, pop_type ){
     fig_title <- ""
-    
     if (nrow(dataset) > 0){
-      outcome_type <- ""
-      
-      if (input$in_outcome_type != "all"){
-        outcome_type <- paste(input$in_outcome_type, "- ")
-        
-      }
-      
-      fig_title <- input$in_outcome
-      
-      fig_title <- paste0(input$in_outcome, " (", tolower(input$in_outcome_type), ")")#,  
-                          #" & Total-persons: ", format(round(sum(dataset$totalpersons, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
-      
+      fig_title <- ifelse(input$in_outcome_cat == 1, input$in_outcome, paste0(input$in_outcome, " (", tolower(input$in_outcome_type), ")"))
     }
     fig_title
   }
