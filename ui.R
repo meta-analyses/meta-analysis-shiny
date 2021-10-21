@@ -53,7 +53,7 @@ shinyUI(fluidPage(
     DT::dataTableOutput("PIF"),
     HTML("<hr>"),
     DT::dataTableOutput("dose_range"),
-    shinyBS::bsCollapsePanel("Dose distribution", "This shows distribution of Marginal MET hours per week, normalized by total persons in each category",
+    shinyBS::bsCollapsePanel("Dose distribution", "This shows distribution of Marginal MET hours per week",
                              uiOutput("generic_warning_message"), 
                              DT::dataTableOutput("dose_distr"),
                              plotlyOutput("dose_distr_plot"))
