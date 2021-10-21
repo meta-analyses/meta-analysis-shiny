@@ -1219,9 +1219,7 @@ shinyServer(function(input, output, session){
       return(data.frame(File=character()))
     }
     
-    overall_data <- subset(overall_data, select = c(dose, totalpersons)) %>% 
-      mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T)) %>% 
-      dplyr::select(-c(dose, totalpersons)) %>% filter(!is.na(weighted_dose))
+    overall_data <- subset(overall_data, select = dose) %>% filter(!is.na(dose))
     
     overall_data <- as.data.frame(do.call(cbind, lapply(overall_data, summary)))
     td <- overall_data
@@ -1232,14 +1230,12 @@ shinyServer(function(input, output, session){
     
     rownames(overall_data) <- temp_rnames
     
-    overall_data <- overall_data %>% rownames_to_column("summary") %>% pivot_wider(names_from = summary, values_from = weighted_dose)
+    overall_data <- overall_data %>% rownames_to_column("summary") %>% pivot_wider(names_from = summary, values_from = dose)
     
     if (input$total_sub_population == "2"){
       female_overall_data <- get_female_subpopulation_data()
     
-      female_overall_data <- subset(female_overall_data, select = c(dose, totalpersons)) %>% 
-        mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T)) %>% 
-        dplyr::select(-c(dose, totalpersons)) %>% filter(!is.na(weighted_dose))
+      female_overall_data <- subset(female_overall_data, select = dose) %>% filter(!is.na(dose))
       
       female_overall_data <- as.data.frame(do.call(cbind, lapply(female_overall_data, summary)))
       td <- female_overall_data
@@ -1250,7 +1246,7 @@ shinyServer(function(input, output, session){
       
       rownames(female_overall_data) <- temp_rnames
       
-      female_overall_data <- female_overall_data %>% rownames_to_column("summary") %>% pivot_wider(names_from = summary, values_from = weighted_dose)
+      female_overall_data <- female_overall_data %>% rownames_to_column("summary") %>% pivot_wider(names_from = summary, values_from = dose)
       
       overall_data <- rbind(overall_data, female_overall_data)
       
@@ -1300,12 +1296,10 @@ shinyServer(function(input, output, session){
           !is.null(plot_w_data) && nrow(plot_w_data) > 0){
         
         plot_m_data <- plot_m_data %>% 
-          mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T), 
-                 population  = "Men") %>% filter(!is.na(weighted_dose))
+          mutate(population  = "Men") %>% filter(!is.na(dose))
         
         plot_w_data <- plot_w_data %>% 
-          mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T), 
-                 population  = "Women") %>% filter(!is.na(weighted_dose))
+          mutate(population  = "Women") %>% filter(!is.na(dose))
         
         get_dose_distr(rbind(plot_m_data, plot_w_data))
       }else{
@@ -1319,8 +1313,7 @@ shinyServer(function(input, output, session){
       if (!is.null(plot_data) && nrow(plot_data) > 0){
         
         plot_data <- plot_data %>% 
-          mutate(weighted_dose = dose * totalpersons/ sum(totalpersons, na.rm = T), 
-                 population  = "Total (men and women)") %>% filter(!is.na(weighted_dose))
+          mutate(population  = "Total (men and women)") %>% filter(!is.na(dose))
         
         get_dose_distr(plot_data)
       }else{
@@ -1341,10 +1334,12 @@ shinyServer(function(input, output, session){
     if (!is.null(dataset) && nrow(dataset) > 0){
       
       gg <- ggplot(data = dataset) +
-        geom_density(aes(weighted_dose, y = ..scaled.., fill = population), size = 0.2, alpha = 0.4) +
-        theme(legend.position = "bottom") +
-        xlab("Marginal MET hours per week") +
-        ylab("Density")
+        geom_density(aes(dose, y = ..scaled.., fill = population), size = 0.2, alpha = 0.4) +
+        theme(legend.position = "bottom", 
+              legend.box = "horizontal",
+              legend.direction = "horizontal") +
+        labs(title = "Marginal MET hours per week") +
+        ylab("Density") + xlab("")
       
       # plot.margin = unit(c(2, 1, 1, 1), "cm"), 
       # plot.title = element_text(size = 12, colour = "black", vjust = 7),
@@ -1356,13 +1351,18 @@ shinyServer(function(input, output, session){
           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
           plot.title = element_text(size = 12, colour = "red", vjust = 7),
           plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="red"),
-          legend.direction = "horizontal",
-          legend.position = c(0.1, 1.05)) +
+          legend.direction = "horizontal", 
+          legend.box = "horizontal",
+          legend.position = "bottom") +
         labs (title = "Sorry no data is available")
     }
     
-    ggplotly(gg) %>%
-      layout(legend = list(orientation = "h", x = 0.4))
+    ggplotly(gg) %>% 
+      layout(
+        legend = list(
+          orientation = "h")
+      )
+    
   }
   
   
