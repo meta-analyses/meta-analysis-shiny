@@ -817,7 +817,9 @@ shinyServer(function(input, output, session){
     }
     
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(ref_number, first_author, effect_measure, totalpersons, personyrs, cases, dose, RR, lci_effect, uci_effect))
+    sub_population_data <- subset(sub_population_data, select = c(ref_number, first_author, effect_measure, totalpersons, 
+                                                                  dose, personyrs, cases, 
+                                                                  RR, lci_effect, uci_effect))
     
     # Remove gender specific suffix from ref_number
     sub_population_data$ref_number <- sapply(strsplit(sub_population_data$ref_number,"-"), `[`, 1)
@@ -862,7 +864,9 @@ shinyServer(function(input, output, session){
     }
     
     # Subset by columns
-    sub_population_data <- subset(sub_population_data, select = c(ref_number, first_author, effect_measure, totalpersons, personyrs, dose, cases, RR, lci_effect, uci_effect))
+    sub_population_data <- subset(sub_population_data, select = c(ref_number, first_author, effect_measure, totalpersons, 
+                                                                  dose, personyrs, cases, 
+                                                                  RR, lci_effect, uci_effect))
     
     # Round relevant columns
     sub_population_data$totalpersons <- round(sub_population_data$totalpersons)
@@ -1207,6 +1211,8 @@ shinyServer(function(input, output, session){
       return(data.frame(File=character()))
     }
     
+    browser()
+    
     overall_data <- subset(overall_data, select = dose) %>% filter(!is.na(dose))
     
     overall_data <- as.data.frame(do.call(cbind, lapply(overall_data, summary)))
@@ -1239,7 +1245,7 @@ shinyServer(function(input, output, session){
       overall_data <- rbind(overall_data, female_overall_data)
       
       overall_data <- cbind(data.frame("Population" = c("Men", "Women")), overall_data, row.names = NULL)
-    
+      
     }
     
     fname <- "total_population_dose_distr"
