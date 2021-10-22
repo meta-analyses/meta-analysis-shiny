@@ -25,7 +25,7 @@ broad_outcomes <- c("All-cause mortality" = 1,
 
 shinyUI(fluidPage(
   titlePanel(fluidRow(
-    column(4, tags$a(img(src="mrc-cam.png", style = "height:50px"), href="http://www.mrc-epid.cam.ac.uk", target="_blank", align="left")),
+    column(4, tags$a(img(src="MRCEpid_core_logo2021_RGB.png", style = "height:50px"), href="http://www.mrc-epid.cam.ac.uk", target="_blank", align="left")),
     column(2, offset = 6, div(tags$a(img(src="cedar.png", style = "height:50px"), href="http://www.cedar.iph.cam.ac.uk/", target="_blank")), align="right")
   )
   , "Meta-Analyses Physical Activity"),
