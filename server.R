@@ -431,7 +431,7 @@ shinyServer(function(input, output, session){
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
-          get_DR_plot(dataset = plot_data, q = q, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", in_outcome, in_outcome_type)
+          get_DR_plot(dataset = plot_data, q = q, main_quantile = in_main_quantile, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", in_outcome, in_outcome_type)
           
         }else{
           
@@ -441,7 +441,7 @@ shinyServer(function(input, output, session){
           
           fig_title <- paste0(gt, " - ", fig_title)
           
-          get_DR_plot(dataset = NULL, q = NULL, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", in_outcome, in_outcome_type)
+          get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", in_outcome, in_outcome_type)
           
         }
         
