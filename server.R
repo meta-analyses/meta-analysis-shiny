@@ -311,10 +311,10 @@ shinyServer(function(input, output, session){
         
         to_download$top_plot_data <<- acmfdata
         
-        get_ind_plot(acmfdata, q, plot_title = p_title)
+        get_ind_plot(acmfdata, q, main_quantile = in_main_quantile, plot_title = p_title)
       }else{
         
-        get_ind_plot(NULL, 0, "")
+        get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "")
         
       }
       
@@ -405,10 +405,10 @@ shinyServer(function(input, output, session){
         
         to_download$bottom_plot_data <<- acmfdata
         
-        get_ind_plot(acmfdata, q, plot_title = p_title)
+        get_ind_plot(acmfdata, q, main_quantile = in_main_quantile, plot_title = p_title)
       }else{
         
-        get_ind_plot(NULL, 0, "")
+        get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "")
       }
       
     }
@@ -458,11 +458,11 @@ shinyServer(function(input, output, session){
           
           to_download$bottom_plot_data <<- sub_pop_data
           
-          get_ind_plot(sub_pop_data, q, plot_title = p_title)
+          get_ind_plot(sub_pop_data, q, main_quantile = in_main_quantile, plot_title = p_title)
         }
         
         else{
-          get_ind_plot(NULL, 0, "")
+          get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "")
         }
       }
     }
@@ -509,7 +509,7 @@ shinyServer(function(input, output, session){
   }
   
   
-  get_ind_plot <- function (dataset, q, plot_title){
+  get_ind_plot <- function (dataset, q, main_quantile, plot_title){
     
     if (!is.null(dataset) && nrow(dataset) > 0){
       
@@ -550,24 +550,25 @@ shinyServer(function(input, output, session){
         ylab("Relative Risk") +
         labs(title = paste(plot_title))
       
+      # Remove 0th percentile
+      q <- q[-c(1)]
       
-      # qdf <- q %>% as.data.frame()
-      # names(qdf) <- 'val'
-      # 
-      # p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
-      #                                       y = 0.8,
-      #                                       text = paste0("Person Years (", names(q), ")"),
-      #                                       xref = "x",
-      #                                       yref = "y",
-      #                                       showarrow = TRUE,
-      #                                       arrowhead = 4,
-      #                                       arrowsize = .5,
-      #                                       ax = 20,
-      #                                       ay = -40,
-      #                                       font=list(size = 7))
+      qdf <- q %>% as.data.frame()
+      names(qdf) <- 'val'
       
-      p <- ggplotly(gg)
+      qdf$pyq <- paste0(c(main_quantile %>% as.numeric() / 2  * 100, main_quantile %>% as.numeric() * 100), "%")
       
+      p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
+                                            y = min(layer_scales(gg)$y$get_limits()),
+                                            text = paste0("person-years (", qdf$pyq, ")"),
+                                            xref = "x",
+                                            yref = "y",
+                                            showarrow = TRUE,
+                                            arrowhead = 4,
+                                            arrowsize = .5,
+                                            ax = 20,
+                                            ay = -40,
+                                            font=list(size = 9))
       
     }else{
       gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
