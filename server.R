@@ -1216,8 +1216,6 @@ shinyServer(function(input, output, session){
       return(data.frame(File=character()))
     }
     
-    browser()
-    
     overall_data <- subset(overall_data, select = dose) %>% filter(!is.na(dose))
     
     overall_data <- as.data.frame(do.call(cbind, lapply(overall_data, summary)))
