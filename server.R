@@ -647,7 +647,7 @@ shinyServer(function(input, output, session){
       
       p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
                                             y = ymin,
-                                            text = paste0("person-years(", qdf$pyq, ")"),
+                                            text = paste0("person-years (", qdf$pyq, ")"),
                                             xref = "x",
                                             yref = "y",
                                             showarrow = TRUE,
@@ -655,7 +655,7 @@ shinyServer(function(input, output, session){
                                             arrowsize = .5,
                                             ax = 20,
                                             ay = -40,
-                                            font=list(size = 7))
+                                            font=list(size = 9))
       
     }else{
       gg <- ggplot(data.frame()) + geom_point() + xlim(0, 100) + ylim(0, 1) + 
