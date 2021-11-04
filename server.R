@@ -637,6 +637,9 @@ shinyServer(function(input, output, session){
           geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10)
       }
       
+      # Remove 0th percentile
+      q <- q[-c(1)]
+      
       qdf <- q %>% as.data.frame()
       names(qdf) <- 'val'
       
