@@ -353,13 +353,13 @@ shinyServer(function(input, output, session){
           fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\nNumber of entries: ",  length(unique(acmfdata$id)) , 
                               " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
           
-          get_DR_plot(dataset = plot_data, q = q, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
+          get_DR_plot(dataset = plot_data, q = q, main_quantile = in_main_quantile, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
         }else
-          get_DR_plot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
+          get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  "", pop_title, in_outcome, outcome_type)
         
       }else{
         
-        get_DR_plot(dataset = NULL, q = NULL, plotTitle =  "", pop_title, in_outcome, outcome_type)
+        get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  "", pop_title, in_outcome, outcome_type)
       }
       
     }
@@ -587,7 +587,7 @@ shinyServer(function(input, output, session){
   }
   
   
-  get_DR_plot <- function (dataset, q, plotTitle, pop_type , outcome, outcome_type ){
+  get_DR_plot <- function (dataset, q, main_quantile, plotTitle, pop_type , outcome, outcome_type ){
     
     if (!is.null(dataset) && nrow(dataset) > 0){
       
@@ -640,9 +640,11 @@ shinyServer(function(input, output, session){
       qdf <- q %>% as.data.frame()
       names(qdf) <- 'val'
       
+      qdf$pyq <- paste0(c(main_quantile %>% as.numeric() / 2  * 100, main_quantile %>% as.numeric() * 100), "%")
+      
       p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
                                             y = ymin,
-                                            text = paste0("Person Years (", names(q), ")"),
+                                            text = paste0("person-years(", qdf$pyq, ")"),
                                             xref = "x",
                                             yref = "y",
                                             showarrow = TRUE,
