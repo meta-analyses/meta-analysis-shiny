@@ -46,17 +46,17 @@ shinyUI(fluidPage(
       ),
     conditionalPanel(
       condition = "input.total_sub_population != 1",
-      HTML("<hr>"),
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE)
     ),
-    HTML("<hr>"),
-    DT::dataTableOutput("PIF"),
-    HTML("<hr>"),
-    DT::dataTableOutput("dose_range"),
+    shinyBS::bsCollapse(shinyBS::bsCollapsePanel("Potential Impact Fraction (PIF)", 
+                                                 DT::dataTableOutput("PIF"),
+                                                 DT::dataTableOutput("dose_range")
+    ),
     shinyBS::bsCollapsePanel("Dose distribution", "This shows distribution of Marginal MET hours per week",
                              uiOutput("generic_warning_message"), 
                              DT::dataTableOutput("dose_distr"),
                              plotlyOutput("dose_distr_plot"))
+    )
   ),
   
   mainPanel(
