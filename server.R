@@ -1336,7 +1336,7 @@ shinyServer(function(input, output, session){
         theme(legend.position = "top", 
               legend.box = "horizontal",
               legend.direction = "horizontal") +
-        labs(title = "Marginal MET hours per week") +
+        labs(title = "Marginal MET hours per week", fill="") +
         ylab("Density") + xlab("Marginal MET hours per week")
       
       # plot.margin = unit(c(2, 1, 1, 1), "cm"), 
