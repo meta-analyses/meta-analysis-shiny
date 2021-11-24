@@ -1333,11 +1333,11 @@ shinyServer(function(input, output, session){
       
       gg <- ggplot(data = dataset) +
         geom_density(aes(dose, y = ..scaled.., fill = population), size = 0.2, alpha = 0.4) +
-        theme(legend.position = "bottom", 
+        theme(legend.position = "top", 
               legend.box = "horizontal",
               legend.direction = "horizontal") +
         labs(title = "Marginal MET hours per week") +
-        ylab("Density") + xlab("")
+        ylab("Density") + xlab("Marginal MET hours per week")
       
       # plot.margin = unit(c(2, 1, 1, 1), "cm"), 
       # plot.title = element_text(size = 12, colour = "black", vjust = 7),
@@ -1356,10 +1356,7 @@ shinyServer(function(input, output, session){
     }
     
     ggplotly(gg) %>% 
-      layout(
-        legend = list(
-          orientation = "h")
-      )
+      layout(legend = list(x = 0.9, y = 0.9))
     
   }
   
