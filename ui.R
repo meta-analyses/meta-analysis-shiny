@@ -44,6 +44,8 @@ shinyUI(fluidPage(
              "Knots are where we allow shape changes. Using person years (%), it is at three locations (0th, 37.5th and 75th, as an example) ", 
              placement = "top"))
       ),
+    
+    fluidRow(column(4, checkboxInput(inputId = "y_axis_log10", label = "logarithmic y-axis (log10)", value = TRUE))),
     conditionalPanel(
       condition = "input.total_sub_population != 1",
       radioButtons("plot_options", "Plot options: ", plot_options, inline = TRUE)
