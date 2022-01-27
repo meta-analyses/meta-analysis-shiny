@@ -275,6 +275,7 @@ shinyServer(function(input, output, session){
     input$total_sub_population
     input$in_main_quantile
     input$plot_options
+    input$y_axis_log10
     
     isolate({
       in_outcome <- input$in_outcome
@@ -282,6 +283,7 @@ shinyServer(function(input, output, session){
       total_sub_population <- input$total_sub_population
       in_main_quantile <- input$in_main_quantile
       plot_options <- input$plot_options
+      y_axis_log10 <- input$y_axis_log10
     })
     
     pop_title <- "Total Population"
@@ -311,10 +313,10 @@ shinyServer(function(input, output, session){
         
         to_download$top_plot_data <<- acmfdata
         
-        get_ind_plot(acmfdata, q, main_quantile = in_main_quantile, plot_title = p_title)
+        get_ind_plot(acmfdata, q, main_quantile = in_main_quantile, plot_title = p_title, log_scale = y_axis_log10)
       }else{
         
-        get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "")
+        get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "", log_scale = y_axis_log10)
         
       }
       
@@ -353,13 +355,14 @@ shinyServer(function(input, output, session){
           fig_title <- paste0(pop_title, " - ", outcome_type,  fig_title, "\nNumber of entries: ",  length(unique(acmfdata$id)) , 
                               " & Person-years: ", format(round(sum(acmfdata$personyrs, na.rm = TRUE)), scientific = FALSE, big.mark = ','))
           
-          get_DR_plot(dataset = plot_data, q = q, main_quantile = in_main_quantile, plotTitle = fig_title, pop_title, in_outcome, outcome_type)
+          get_DR_plot(dataset = plot_data, q = q, main_quantile = in_main_quantile, plotTitle = fig_title, pop_title, in_outcome, outcome_type, 
+                      log_scale = y_axis_log10)
         }else
-          get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  "", pop_title, in_outcome, outcome_type)
+          get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  "", pop_title, in_outcome, outcome_type, log_scale = y_axis_log10)
         
       }else{
         
-        get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  "", pop_title, in_outcome, outcome_type)
+        get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  "", pop_title, in_outcome, outcome_type, log_scale = y_axis_log10)
       }
       
     }
@@ -368,7 +371,8 @@ shinyServer(function(input, output, session){
                    input$in_outcome_type,
                    input$total_sub_population,
                    input$in_main_quantile,
-                   input$plot_options)
+                   input$plot_options,
+                   input$y_axis_log10)
   
   
   output$bottom_plot <- renderPlotly({
@@ -378,6 +382,7 @@ shinyServer(function(input, output, session){
     input$total_sub_population
     input$in_main_quantile
     input$plot_options
+    input$y_axis_log10
     
     isolate({
       in_outcome <- input$in_outcome
@@ -385,7 +390,9 @@ shinyServer(function(input, output, session){
       total_sub_population <- input$total_sub_population
       in_main_quantile <- input$in_main_quantile
       plot_options <- input$plot_options
+      y_axis_log10 = input$y_axis_log10
     })
+    
     
     to_download$bottom_plot_data <<- NULL
     
@@ -405,10 +412,10 @@ shinyServer(function(input, output, session){
         
         to_download$bottom_plot_data <<- acmfdata
         
-        get_ind_plot(acmfdata, q, main_quantile = in_main_quantile, plot_title = p_title)
+        get_ind_plot(acmfdata, q, main_quantile = in_main_quantile, plot_title = p_title, log_scale = y_axis_log10)
       }else{
         
-        get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "")
+        get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "", log_scale = y_axis_log10)
       }
       
     }
@@ -431,7 +438,8 @@ shinyServer(function(input, output, session){
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
-          get_DR_plot(dataset = plot_data, q = q, main_quantile = in_main_quantile, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), "female population", in_outcome, in_outcome_type)
+          get_DR_plot(dataset = plot_data, q = q, main_quantile = in_main_quantile, plotTitle = get_title(dataset = sub_pop_data, pop_type = "female"), 
+                      "female population", in_outcome, in_outcome_type, log_scale = y_axis_log10)
           
         }else{
           
@@ -441,7 +449,8 @@ shinyServer(function(input, output, session){
           
           fig_title <- paste0(gt, " - ", fig_title)
           
-          get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  get_title(dataset = NULL, pop_type = "female"), "female population", in_outcome, in_outcome_type)
+          get_DR_plot(dataset = NULL, q = NULL, main_quantile = in_main_quantile, plotTitle =  get_title(dataset = NULL, pop_type = "female"), 
+                      "female population", in_outcome, in_outcome_type, log_scale = y_axis_log10)
           
         }
         
@@ -458,11 +467,11 @@ shinyServer(function(input, output, session){
           
           to_download$bottom_plot_data <<- sub_pop_data
           
-          get_ind_plot(sub_pop_data, q, main_quantile = in_main_quantile, plot_title = p_title)
+          get_ind_plot(sub_pop_data, q, main_quantile = in_main_quantile, plot_title = p_title, log_scale = y_axis_log10)
         }
         
         else{
-          get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "")
+          get_ind_plot(NULL, 0, main_quantile = in_main_quantile, "", log_scale = y_axis_log10)
         }
       }
     }
@@ -471,7 +480,8 @@ shinyServer(function(input, output, session){
                    input$in_outcome_type,
                    input$total_sub_population,
                    input$in_main_quantile,
-                   input$plot_options)
+                   input$plot_options,
+                   input$y_axis_log10)
   
   get_title <- function(dataset, pop_type ){
     fig_title <- ""
@@ -509,7 +519,7 @@ shinyServer(function(input, output, session){
   }
   
   
-  get_ind_plot <- function (dataset, q, main_quantile, plot_title){
+  get_ind_plot <- function (dataset, q, main_quantile, plot_title, log_scale = TRUE){
     
     if (!is.null(dataset) && nrow(dataset) > 0){
       
@@ -550,6 +560,14 @@ shinyServer(function(input, output, session){
         ylab("Relative Risk") +
         labs(title = paste(plot_title))
       
+      if (!log_scale){
+        gg <- gg + ylab("Relative Risk")
+      }
+      else{
+        gg <- gg + scale_y_log10() +
+          ylab("Relative Risk (log)")
+      }
+      
       # Remove 0th percentile
       q <- q[-c(1)]
       
@@ -588,7 +606,7 @@ shinyServer(function(input, output, session){
   }
   
   
-  get_DR_plot <- function (dataset, q, main_quantile, plotTitle, pop_type , outcome, outcome_type ){
+  get_DR_plot <- function (dataset, q, main_quantile, plotTitle, pop_type , outcome, outcome_type, log_scale = TRUE){
     
     if (!is.null(dataset) && nrow(dataset) > 0){
       
@@ -616,11 +634,8 @@ shinyServer(function(input, output, session){
         geom_ribbon(data = subset(dataset, dose < as.numeric(q[3]) && dose <= 35), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
-        scale_y_continuous(expand = c(0, 0),
-                           breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
         coord_cartesian(xlim = c(0, 35)) + #, ylim = c(ymin, ymax)) +
         xlab(paste("Marginal MET hours per week")) +
-        ylab("Relative Risk") +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
         #geom_label(aes(label = "test"), data = q %>% as.data.frame(), nudge_x = 0.35, size = 4) +
         
@@ -632,12 +647,22 @@ shinyServer(function(input, output, session){
           legend.position = c(0.1, 1.05)) + 
         labs(title = paste(plotTitle)) #+ labs(fill = "") 
       
+      
+      gg <- gg + scale_y_continuous(expand = c(0, 0), breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2))
+      
+      if (!log_scale){
+        gg <- gg + ylab("Relative Risk")
+      }
+      else{
+        gg <- gg + scale_y_log10() +
+          ylab("Relative Risk (log)")
+      }
+      
       if (max(dataset$dose) >= as.numeric(q[3])){
         gg <- gg + 
           geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
-          geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10)
+          geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10,   stat = "identity")
       }
-      
       # Remove 0th percentile
       q <- q[-c(1)]
       
@@ -647,7 +672,7 @@ shinyServer(function(input, output, session){
       qdf$pyq <- paste0(c(main_quantile %>% as.numeric() / 2  * 100, main_quantile %>% as.numeric() * 100), "%")
       
       p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
-                                            y = ymin,
+                                            y = ifelse(log_scale, layer_scales(gg)$y$range$range[1], ymin),
                                             text = paste0("person-years (", qdf$pyq, ")"),
                                             xref = "x",
                                             yref = "y",
@@ -1019,6 +1044,7 @@ shinyServer(function(input, output, session){
         
       }
     }
+    
     DT::datatable(dat, container = sketch, options = list(paging = F, dom = 't'), rownames = FALSE)
   }) 
   
