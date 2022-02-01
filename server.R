@@ -1207,7 +1207,7 @@ shinyServer(function(input, output, session){
     }else if (outcome == "4"){
       
       local_outcome_choices <- (uoutcome %>% filter(outcome %in% c("Depression", 
-                                                                   "Depressive symptoms", 
+                                                                   "Elevated depressive symptoms", 
                                                                    "Major depression"
       )))$outcome
       
