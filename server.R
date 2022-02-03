@@ -2,7 +2,6 @@ options(shiny.sanitize.errors = F)
 lower_guideline_value <- NA
 upper_guideline_value <- NA
 
-to_download <- NULL
 shinyServer(function(input, output, session){
   
   observe( {
@@ -288,8 +287,6 @@ shinyServer(function(input, output, session){
     
     pop_title <- "Total Population"
     
-    to_download$top_plot_data <<- NULL
-    
     if (total_sub_population == "1"){
       acmfdata <- get_overall_data()
       
@@ -310,8 +307,6 @@ shinyServer(function(input, output, session){
         q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
         
         p_title <- get_title(dataset = acmfdata, pop_type = "female")
-        
-        to_download$top_plot_data <<- acmfdata
         
         get_ind_plot(acmfdata, q, main_quantile = in_main_quantile, plot_title = p_title, log_scale = y_axis_log10)
       }else{
@@ -341,8 +336,6 @@ shinyServer(function(input, output, session){
           plot_data <- (male_pop_dose_res_data() %>% as.data.frame())
         
         if (!is.null(plot_data) && nrow(plot_data) > 0){
-          
-          to_download$top_plot_data <<- plot_data
           
           fig_title <- in_outcome
           
@@ -394,8 +387,6 @@ shinyServer(function(input, output, session){
     })
     
     
-    to_download$bottom_plot_data <<- NULL
-    
     if (total_sub_population == "1"){
       
       acmfdata <- get_overall_data()
@@ -409,8 +400,6 @@ shinyServer(function(input, output, session){
         last_knot <- round(last_knot[2], 2)
         
         q <- quantile(acmfdata$dose, c(0, last_knot / 2, last_knot))
-        
-        to_download$bottom_plot_data <<- acmfdata
         
         get_ind_plot(acmfdata, q, main_quantile = in_main_quantile, plot_title = p_title, log_scale = y_axis_log10)
       }else{
@@ -433,8 +422,6 @@ shinyServer(function(input, output, session){
           last_knot <- get_last_knot(sub_pop_data, personyrs_pert = in_main_quantile %>% as.numeric(), dose_pert = in_main_quantile %>% as.numeric())
           
           last_knot <- round(last_knot[2], 2)
-          
-          to_download$bottom_plot_data <<- plot_data
           
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
@@ -464,8 +451,6 @@ shinyServer(function(input, output, session){
           q <- quantile(sub_pop_data$dose, c(0, last_knot / 2, last_knot))
           
           p_title <- get_title(dataset = sub_pop_data, pop_type = "female")
-          
-          to_download$bottom_plot_data <<- sub_pop_data
           
           get_ind_plot(sub_pop_data, q, main_quantile = in_main_quantile, plot_title = p_title, log_scale = y_axis_log10)
         }
