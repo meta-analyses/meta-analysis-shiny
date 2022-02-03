@@ -1157,8 +1157,20 @@ shinyServer(function(input, output, session){
             gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% tolower(), "-q-", input$in_main_quantile,  ".csv", sep="")
     },
     content = function(file) {
-      write.csv(to_download$top_plot_data, file)
+      
+      data <- NULL
+      
+      if (input$total_sub_population == "2" && input$plot_options == "2")
+          data <- (get_male_subpopulation_data() %>% as.data.frame())
+      else{
+        if (input$total_sub_population == "1")
+          data <- (overall_pop_dose_res_data() %>% as.data.frame())
+        else
+          data <- (male_pop_dose_res_data() %>% as.data.frame())
+      }
+      write.csv(data, file)
     }
+
   )
   
   
@@ -1169,7 +1181,18 @@ shinyServer(function(input, output, session){
             gsub(x = input$in_outcome_type, pattern = " ", replacement = "-") %>% tolower(), "-q-", input$in_main_quantile,  ".csv", sep="")
     },
     content = function(file) {
-      write.csv(to_download$bottom_plot_data, file)
+      data <- NULL
+      
+      if (input$total_sub_population == "1")
+        data <- get_overall_data() %>% as.data.frame()
+      else{
+        if (input$plot_options == 1)
+          data <- female_pop_dose_res_data() %>% as.data.frame()
+        else
+          data <- get_female_subpopulation_data() %>% as.data.frame()
+      }
+
+      write.csv(data, file)
     }
   )
   
