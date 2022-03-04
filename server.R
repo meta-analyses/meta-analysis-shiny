@@ -549,7 +549,7 @@ shinyServer(function(input, output, session){
         gg <- gg + ylab("Relative Risk")
       }
       else{
-        gg <- gg + scale_y_log10() +
+        gg <- gg + scale_y_log10(breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
           ylab("Relative Risk (log)")
       }
       
@@ -632,14 +632,13 @@ shinyServer(function(input, output, session){
           legend.position = c(0.1, 1.05)) + 
         labs(title = paste(plotTitle)) #+ labs(fill = "") 
       
-      
       gg <- gg + scale_y_continuous(expand = c(0, 0), breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2))
       
       if (!log_scale){
         gg <- gg + ylab("Relative Risk")
       }
       else{
-        gg <- gg + scale_y_log10() +
+        gg <- gg + scale_y_log10(breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
           ylab("Relative Risk (log)")
       }
       
