@@ -549,7 +549,8 @@ shinyServer(function(input, output, session){
         gg <- gg + ylab("Relative Risk")
       }
       else{
-        gg <- gg + scale_y_log10(breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
+        gg <- gg + scale_y_log10(expand = c(0, 0),
+                                 breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
           ylab("Relative Risk (log)")
       }
       
@@ -609,14 +610,9 @@ shinyServer(function(input, output, session){
       
       ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(lb) %>% min(na.rm = T) %>% as.numeric()
       
-      # geom_label(aes(label = Dose),
-      #data = DF %>% filter(Time == max(Time)),
-      #nudge_x = 0.35,
-      #size = 4)
-      
       gg <- ggplot() + 
-        geom_line(data = subset(dataset, dose < as.numeric(q[3]) && dose <= 35), aes(x = dose, y = RR)) +
-        geom_ribbon(data = subset(dataset, dose < as.numeric(q[3]) && dose <= 35), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) +
+        geom_line(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, y = RR)) +
+        geom_ribbon(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) + # && dose <= 35
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
         coord_cartesian(xlim = c(0, 35)) + #, ylim = c(ymin, ymax)) +
@@ -630,23 +626,21 @@ shinyServer(function(input, output, session){
           plot.subtitle = element_text(size = 10, hjust=0.5, face="italic", color="black"),
           legend.direction = "horizontal",
           legend.position = c(0.1, 1.05)) + 
-        labs(title = paste(plotTitle)) #+ labs(fill = "") 
+        labs(title = paste(plotTitle))
       
-      gg <- gg + scale_y_continuous(expand = c(0, 0), breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2))
+      if (max(dataset$dose) >= as.numeric(q[3])){
+        gg <- gg +
+          geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
+          geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10,   stat = "identity")
+      }
       
       if (!log_scale){
         gg <- gg + ylab("Relative Risk")
       }
       else{
-        gg <- gg + scale_y_log10(breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
-          ylab("Relative Risk (log)")
+        gg <- gg + ylab("Relative Risk (log)") + scale_y_log10()
       }
       
-      if (max(dataset$dose) >= as.numeric(q[3])){
-        gg <- gg + 
-          geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
-          geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10,   stat = "identity")
-      }
       # Remove 0th percentile
       q <- q[-c(1)]
       
