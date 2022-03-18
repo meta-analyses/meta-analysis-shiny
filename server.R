@@ -638,7 +638,8 @@ shinyServer(function(input, output, session){
         gg <- gg + ylab("Relative Risk")
       }
       else{
-        gg <- gg + ylab("Relative Risk (log)") + scale_y_log10()
+        gg <- gg + scale_y_log10(breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
+          ylab("Relative Risk (log)")
       }
       
       # Remove 0th percentile
