@@ -615,10 +615,11 @@ shinyServer(function(input, output, session){
         geom_ribbon(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) + # && dose <= 35
         scale_x_continuous(expand = c(0, 0),
                            breaks = seq(from = 0, to = 35, by = 5)) + 
+        scale_y_continuous(expand = c(0, 0),
+                           breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
         coord_cartesian(xlim = c(0, 35)) + #, ylim = c(ymin, ymax)) +
         xlab(paste("Marginal MET hours per week")) +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
-        #geom_label(aes(label = "test"), data = q %>% as.data.frame(), nudge_x = 0.35, size = 4) +
         
         theme(
           plot.margin = unit(c(2, 1, 1, 1), "cm"), 
