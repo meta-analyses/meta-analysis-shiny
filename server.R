@@ -514,7 +514,7 @@ shinyServer(function(input, output, session){
       
       dataset$ref_number <- as.factor(dataset$ref_number)
       
-      dataset <- dataset %>% filter(dose <= 35)
+      # dataset <- dataset %>% filter(dose <= 35)
       
       ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(dose) %>% max(na.rm = T) %>% as.numeric()
       
@@ -604,20 +604,15 @@ shinyServer(function(input, output, session){
       dataset$ub <- round(dataset$ub, 3)
       dataset$lb <- round(dataset$lb, 3)
       
-      dataset <- dataset %>% filter(dose <= 35)
-      
-      ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(ub) %>% max(na.rm = T) %>% as.numeric() # filter(dose <= 35) %>% 
+      ymax <- dataset %>% filter(dose <= 35) %>% dplyr::select(ub) %>% max(na.rm = T) %>% as.numeric()
       
       ymin <- dataset %>% filter(dose <= 35) %>% dplyr::select(lb) %>% min(na.rm = T) %>% as.numeric()
       
       gg <- ggplot() + 
         geom_line(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, y = RR)) +
         geom_ribbon(data = subset(dataset, dose < as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.25) + # && dose <= 35
-        scale_x_continuous(expand = c(0, 0),
-                           breaks = seq(from = 0, to = 35, by = 5)) + 
-        scale_y_continuous(expand = c(0, 0),
-                           breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
-        coord_cartesian(xlim = c(0, 35)) + #, ylim = c(ymin, ymax)) +
+        geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
+        geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10,   stat = "identity") +
         xlab(paste("Marginal MET hours per week")) +
         geom_vline(xintercept= q, linetype="dotted", alpha=0.4) + 
         
@@ -629,19 +624,23 @@ shinyServer(function(input, output, session){
           legend.position = c(0.1, 1.05)) + 
         labs(title = paste(plotTitle))
       
-      if (max(dataset$dose) >= as.numeric(q[3])){
-        gg <- gg +
-          geom_line(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, y = RR), linetype = "dashed") +
-          geom_ribbon(data = subset(dataset, dose >= as.numeric(q[3])), aes(x = dose, ymin=`lb`,ymax=`ub`), alpha = 0.10,   stat = "identity")
-      }
-      
       if (!log_scale){
         gg <- gg + ylab("Relative Risk")
       }
       else{
-        gg <- gg + scale_y_log10(breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2)) +
+        gg <- gg + scale_y_log10() +
           ylab("Relative Risk (log)")
       }
+      
+      gg <- gg +
+        coord_cartesian(xlim = c(0, 35), ylim = c(ymin, ymax)) +
+        scale_x_continuous(expand = c(0, 0),
+                           breaks = seq(from = 0, to = 35, by = 5)) + 
+        scale_y_continuous(expand = c(0, 0),
+                           breaks = seq(from = ifelse(ymin > 0, 0, round(ymin, 1) + 0.2), to = ymax, by = 0.2),
+                           trans = ifelse(log_scale, "log", "identity"))
+        
+        
       
       # Remove 0th percentile
       q <- q[-c(1)]
@@ -652,7 +651,7 @@ shinyServer(function(input, output, session){
       qdf$pyq <- paste0(c(main_quantile %>% as.numeric() / 2  * 100, main_quantile %>% as.numeric() * 100), "%")
       
       p <- ggplotly(gg) %>% add_annotations(x = qdf$val,
-                                            y = ifelse(log_scale, layer_scales(gg)$y$range$range[1], ymin),
+                                            y = ifelse(log_scale, log(ymin), ymin),
                                             text = paste0("person-years (", qdf$pyq, ")"),
                                             xref = "x",
                                             yref = "y",
